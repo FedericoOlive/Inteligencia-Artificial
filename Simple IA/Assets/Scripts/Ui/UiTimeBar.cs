@@ -12,8 +12,18 @@ namespace SimpleIA
 
         void Update ()
         {
-            //textState.text = aiController.GetNameCurrentState();
-            //currentBar.fillAmount = aiController.GetCurrentLerpTime();
+            //SetTextCurrentAction(aiController.GetNameCurrentState());
+            //SetBarFill(aiController.GetCurrentLerpTime());
+        }
+
+        void SetTextCurrentAction (string text)
+        {
+            textState.text = text;
+        }
+
+        void SetBarFill (float lerp)
+        {
+            currentBar.fillAmount = lerp;
         }
     }
 }
