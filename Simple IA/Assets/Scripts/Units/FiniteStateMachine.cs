@@ -3,44 +3,35 @@ using System.Collections.Generic;
 
 public class FiniteStateMachine
 {
-    private int currentState;
-    private int[,] relations;
-    private Dictionary<int, List<Action>> behaviours;
+    private States[,] relations;
+    private Dictionary<States, List<Action>> behaviours;
 
-    public FiniteStateMachine(int states, int flags)
+    public FiniteStateMachine (States states, Flags flags)
     {
-        currentState = -1;
+        relations = new States[(int) States.Last, (int) Flags.Last];
+        for (int i = 0; i < (int) States.Last; i++)
+        {
+            for (int j = 0; j < (int) Flags.Last; j++)
+            {
+                relations[i, j] = States.Last;
+            }
+        }
 
-        relations = new int[states, flags];
-        for (int i = 0; i < states; i++)
-            for (int j = 0; j < flags; j++)
-                relations[i, j] = -1;
-
-        behaviours = new Dictionary<int, List<Action>>();
+        behaviours = new Dictionary<States, List<Action>>();
     }
 
-    public void ForceCurretState(int state)
+    public void SetRelation (States sourceState, Flags flag, States destinationState)
     {
-        currentState = state;
+        relations[(int) sourceState, (int) flag] = destinationState;
     }
 
-    public void SetRelation(int sourceState, int flag, int destinationState)
+    public void SetFlag (ref States currentState, Flags flag)
     {
-        relations[sourceState, flag] = destinationState;
+        if (relations[(int) currentState, (int) flag] != States.Last)
+            currentState = relations[(int) currentState, (int) flag];
     }
 
-    public void SetFlag(int flag)
-    {
-        if (relations[currentState, flag] != -1)
-            currentState = relations[currentState, flag];
-    }
-
-    public int GetCurrentState()
-    {
-        return currentState;
-    }
-
-    public void SetBehaviour(int state, Action behaviour)
+    public void SetBehaviour (States state, Action behaviour)
     {
         List<Action> newBehaviours = new List<Action>();
         newBehaviours.Add(behaviour);
@@ -51,7 +42,7 @@ public class FiniteStateMachine
             behaviours.Add(state, newBehaviours);
     }
 
-    public void AddBehaviour(int state, Action behaviour)
+    public void AddBehaviour (States state, Action behaviour)
     {
 
         if (behaviours.ContainsKey(state))
@@ -64,7 +55,7 @@ public class FiniteStateMachine
         }
     }
 
-    public void Update()
+    public void Update (ref States currentState)
     {
         if (behaviours.ContainsKey(currentState))
         {
@@ -81,21 +72,4 @@ public class FiniteStateMachine
             }
         }
     }
-}
-public enum States
-{
-    Mining,
-    GoToMine,
-    GoToAnthill,
-    Idle,
-    Last
-}
-
-public enum Flags
-{
-    OnFullInventory,
-    OnReachMine,
-    OnReachDeposit,
-    OnEmpyMine,
-    Last
 }

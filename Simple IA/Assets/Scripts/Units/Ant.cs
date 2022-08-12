@@ -1,46 +1,69 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Ant : MonoBehaviour
 {
-    //[SerializeField] private GameObject objetive;
-    [SerializeField] private GameObject anthill;
+    private MeshRenderer meshRenderer;
+    [SerializeField] private Anthill anthill;
     [SerializeField] private Resource resource;
 
     private float speed = 10.0f;
-    private float miningTime = 5.0f;
+    private float miningTime = 1.0f;
     private float currentMiningTime = 0.0f;
 
     private ResourceCharge resourceCharge = new ResourceCharge();
     private int maxResourceCharge = 1;
-
-    //private int mineUses = 10;
-
+    private States currentState;
     private FiniteStateMachine finiteStateMachine;
 
-    void Start()
+    private void Awake ()
     {
-        finiteStateMachine = new FiniteStateMachine((int) States.Last, (int) Flags.Last);
-
-        finiteStateMachine.ForceCurretState((int) States.GoToMine);
-
-        finiteStateMachine.SetRelation((int) States.GoToMine, (int) Flags.OnReachMine, (int) States.Mining);
-        finiteStateMachine.SetRelation((int) States.Mining, (int) Flags.OnFullInventory, (int) States.GoToAnthill);
-        finiteStateMachine.SetRelation((int) States.GoToAnthill, (int) Flags.OnReachDeposit, (int) States.GoToMine);
-        finiteStateMachine.SetRelation((int) States.GoToAnthill, (int) Flags.OnEmpyMine, (int) States.Idle);
-
-
-        finiteStateMachine.AddBehaviour((int) States.Mining, MiningBehaviour);
-        finiteStateMachine.AddBehaviour((int) States.GoToMine, GoingBehaviour);
-        finiteStateMachine.AddBehaviour((int) States.GoToAnthill, Going2Behaviour);
-
-
-        finiteStateMachine.AddBehaviour((int) States.Idle, () => { Debug.Log("Idle"); });
-        finiteStateMachine.AddBehaviour((int) States.Mining, () => { Debug.Log("Taking"); });
-        finiteStateMachine.AddBehaviour((int) States.GoToMine, () => { Debug.Log("Go To Mine"); });
-        finiteStateMachine.AddBehaviour((int) States.GoToAnthill, () => { Debug.Log("Go To Anthill"); });
+        meshRenderer = GetComponent<MeshRenderer>();
     }
 
-    private void Going2Behaviour ()
+    public void Init (Anthill anthill, Transform resource)
+    {
+        meshRenderer.material.color = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f), 1);
+        this.anthill = anthill;
+        if (resource)
+            this.resource = resource.GetComponent<Resource>();
+        else
+            this.resource = anthill.GetNewResource().GetComponent<Resource>();
+
+        SetFsm();
+    }
+
+    void SetFsm ()
+    {
+        finiteStateMachine = new FiniteStateMachine(States.Last, Flags.Last);
+
+        currentState = States.Idle;
+
+        finiteStateMachine.SetRelation(States.GoToMine, Flags.OnReachMine, States.Mining);
+        finiteStateMachine.SetRelation(States.Mining, Flags.OnFullInventory, States.GoToAnthill);
+        finiteStateMachine.SetRelation(States.GoToAnthill, Flags.OnEmpyMine, States.Idle);
+        finiteStateMachine.SetRelation(States.Idle, Flags.OnReachDeposit, States.GoToMine);
+
+        finiteStateMachine.AddBehaviour(States.Mining, MiningBehaviour);
+        finiteStateMachine.AddBehaviour(States.GoToMine, GoingToResourceBehaviour);
+        finiteStateMachine.AddBehaviour(States.GoToAnthill, GoingToAnthillBehaviour);
+        finiteStateMachine.AddBehaviour(States.Idle, WaitingInstruction);
+
+        finiteStateMachine.AddBehaviour(States.Idle, () => { Debug.Log("Idle"); });
+        finiteStateMachine.AddBehaviour(States.Mining, () => { Debug.Log("Taking"); });
+        finiteStateMachine.AddBehaviour(States.GoToMine, () => { Debug.Log("Go To Mine"); });
+        finiteStateMachine.AddBehaviour(States.GoToAnthill, () => { Debug.Log("Go To Anthill"); });
+    }
+
+    private void WaitingInstruction ()
+    {
+        if (!resource)
+            resource = anthill.GetNewResource().GetComponent<Resource>();
+        finiteStateMachine.SetFlag(ref currentState, Flags.OnReachDeposit);
+    }
+
+    private void GoingToAnthillBehaviour ()
     {
         Vector3 dir = (anthill.transform.position - transform.position).normalized;
 
@@ -52,14 +75,20 @@ public class Ant : MonoBehaviour
         else
         {
             if (resource.GetAmount() <= 0)
-                finiteStateMachine.SetFlag((int) Flags.OnEmpyMine);
+                finiteStateMachine.SetFlag(ref currentState, Flags.OnEmpyMine);
             else
-                finiteStateMachine.SetFlag((int) Flags.OnReachDeposit);
+                finiteStateMachine.SetFlag(ref currentState, Flags.OnReachDeposit);
         }
     }
 
-    private void GoingBehaviour ()
+    private void GoingToResourceBehaviour ()
     {
+        if (!resource)
+        {
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnReachMine);
+            return;
+        }
+
         Vector3 dir = (resource.transform.position - transform.position).normalized;
 
         if (Vector3.Distance(resource.transform.position, transform.position) > 0.1f)
@@ -69,7 +98,7 @@ public class Ant : MonoBehaviour
         }
         else
         {
-            finiteStateMachine.SetFlag((int) Flags.OnReachMine);
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnReachMine);
         }
     }
 
@@ -82,15 +111,17 @@ public class Ant : MonoBehaviour
         else
         {
             currentMiningTime = 0.0f;
-            finiteStateMachine.SetFlag((int) Flags.OnFullInventory);
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnFullInventory);
 
-            resource.TakeResource(ref resourceCharge, maxResourceCharge);
+            if (resource)
+                resource.TakeResource(ref resourceCharge, maxResourceCharge);
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    void Update ()
     {
-        finiteStateMachine.Update();
+        if (finiteStateMachine == null)
+            SetFsm();
+        finiteStateMachine.Update(ref currentState);
     }
 }
