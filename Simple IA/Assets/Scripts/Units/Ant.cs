@@ -7,6 +7,7 @@ public class Ant : MonoBehaviour
     private MeshRenderer meshRenderer;
     [SerializeField] private Anthill anthill;
     [SerializeField] private Resource resource;
+    [SerializeField] private States currentState;
 
     private float speed = 10.0f;
     private float miningTime = 1.0f;
@@ -14,7 +15,6 @@ public class Ant : MonoBehaviour
 
     private ResourceCharge resourceCharge = new ResourceCharge();
     private int maxResourceCharge = 1;
-    private States currentState;
     private FiniteStateMachine finiteStateMachine;
 
     private void Awake ()
@@ -24,14 +24,9 @@ public class Ant : MonoBehaviour
 
     public void Init (Anthill anthill, Transform resource)
     {
+        SetFsm();
         meshRenderer.material.color = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f), 1);
         this.anthill = anthill;
-        if (resource)
-            this.resource = resource.GetComponent<Resource>();
-        else
-            this.resource = anthill.GetNewResource().GetComponent<Resource>();
-
-        SetFsm();
     }
 
     void SetFsm ()
@@ -43,6 +38,7 @@ public class Ant : MonoBehaviour
         finiteStateMachine.SetRelation(States.GoToMine, Flags.OnReachMine, States.Mining);
         finiteStateMachine.SetRelation(States.Mining, Flags.OnFullInventory, States.GoToAnthill);
         finiteStateMachine.SetRelation(States.GoToAnthill, Flags.OnEmpyMine, States.Idle);
+        finiteStateMachine.SetRelation(States.GoToAnthill, Flags.OnReachDeposit, States.GoToMine);
         finiteStateMachine.SetRelation(States.Idle, Flags.OnReachDeposit, States.GoToMine);
 
         finiteStateMachine.AddBehaviour(States.Mining, MiningBehaviour);
@@ -59,7 +55,13 @@ public class Ant : MonoBehaviour
     private void WaitingInstruction ()
     {
         if (!resource)
-            resource = anthill.GetNewResource().GetComponent<Resource>();
+        {
+            Transform newResource = anthill.GetNewResource();
+            if (newResource)
+                resource = newResource.GetComponent<Resource>();
+            return;
+        }
+
         finiteStateMachine.SetFlag(ref currentState, Flags.OnReachDeposit);
     }
 

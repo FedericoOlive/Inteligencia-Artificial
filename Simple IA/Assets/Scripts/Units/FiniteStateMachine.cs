@@ -73,3 +73,21 @@ public class FiniteStateMachine
         }
     }
 }
+
+public enum States
+{
+    Idle,
+    Mining,
+    GoToMine,
+    GoToAnthill,
+    Last
+}
+
+public enum Flags
+{
+    OnFullInventory,
+    OnReachMine,
+    OnReachDeposit,
+    OnEmpyMine,
+    Last
+}

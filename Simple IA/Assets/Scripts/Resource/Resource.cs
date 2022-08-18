@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Resource : MonoBehaviour
 {
     [SerializeField] private ResourceCharge resourceCharge=new ResourceCharge();
-
+    public event Action<Resource> OnEmptyResource;
     public int GetAmount () => resourceCharge.resourceAmount;
     public ResourceType GetResourceType () => resourceCharge.resourceType;
 
@@ -29,7 +31,7 @@ public class Resource : MonoBehaviour
 
     void DestroyResource ()
     {
-        Destroy(gameObject);
+        OnEmptyResource?.Invoke(this);
     }
 }
 

@@ -1,16 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class Anthill : MonoBehaviour
 {
-    public GameObject pfAnt;
-    public GameObject pfObjetive;
+    [SerializeField] private ResourceManager resourceManager;
+    [SerializeField] private GameObject pfAnt;
+
     private Anthill origin;
-    private GameObject objetive;
     private List<Ant> ants = new List<Ant>();
-    [SerializeField] private Vector2 distance = new Vector2(15, 7.5f);
 
     private void Awake ()
     {
@@ -24,7 +22,11 @@ public class Anthill : MonoBehaviour
 
     private void Update ()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftControl))
+        {
+            StartCoroutine(SpawnMultipleAnts(100));
+        }
+        else if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift))
         {
             StartCoroutine(SpawnMultipleAnts(10));
         }
@@ -48,17 +50,14 @@ public class Anthill : MonoBehaviour
         GameObject newAnt = Instantiate(pfAnt, origin.transform.position, Quaternion.identity, origin.transform);
         Ant ant = newAnt.GetComponent<Ant>();
         ants.Add(ant);
-        ant.Init(origin, objetive.transform);
+        ant.Init(origin, GetNewResource());
     }
 
     public Transform GetNewResource ()
     {
-        if (!objetive)
-        {
-            Vector3 pos = new Vector3(Random.Range(-distance.x, distance.x), 0, Random.Range(-distance.y, distance.y));
-            objetive = Instantiate(pfObjetive, pos, Quaternion.identity);
-        }
-
-        return objetive.transform;
+        Resource resource = resourceManager.GetRandomResource();
+        if (resource != null)
+            return resource.transform;
+        return null;
     }
 }
