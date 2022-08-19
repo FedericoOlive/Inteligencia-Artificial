@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class ResourceManager : MonoBehaviour
 {
@@ -30,6 +28,7 @@ public class ResourceManager : MonoBehaviour
     void CreateResource ()
     {
         Vector3 randomPos = new Vector3(Random.Range(-distanceSpawn.x, distanceSpawn.x), 0, Random.Range(-distanceSpawn.y, distanceSpawn.y));
+        randomPos += transform.position;
         Resource resource = Instantiate(pfResource, randomPos, Quaternion.identity, transform).GetComponent<Resource>();
         resource.OnEmptyResource += DestroyResource;
         resources.Add(resource);

@@ -4,7 +4,7 @@ using Random = UnityEngine.Random;
 
 public class Ant : MonoBehaviour
 {
-    private MeshRenderer meshRenderer;
+    public MeshRenderer meshRenderer;
     [SerializeField] private Anthill anthill;
     [SerializeField] private Resource resource;
     [SerializeField] private States currentState;
@@ -25,7 +25,7 @@ public class Ant : MonoBehaviour
     public void Init (Anthill anthill, Transform resource)
     {
         SetFsm();
-        meshRenderer.material.color = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f), 1);
+        meshRenderer.material.color = Color.white;
         this.anthill = anthill;
     }
 
