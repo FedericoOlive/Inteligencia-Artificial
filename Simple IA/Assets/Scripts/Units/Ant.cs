@@ -4,14 +4,13 @@ using Random = UnityEngine.Random;
 
 public class Ant : MonoBehaviour
 {
+    [SerializeField] private Stats stats = new Stats();
     public MeshRenderer meshRenderer;
     [SerializeField] private Anthill anthill;
     [SerializeField] private Resource resource;
     [SerializeField] private States currentState;
 
-    private float speed = 10.0f;
-    private float miningTime = 1.0f;
-    private float currentMiningTime = 0.0f;
+    private float currentActionTime = 0.0f;
 
     private ResourceCharge resourceCharge = new ResourceCharge();
     private int maxResourceCharge = 1;
@@ -71,15 +70,12 @@ public class Ant : MonoBehaviour
 
         if (Vector3.Distance(anthill.transform.position, transform.position) > 0.1f)
         {
-            Vector3 movement = dir * speed * Time.deltaTime;
+            Vector3 movement = dir * stats.speed * Time.deltaTime;
             transform.position += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
-            if (resource.GetAmount() <= 0)
-                finiteStateMachine.SetFlag(ref currentState, Flags.OnEmpyMine);
-            else
-                finiteStateMachine.SetFlag(ref currentState, Flags.OnReachDeposit);
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnReachDeposit);
         }
     }
 
@@ -95,7 +91,7 @@ public class Ant : MonoBehaviour
 
         if (Vector3.Distance(resource.transform.position, transform.position) > 0.1f)
         {
-            Vector3 movement = dir * speed * Time.deltaTime;
+            Vector3 movement = dir * stats.speed * Time.deltaTime;
             transform.position += new Vector3(movement.x, 0, movement.z);
         }
         else
@@ -106,17 +102,30 @@ public class Ant : MonoBehaviour
 
     private void MiningBehaviour ()
     {
-        if (currentMiningTime < miningTime)
+        if (currentActionTime < stats.pickTime)
         {
-            currentMiningTime += Time.deltaTime;
+            currentActionTime += Time.deltaTime;
         }
         else
         {
-            currentMiningTime = 0.0f;
+            currentActionTime = 0.0f;
             finiteStateMachine.SetFlag(ref currentState, Flags.OnFullInventory);
 
             if (resource)
                 resource.TakeResource(ref resourceCharge, maxResourceCharge);
+        }
+    }
+
+    private void DepositingBehaviour ()
+    {
+        if (currentActionTime < stats.dropTime)
+        {
+            currentActionTime += Time.deltaTime;
+        }
+        else
+        {
+            currentActionTime = 0.0f;
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnEmptyInventory);
         }
     }
 

@@ -80,6 +80,7 @@ public enum States
     Mining,
     GoToMine,
     GoToAnthill,
+    Depositing,
     Last
 }
 
@@ -89,5 +90,6 @@ public enum Flags
     OnReachMine,
     OnReachDeposit,
     OnEmpyMine,
+    OnEmptyInventory,
     Last
 }

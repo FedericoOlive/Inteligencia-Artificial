@@ -33,6 +33,7 @@ public class AntsInBox : MonoBehaviour
             currentPos.y = 0;
 
             center = (currentPos + initialPos) / 2;
+            center.z -= 0.35f;
             distance.x = Mathf.Abs(Mathf.Abs(currentPos.x) - Mathf.Abs(initialPos.x));
             distance.y = 0.1f;
             distance.z = Mathf.Abs(Mathf.Abs(currentPos.z) - Mathf.Abs(initialPos.z));
