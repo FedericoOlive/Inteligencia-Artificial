@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class NodeGenerator : MonoBehaviour
 {
@@ -7,8 +12,13 @@ public class NodeGenerator : MonoBehaviour
     private Node[] map;
     private Pathfinding pathfinding;
 
-    void Start()
+    public Vector2Int startPos = new Vector2Int();
+    public Vector2Int endPos = new Vector2Int();
+    public bool findPath;
+
+    private void Start ()
     {
+        findPath = false;
         pathfinding = new Pathfinding();
         NodeUtils.MapSize = mapSize;
         map = new Node[mapSize.x * mapSize.y];
@@ -22,9 +32,9 @@ public class NodeGenerator : MonoBehaviour
             }
         }
 
-        List<Vector2Int> path = pathfinding.GetPath(map, 
-            map[NodeUtils.PositionToIndex(new Vector2Int(0, 0))], 
-            map[NodeUtils.PositionToIndex(new Vector2Int(8, 3))]);
+        List<Vector2Int> path = pathfinding.GetPath(map,
+            map[NodeUtils.PositionToIndex(startPos)],
+            map[NodeUtils.PositionToIndex(endPos)]);
 
         for (int i = 0; i < path.Count; i++)
         {
@@ -32,17 +42,36 @@ public class NodeGenerator : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected ()
     {
         if (map == null)
             return;
         Gizmos.color = Color.green;
-        GUIStyle style = new GUIStyle() { fontSize = 25  };
+        GUIStyle style = new GUIStyle() {fontSize = 10};
         foreach (Node node in map)
         {
-            Vector3 worldPosition = new Vector3((float)node.position.x, (float)node.position.y, 0.0f);
+
+            switch (node.state)
+            {
+                case Node.NodeState.Open:
+                    Gizmos.color = Color.blue;
+                    break;
+                case Node.NodeState.Closed:
+                    Gizmos.color = Color.red;
+                    break;
+                case Node.NodeState.Ready:
+                    Gizmos.color = Color.green;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            Vector3 worldPosition = new Vector3((float) node.position.x, (float) node.position.y, 0.0f);
+            Handles.Label(worldPosition, node.position.ToString(), style);
+
             Gizmos.DrawWireSphere(worldPosition, 0.2f);
-            //Handles.Label(worldPosition, node.position.ToString(), style);
         }
     }
+#endif
 }

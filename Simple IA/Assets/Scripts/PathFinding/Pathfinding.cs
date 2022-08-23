@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Pathfinding
@@ -11,14 +10,11 @@ public class Pathfinding
         {
             currentNode.state = Node.NodeState.Closed;
 
-            for (int i = 0; i < currentNode.adjacentNodeIDs.Count; i++)
+            for (int i = 0; i < currentNode.adjacentNodeIds.Count; i++)
             {
-                if (currentNode.adjacentNodeIDs[i] != -1)
+                if (currentNode.adjacentNodeIds[i] != -1)
                 {
-                    if (map[currentNode.adjacentNodeIDs[i]].state == Node.NodeState.Ready)
-                    {
-                        map[currentNode.adjacentNodeIDs[i]].Open(currentNode.ID);
-                    }
+                    map[currentNode.adjacentNodeIds[i]].Open(currentNode.id);
                 }
             }
 
@@ -40,10 +36,10 @@ public class Pathfinding
     {
         List<Vector2Int> path = new List<Vector2Int>();
 
-        while (current.openerID != -1)
+        while (current.openerId != -1)
         {
             path.Add(current.position);
-            current = map[current.openerID];
+            current = map[current.openerId];
         }
 
         path.Reverse();
@@ -53,20 +49,23 @@ public class Pathfinding
 
     private Node GetNextNode (Node[] map, Node currentNode)
     {
-        for (int i = 0; i < currentNode.adjacentNodeIDs.Count; i++)
+        for (int i = 0; i < currentNode.adjacentNodeIds.Count; i++)
         {
-            if (currentNode.adjacentNodeIDs[i] != -1)
+            if (currentNode.adjacentNodeIds[i] != -1)
             {
-                if (map[currentNode.adjacentNodeIDs[i]].openerID == currentNode.ID)
+                if (map[currentNode.adjacentNodeIds[i]].state == Node.NodeState.Open)
                 {
-                    return map[currentNode.adjacentNodeIDs[i]];
+                    if (map[currentNode.adjacentNodeIds[i]].openerId == currentNode.id)
+                    {
+                        return map[currentNode.adjacentNodeIds[i]];
+                    }
                 }
             }
         }
 
-        if (currentNode.openerID == -1)
+        if (currentNode.openerId == -1)
             return null;
 
-        return GetNextNode(map, map[currentNode.openerID]);
+        return GetNextNode(map, map[currentNode.openerId]);
     }
 }
