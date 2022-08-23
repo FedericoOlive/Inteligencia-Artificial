@@ -431,9 +431,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapSize: {x: 10, y: 10}
+  map: []
   startPos: {x: 0, y: 0}
   endPos: {x: 8, y: 2}
-  findPath: 0
+  findPath: 1
 --- !u!4 &1023345720
 Transform:
   m_ObjectHideFlags: 0

@@ -9,7 +9,7 @@ using UnityEditor;
 public class NodeGenerator : MonoBehaviour
 {
     public Vector2Int mapSize;
-    private Node[] map;
+    [SerializeField] private Node[] map;
     private Pathfinding pathfinding;
 
     public Vector2Int startPos = new Vector2Int();
@@ -18,7 +18,6 @@ public class NodeGenerator : MonoBehaviour
 
     private void Start ()
     {
-        findPath = false;
         pathfinding = new Pathfinding();
         NodeUtils.MapSize = mapSize;
         map = new Node[mapSize.x * mapSize.y];

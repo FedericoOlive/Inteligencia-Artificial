@@ -17,9 +17,9 @@ public static class NodeUtils
 
     public static int PositionToIndex (Vector2Int position)
     {
-        if (position.x < 0 || position.x >= MapSize.x ||
-            position.y < 0 || position.y >= MapSize.y)
+        if (position.x < 0 || position.x >= MapSize.x || position.y < 0 || position.y >= MapSize.y)
             return -1;
-        return position.y * MapSize.x + position.x;
+        int aux = position.y * MapSize.x + position.x;
+        return aux;
     }
 }

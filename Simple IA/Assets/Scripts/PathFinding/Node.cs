@@ -1,22 +1,23 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Node
 {
     public enum NodeState
     {
-        Block,
         Open, // Abiertos por otro nodo pero no visitados
         Closed, // ya visitados
-        Ready // no abiertos por nadie
+        Ready, // no abiertos por nadie
+        Block
     }
 
-    public int id;
+    [HideInInspector] public int id;
     public Vector2Int position;
-    public List<int> adjacentNodeIds;
+    [HideInInspector] public List<int> adjacentNodeIds;
     public NodeState state;
-    public int openerId;
-    public bool isPosAvailable = true;
+    [HideInInspector] public int openerId;
+    [HideInInspector] public bool isPosAvailable = true;
 
     public Node (int newId, Vector2Int newPos)
     {

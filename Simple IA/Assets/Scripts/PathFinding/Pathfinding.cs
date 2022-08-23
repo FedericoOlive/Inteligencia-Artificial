@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+// Falta borrar una linea de código que la mostró en clase
+
 public class Pathfinding
 {
     public List<Vector2Int> GetPath (Node[] map, Node origin, Node destination)
@@ -14,7 +16,10 @@ public class Pathfinding
             {
                 if (currentNode.adjacentNodeIds[i] != -1)
                 {
-                    map[currentNode.adjacentNodeIds[i]].Open(currentNode.id);
+                    if (map[currentNode.adjacentNodeIds[i]].state == Node.NodeState.Ready)
+                    {
+                        map[currentNode.adjacentNodeIds[i]].Open(currentNode.id);
+                    }
                 }
             }
 
@@ -23,12 +28,9 @@ public class Pathfinding
                 return new List<Vector2Int>();
         }
 
+        // destination.Open(currentNode.id); // Porque no funciona? Si no abro la ultima, no se setea como abierta
         List<Vector2Int> path = GeneratePath(map, currentNode);
-        foreach (Node node in map)
-        {
-            node.Reset();
-        }
-
+        
         return path;
     }
 
@@ -41,7 +43,7 @@ public class Pathfinding
             path.Add(current.position);
             current = map[current.openerId];
         }
-
+        path.Add(current.position);
         path.Reverse();
 
         return path;
