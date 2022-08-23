@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class Anthill : MonoBehaviour
 {
     [SerializeField] private ResourceManager resourceManager;
@@ -9,6 +13,7 @@ public class Anthill : MonoBehaviour
 
     private Anthill origin;
     private List<Ant> ants = new List<Ant>();
+    private float visionRadius = 20.0f;
 
     private void Awake ()
     {
@@ -36,7 +41,7 @@ public class Anthill : MonoBehaviour
         }
     }
 
-    IEnumerator SpawnMultipleAnts (int amount)
+    private IEnumerator SpawnMultipleAnts (int amount)
     {
         for (int i = 0; i < amount; i++)
         {
@@ -60,4 +65,12 @@ public class Anthill : MonoBehaviour
             return resource.transform;
         return null;
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected ()
+    {
+        Handles.color = Color.yellow;
+        Handles.DrawWireDisc(transform.position, Vector3.up, visionRadius);
+    }
+#endif
 }

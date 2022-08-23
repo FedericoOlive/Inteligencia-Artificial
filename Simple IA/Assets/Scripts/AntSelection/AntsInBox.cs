@@ -25,7 +25,7 @@ public class AntsInBox : MonoBehaviour
         transform.localScale = Vector3.zero;
     }
 
-    void Update ()
+    private void Update ()
     {
         if (Input.GetMouseButton(0))
         {

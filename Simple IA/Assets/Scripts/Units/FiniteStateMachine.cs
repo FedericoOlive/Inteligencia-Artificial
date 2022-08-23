@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class FiniteStateMachine
 {
@@ -28,7 +29,12 @@ public class FiniteStateMachine
     public void SetFlag (ref States currentState, Flags flag)
     {
         if (relations[(int) currentState, (int) flag] != States.Last)
+        {
             currentState = relations[(int) currentState, (int) flag];
+            return;
+        }
+
+        Debug.Log("No existe connexión entre: " + currentState + " y " + flag);
     }
 
     public void SetBehaviour (States state, Action behaviour)
@@ -77,7 +83,7 @@ public class FiniteStateMachine
 public enum States
 {
     Idle,
-    Mining,
+    Harvesting,
     GoToMine,
     GoToAnthill,
     Depositing,

@@ -11,7 +11,7 @@ public class AntForceOrder : MonoBehaviour
         cam = Camera.main;
     }
 
-    void Update ()
+    private void Update ()
     {
         if (Input.GetMouseButtonDown(1))
         {
@@ -19,7 +19,7 @@ public class AntForceOrder : MonoBehaviour
         }
     }
 
-    void SendSelectedAntToOrder ()
+    private void SendSelectedAntToOrder ()
     {
         if (antSelection.antSelected.Count < 1)
             return;

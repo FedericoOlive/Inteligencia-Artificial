@@ -1,6 +1,8 @@
-﻿using System;
-using UnityEngine;
-using Random = UnityEngine.Random;
+﻿using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class Ant : MonoBehaviour
 {
@@ -13,7 +15,6 @@ public class Ant : MonoBehaviour
     private float currentActionTime = 0.0f;
 
     private ResourceCharge resourceCharge = new ResourceCharge();
-    private int maxResourceCharge = 1;
     private FiniteStateMachine finiteStateMachine;
 
     private void Awake ()
@@ -28,25 +29,35 @@ public class Ant : MonoBehaviour
         this.anthill = anthill;
     }
 
-    void SetFsm ()
+    private void Start ()
+    {
+        SetFsm();
+    }
+
+    private void Update ()
+    {
+        finiteStateMachine.Update(ref currentState);
+    }
+
+    private void SetFsm ()
     {
         finiteStateMachine = new FiniteStateMachine(States.Last, Flags.Last);
 
         currentState = States.Idle;
 
-        finiteStateMachine.SetRelation(States.GoToMine, Flags.OnReachMine, States.Mining);
-        finiteStateMachine.SetRelation(States.Mining, Flags.OnFullInventory, States.GoToAnthill);
+        finiteStateMachine.SetRelation(States.GoToMine, Flags.OnReachMine, States.Harvesting);
+        finiteStateMachine.SetRelation(States.Harvesting, Flags.OnFullInventory, States.GoToAnthill);
         finiteStateMachine.SetRelation(States.GoToAnthill, Flags.OnEmpyMine, States.Idle);
         finiteStateMachine.SetRelation(States.GoToAnthill, Flags.OnReachDeposit, States.GoToMine);
         finiteStateMachine.SetRelation(States.Idle, Flags.OnReachDeposit, States.GoToMine);
 
-        finiteStateMachine.AddBehaviour(States.Mining, MiningBehaviour);
+        finiteStateMachine.AddBehaviour(States.Harvesting, MiningBehaviour);
         finiteStateMachine.AddBehaviour(States.GoToMine, GoingToResourceBehaviour);
         finiteStateMachine.AddBehaviour(States.GoToAnthill, GoingToAnthillBehaviour);
         finiteStateMachine.AddBehaviour(States.Idle, WaitingInstruction);
 
         finiteStateMachine.AddBehaviour(States.Idle, () => { Debug.Log("Idle"); });
-        finiteStateMachine.AddBehaviour(States.Mining, () => { Debug.Log("Taking"); });
+        finiteStateMachine.AddBehaviour(States.Harvesting, () => { Debug.Log("Taking"); });
         finiteStateMachine.AddBehaviour(States.GoToMine, () => { Debug.Log("Go To Mine"); });
         finiteStateMachine.AddBehaviour(States.GoToAnthill, () => { Debug.Log("Go To Anthill"); });
     }
@@ -112,7 +123,7 @@ public class Ant : MonoBehaviour
             finiteStateMachine.SetFlag(ref currentState, Flags.OnFullInventory);
 
             if (resource)
-                resource.TakeResource(ref resourceCharge, maxResourceCharge);
+                resource.TakeResource(ref resourceCharge, stats.maxChargeResource);
         }
     }
 
@@ -129,10 +140,11 @@ public class Ant : MonoBehaviour
         }
     }
 
-    void Update ()
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected ()
     {
-        if (finiteStateMachine == null)
-            SetFsm();
-        finiteStateMachine.Update(ref currentState);
+        Handles.color = Color.red;
+        Handles.DrawWireDisc(transform.position, Vector3.up, stats.visionRadius);
     }
+#endif
 }

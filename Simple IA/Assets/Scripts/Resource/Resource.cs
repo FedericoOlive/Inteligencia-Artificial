@@ -6,7 +6,7 @@ public class Resource : MonoBehaviour
 {
     [SerializeField] private ResourceCharge resourceCharge=new ResourceCharge();
     public event Action<Resource> OnEmptyResource;
-    public int GetAmount () => resourceCharge.resourceAmount;
+    public float GetAmount () => resourceCharge.resourceAmount;
     public ResourceType GetResourceType () => resourceCharge.resourceType;
 
     private void Start ()
@@ -15,7 +15,7 @@ public class Resource : MonoBehaviour
         resourceCharge.resourceAmount = Random.Range(1, 11);
     }
 
-    public void TakeResource (ref ResourceCharge antResourceCharge, int maxResourceCharge)
+    public void TakeResource (ref ResourceCharge antResourceCharge, float maxResourceCharge)
     {
         antResourceCharge.resourceType = resourceCharge.resourceType;
         resourceCharge.resourceAmount -= maxResourceCharge;
@@ -29,7 +29,7 @@ public class Resource : MonoBehaviour
         antResourceCharge.resourceAmount = maxResourceCharge;
     }
 
-    void DestroyResource ()
+    private void DestroyResource ()
     {
         OnEmptyResource?.Invoke(this);
     }
