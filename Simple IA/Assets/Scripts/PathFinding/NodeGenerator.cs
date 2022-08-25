@@ -50,7 +50,6 @@ public class NodeGenerator : MonoBehaviour
         GUIStyle style = new GUIStyle() {fontSize = 10};
         foreach (Node node in map)
         {
-
             switch (node.state)
             {
                 case Node.NodeState.Open:
@@ -68,7 +67,6 @@ public class NodeGenerator : MonoBehaviour
 
             Vector3 worldPosition = new Vector3((float) node.position.x, (float) node.position.y, 0.0f);
             Handles.Label(worldPosition, node.position.ToString(), style);
-
             Gizmos.DrawWireSphere(worldPosition, 0.2f);
         }
     }
