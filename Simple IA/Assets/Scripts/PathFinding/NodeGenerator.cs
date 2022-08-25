@@ -42,7 +42,7 @@ public class NodeGenerator : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    private void OnDrawGizmosSelected ()
+    private void OnDrawGizmos ()
     {
         if (map == null)
             return;

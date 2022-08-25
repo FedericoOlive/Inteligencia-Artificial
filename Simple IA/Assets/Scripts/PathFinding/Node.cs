@@ -19,6 +19,9 @@ public class Node
     [HideInInspector] public int openerId;
     [HideInInspector] public bool isPosAvailable = true;
 
+    public int weight = 1;
+    public int totalWeight;
+
     public Node (int newId, Vector2Int newPos)
     {
         id = newId;
@@ -33,15 +36,20 @@ public class Node
         }
     }
 
-    public void Open (int newOpenerId)
+    public void Open (int newOpenerId, int parentWeight)
     {
         state = NodeState.Open;
         openerId = newOpenerId;
+        weight += parentWeight;
     }
 
     public void Reset ()
     {
+        if (state == NodeState.Block)
+            return;
         state = NodeState.Ready;
         openerId = -1;
+        weight = 1;
+        totalWeight = 1;
     }
 }
