@@ -10,7 +10,7 @@ public class EnemyManager : MonoBehaviour
 {
     [SerializeField] private GameObject pfEnemy;
     [SerializeField] private float randomWaitTime;
-    [SerializeField] private Vector3 distanceSpawn = new Vector3(15, 0, 7);
+    [SerializeField] private Vector3 distanceSpawn = new Vector3(14, 0, 7);
 
     private List<Enemy> enemies = new List<Enemy>();
     private IEnumerator spawnEnemy;

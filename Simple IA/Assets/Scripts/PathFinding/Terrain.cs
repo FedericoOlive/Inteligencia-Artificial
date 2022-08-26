@@ -27,7 +27,7 @@ public class Terrain : MonoBehaviour
             {
                 for (int j = 0; j < spawnRows; j++)
                 {
-                    GameObject newCube = Instantiate(cube, pos+ posInit, Quaternion.identity, transform);
+                    GameObject newCube = Instantiate(cube, pos + posInit, Quaternion.identity, transform);
                     pos.x += 1f;
                     cubes.Add(newCube);
 
@@ -75,10 +75,10 @@ public class Terrain : MonoBehaviour
 
         do
         {
-            randomPos = new Vector3(Random.Range((int) min.x, (int) max.x), 0, Random.Range((int) min.y, (int) max.y));
+            randomPos = new Vector3(Random.Range((int) min.x, (int) min.y), 0, Random.Range((int) max.x, (int) max.y));
             randomPos += new Vector3(100, 0, 100);
 
-            if (Physics.Raycast(randomPos, Vector3.down*10, out RaycastHit hit))
+            if (Physics.Raycast(randomPos, Vector3.down * 10, out RaycastHit hit))
             {
                 Cell cell = hit.transform.GetComponent<Cell>();
                 if (cell)
@@ -92,6 +92,7 @@ public class Terrain : MonoBehaviour
         return randomPos;
     }
 }
+
 public enum CellType
 {
     Grass,
