@@ -10,7 +10,7 @@ public class EnemyManager : MonoBehaviour
 {
     [SerializeField] private GameObject pfEnemy;
     [SerializeField] private float randomWaitTime;
-    [SerializeField] private Vector3 maxPos = new Vector3(14, 0, 7);
+    [SerializeField] private Vector3 distanceSpawn = new Vector3(15, 0, 7);
 
     private List<Enemy> enemies = new List<Enemy>();
     private IEnumerator spawnEnemy;
@@ -38,9 +38,9 @@ public class EnemyManager : MonoBehaviour
 
             if (enemies.Count < maxEnemies)
             {
-                Vector3 pos = new Vector3(Random.Range(-maxPos.x, maxPos.x), 0, Random.Range(-maxPos.z, maxPos.z));
-                pos += transform.position;
-                GameObject goEnemy = Instantiate(pfEnemy, pos, Quaternion.identity, transform);
+                Vector3 randomPos = Terrain.GetAvailablePosition(new Vector2(-distanceSpawn.x, distanceSpawn.x), new Vector2(-distanceSpawn.y, distanceSpawn.y), transform.position);
+
+                GameObject goEnemy = Instantiate(pfEnemy, randomPos, Quaternion.identity, transform);
 
                 Enemy enemy = goEnemy.GetComponent<Enemy>();
                 enemies.Add(enemy);
@@ -48,7 +48,7 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    private IEnumerator NewSpawnEnemy()
+    private IEnumerator NewSpawnEnemy ()
     {
         while (true)
         {
@@ -64,7 +64,7 @@ public class EnemyManager : MonoBehaviour
             if (enemies.Count < maxEnemies)
             {
                 int randomAngle = Random.Range(0, 360); // Todo: seguir acá para hacer que spawnee en esa dirección.
-                Vector3 pos = new Vector3(Random.Range(-maxPos.x, maxPos.x), 0, Random.Range(-maxPos.z, maxPos.z));
+                Vector3 pos = new Vector3(Random.Range(-distanceSpawn.x, distanceSpawn.x), 0, Random.Range(-distanceSpawn.z, distanceSpawn.z));
                 pos += transform.position;
                 GameObject goEnemy = Instantiate(pfEnemy, pos, Quaternion.identity, transform);
 
@@ -84,7 +84,7 @@ public class EnemyManager : MonoBehaviour
     private void OnDrawGizmosSelected ()
     {
         Handles.color = Color.red;
-        Handles.DrawWireCube(transform.position, maxPos * 2);
+        Handles.DrawWireCube(transform.position, distanceSpawn * 2);
     }
 #endif
 }
