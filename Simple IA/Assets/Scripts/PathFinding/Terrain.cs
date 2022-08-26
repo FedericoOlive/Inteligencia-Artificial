@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,8 +11,10 @@ public class Terrain : MonoBehaviour
     [SerializeField] private bool spawnButton;
 
     [SerializeField] private List<GameObject> cubes = new List<GameObject>();
+    [SerializeField] private Material[] materials;
+    private int[] percentagesCellType = new[] {50, 70, 90, 100};
 
-    void Update ()
+    private void Update ()
     {
         if (spawnButton)
         {
@@ -21,25 +22,28 @@ public class Terrain : MonoBehaviour
             ResetHexagons();
 
             Vector3 pos = Vector3.zero;
+            Vector3 posInit = transform.position;
             for (int i = 0; i < spawnColumns; i++)
             {
                 for (int j = 0; j < spawnRows; j++)
                 {
-                    GameObject newCube = Instantiate(cube, pos, Quaternion.identity, transform);
-                    pos.x += 1.1f;
+                    GameObject newCube = Instantiate(cube, pos+ posInit, Quaternion.identity, transform);
+                    pos.x += 1f;
                     cubes.Add(newCube);
 
                     Cell cell = newCube.GetComponent<Cell>();
-                    //cell.Init((CellType)Random.Range(0, (int)CellType.Last));
+
+                    cell.cellType = GetCellTypeByRandom();
+                    cell.material = materials[(int) cell.cellType];
                 }
 
                 pos.x = 0;
-                pos.y += 1.1f;
+                pos.z += 1f;
             }
         }
     }
 
-    void ResetHexagons ()
+    private void ResetHexagons ()
     {
         foreach (GameObject hexagon in cubes)
         {
@@ -48,4 +52,27 @@ public class Terrain : MonoBehaviour
 
         cubes.Clear();
     }
+
+    private CellType GetCellTypeByRandom ()
+    {
+        int random = Random.Range(0, 100);
+
+        for (int i = 0; i < percentagesCellType.Length; i++)
+        {
+            if (random < percentagesCellType[i])
+            {
+                return (CellType) i;
+            }
+        }
+
+        return CellType.Grass;
+    }
+}
+public enum CellType
+{
+    Grass,
+    Sand,
+    Water,
+    Mountain,
+    Last
 }
