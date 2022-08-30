@@ -17,9 +17,9 @@ public class Pathfinding
 
     private List<int> openNodesId = new List<int>();
     private List<int> closedNodesId = new List<int>();
-    private Vector2Int destinationPosition;
+    private Vector3Int destinationPosition;
 
-    public List<Vector2Int> GetPath (Node[] map, Node origin, Node destination)
+    public List<Vector3Int> GetPath (Node[] map, Node origin, Node destination)
     {
         openNodesId.Add(origin.id);
         Node currentNode = origin;
@@ -29,7 +29,7 @@ public class Pathfinding
         {
             currentNode = GetNextNode(map, currentNode);
             if (currentNode == null)
-                return new List<Vector2Int>();
+                return new List<Vector3Int>();
 
             for (int i = 0; i < currentNode.adjacentNodeIds.Count; i++)
             {
@@ -48,14 +48,14 @@ public class Pathfinding
             closedNodesId.Add(currentNode.id);
         }
 
-        List<Vector2Int> path = GeneratePath(map, currentNode);
+        List<Vector3Int> path = GeneratePath(map, currentNode);
 
         return path;
     }
 
-    private List<Vector2Int> GeneratePath (Node[] map, Node current)
+    private List<Vector3Int> GeneratePath (Node[] map, Node current)
     {
-        List<Vector2Int> path = new List<Vector2Int>();
+        List<Vector3Int> path = new List<Vector3Int>();
 
         while (current.openerId != -1)
         {
@@ -113,10 +113,10 @@ public class Pathfinding
         }
     }
 
-    private int GetManhattanDistance (Vector2Int origin, Vector2Int destination)
+    private int GetManhattanDistance (Vector3Int origin, Vector3Int destination)
     {
         int distanceX = Mathf.Abs(origin.x - destination.x);
-        int distanceY = Mathf.Abs(origin.y - destination.y);
+        int distanceY = Mathf.Abs(origin.z - destination.z);
 
         return distanceX + distanceY;
     }
