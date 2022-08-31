@@ -1,33 +1,22 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-// Falta borrar una linea de código que la mostró en clase
 
 public class Pathfinding
 {
-    public enum Methods
-    {
-        BreadthFirst,
-        DephFirst,
-        Dijkstra,
-        AStar
-    }
-
-    private Methods methods = Methods.AStar;
-
-    private List<int> openNodesId = new List<int>();
-    private List<int> closedNodesId = new List<int>();
-    private Vector3Int destinationPosition;
-
     public List<Vector3Int> GetPath (Node[] map, Node origin, Node destination)
     {
+        List<int> openNodesId = new List<int>();
+        List<int> closedNodesId = new List<int>();
+        Vector3Int destinationPosition;
+
         openNodesId.Add(origin.id);
-        Node currentNode = origin;
         destinationPosition = destination.position;
+        Node currentNode = origin;
 
         while (currentNode.position != destination.position)
         {
-            currentNode = GetNextNode(map, currentNode);
+            currentNode = GetNextNode(map, currentNode, ref destinationPosition, openNodesId);
             if (currentNode == null)
                 return new List<Vector3Int>();
 
@@ -45,11 +34,15 @@ public class Pathfinding
 
             currentNode.state = Node.NodeState.Closed;
             openNodesId.Remove(currentNode.id);
-            closedNodesId.Add(currentNode.id);
         }
 
         List<Vector3Int> path = GeneratePath(map, currentNode);
 
+        //foreach (Node node in map)
+        //{
+        //    node.Reset();
+        //}
+        //openNodesId.Clear();
         return path;
     }
 
@@ -69,48 +62,20 @@ public class Pathfinding
         return path;
     }
 
-    private Node GetNextNode (Node[] map, Node currentNode)
+    private Node GetNextNode (Node[] map, Node currentNode, ref Vector3Int destinationPosition, List<int> openNodesId)
     {
-        switch (methods)
+        Node node = null;
+        int currentMaxWeightAndDistance = int.MaxValue;
+        for (int i = 0; i < openNodesId.Count; i++)
         {
-            case Methods.BreadthFirst:
-                return map[openNodesId[0]];
-            case Methods.DephFirst:
-                return map[openNodesId[^1]];
-            case Methods.Dijkstra:
+            if (map[openNodesId[i]].totalWeight + GetManhattanDistance(map[openNodesId[i]].position, destinationPosition) < currentMaxWeightAndDistance)
             {
-                Node node = null;
-                int currentMaxWeight = int.MaxValue;
-                for (int i = 0; i < openNodesId.Count; i++)
-                {
-                    if (map[openNodesId[i]].totalWeight < currentMaxWeight)
-                    {
-                        node = map[openNodesId[i]];
-                        currentMaxWeight = map[openNodesId[i]].totalWeight;
-                    }
-                }
-
-                return node;
+                node = map[openNodesId[i]];
+                currentMaxWeightAndDistance = map[openNodesId[i]].totalWeight + GetManhattanDistance(map[openNodesId[i]].position, destinationPosition);
             }
-            case Methods.AStar:
-            {
-                Node node = null;
-                int currentMaxWeightAndDistance = int.MaxValue;
-                for (int i = 0; i < openNodesId.Count; i++)
-                {
-                    if (map[openNodesId[i]].totalWeight + GetManhattanDistance(map[openNodesId[i]].position, destinationPosition) < currentMaxWeightAndDistance)
-                    {
-                        node = map[openNodesId[i]];
-                        currentMaxWeightAndDistance = map[openNodesId[i]].totalWeight + GetManhattanDistance(map[openNodesId[i]].position, destinationPosition);
-                    }
-                }
-
-                return node;
-            }
-
-            default:
-                return null;
         }
+
+        return node;
     }
 
     private int GetManhattanDistance (Vector3Int origin, Vector3Int destination)
