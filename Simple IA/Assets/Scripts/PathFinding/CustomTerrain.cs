@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteAlways]
-public class Terrain : MonoBehaviour
+public class CustomTerrain : MonoBehaviour
 {
     [SerializeField] private GameObject cube;
     [SerializeField] private int spawnColumns;
