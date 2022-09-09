@@ -8,10 +8,19 @@ public static class NodeUtils
     public static List<int> GetAdjacentsNodeIDs (Vector3Int position)
     {
         List<int> IDs = new List<int>();
-        IDs.Add(PositionToIndex(new Vector3Int(position.x + 1, 0, position.z)));
-        IDs.Add(PositionToIndex(new Vector3Int(position.x,     0, position.z - 1)));
-        IDs.Add(PositionToIndex(new Vector3Int(position.x - 1, 0, position.z)));
-        IDs.Add(PositionToIndex(new Vector3Int(position.x,     0, position.z + 1)));
+
+        int idNode = PositionToIndex(new Vector3Int(position.x + 1, 0, position.z));
+        if (idNode != -1)
+            IDs.Add(idNode);
+        idNode = PositionToIndex(new Vector3Int(position.x, 0, position.z - 1));
+        if (idNode != -1)
+            IDs.Add(idNode);
+        idNode = PositionToIndex(new Vector3Int(position.x - 1, 0, position.z));
+        if (idNode != -1)
+            IDs.Add(idNode);
+        idNode = PositionToIndex(new Vector3Int(position.x, 0, position.z + 1));
+        if (idNode != -1)
+            IDs.Add(idNode);
         return IDs;
     }
 

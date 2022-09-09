@@ -1,9 +1,17 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-
 public class Pathfinding
 {
+
+    public List<Vector3Int> GetPath (Node[] map, Vector3Int originPosition, Vector3Int destinationPosition)
+    {
+        Node origin = map[NodeUtils.PositionToIndex(originPosition)];
+        Node destination = map[NodeUtils.PositionToIndex(destinationPosition)];
+
+        return GetPath(map, origin, destination);
+    }
+
     public List<Vector3Int> GetPath (Node[] map, Node origin, Node destination)
     {
         List<int> openNodesId = new List<int>();

@@ -9,16 +9,17 @@ using UnityEditor;
 public class NodeGenerator : MonoBehaviour
 {
     public Vector3Int mapSize;
-    [SerializeField] private Node[] map;
+    private static Node[] map;
     private Pathfinding pathfinding;
 
     public Vector3Int startPos = new Vector3Int();
     public Vector3Int endPos = new Vector3Int();
-    public bool findPath;
 
     [SerializeField] private bool showLabel;
     [SerializeField] private int sizeLabel = 10;
     [SerializeField] private Vector3 offsetLabel = new Vector3(-0.45f, -0.45f, 0);
+    [SerializeField] private float alphaColor = 0.5f;
+    private List<Vector3Int> path = new List<Vector3Int>();
 
     private void Start ()
     {
@@ -35,40 +36,71 @@ public class NodeGenerator : MonoBehaviour
             }
         }
 
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 0))].state = Node.NodeState.Block;
-        map[NodeUtils.PositionToIndex(new Vector3Int(3, 0, 1))].state = Node.NodeState.Block;
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 1))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 2))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 3))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 4))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 5))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 6))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 7))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 8))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 9))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 10))].SetWeight(20);
-        map[NodeUtils.PositionToIndex(new Vector3Int(1, 0, 11))].SetWeight(20);
-
-        List<Vector3Int> path = pathfinding.GetPath(map,
-            map[NodeUtils.PositionToIndex(startPos)],
-            map[NodeUtils.PositionToIndex(endPos)]);
-
-        for (int i = 0; i < path.Count; i++)
-        {
-            Debug.Log(path[i]);
-        }
+        path = pathfinding.GetPath(map, startPos, endPos);
     }
+
+    public void GetPath (Vector3Int origin, Vector3Int end) => pathfinding.GetPath(map, map[NodeUtils.PositionToIndex(origin)], map[NodeUtils.PositionToIndex(end)]);
+    
+    public static Node[] GetMap () => map;
+
 
 #if UNITY_EDITOR
     private void OnDrawGizmos ()
     {
         if (map == null)
             return;
-        GUIStyle style = new GUIStyle() {fontSize = sizeLabel};
         Color newColor = Color.black;
-
+        GUIStyle style = new GUIStyle() { fontSize = sizeLabel };
+        //
+        //foreach (Node node in map)
+        //{
+        //    switch (node.viewerId)
+        //    {
+        //        case -1:
+        //            newColor = Color.black;
+        //            break;
+        //        case 0:
+        //            newColor = Color.red;
+        //            break;
+        //        case 1:
+        //            newColor = Color.blue;
+        //            break;
+        //        case 2:
+        //            newColor = Color.green;
+        //            break;
+        //        case 3:
+        //            newColor = Color.yellow;
+        //            break;
+        //        default:
+        //            newColor = Color.magenta;
+        //            break;
+        //    }
+        //
+        //    newColor.a = alphaColor;
+        //    Gizmos.color = newColor;
+        //    Gizmos.DrawCube(node.position, new Vector3(1, 0, 1));
+        //    Vector3Int pos = node.position;
+        //    if (showLabel)
+        //    {
+        //        string label = node.position.ToString() + "\nID: " + node.id + "\n Peso: " + node.weight;
+        //        Handles.Label(pos + offsetLabel, label, style);
+        //    }
+        //}
+        //
+        //
+        //return;
         foreach (Node node in map)
         {
+            bool dontDraw = false;
+            foreach (Vector3Int pos in path)
+            {
+                if (node.position == pos)
+                {
+                    dontDraw = true;
+                    break;
+                }
+            }
+        
             switch (node.state)
             {
                 case Node.NodeState.Open:
@@ -81,28 +113,39 @@ public class NodeGenerator : MonoBehaviour
                     newColor = Color.green;
                     break;
                 case Node.NodeState.Block:
-                    newColor = Color.magenta;
+                    newColor = Color.black;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            Vector3 worldPosition = new Vector3(node.position.x, 0, node.position.z);
-
-            newColor.a = 0.4f;
+        
+            Vector3 nodePosition = node.position;
+        
+            newColor.a = alphaColor;
             Gizmos.color = newColor;
-
-            Gizmos.DrawCube(worldPosition, new Vector3(1, 0, 1));
-
+        
+            if (!dontDraw)
+                Gizmos.DrawCube(nodePosition, new Vector3(1, 0, 1));
+        
             if (showLabel)
             {
                 string label = node.position.ToString() + "\nID: " + node.id + "\n Peso: " + node.weight;
-                Handles.Label(worldPosition + offsetLabel, label, style);
+                Handles.Label(nodePosition + offsetLabel, label, style);
             }
-
-
+        
+        
             Gizmos.color = Color.black;
-            Gizmos.DrawWireCube(worldPosition, new Vector3(1, 0, 1));
+            Gizmos.DrawWireCube(nodePosition, new Vector3(1, 0, 1));
+        }
+        
+        newColor = Color.cyan;
+        newColor.a = alphaColor;
+
+        Gizmos.color = newColor;
+        foreach (Vector3Int pos in path)
+        {
+            Gizmos.DrawCube(pos, new Vector3(1, 0, 1));
+
         }
     }
 #endif
