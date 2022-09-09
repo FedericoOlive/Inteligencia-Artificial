@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Flocking : MonoBehaviour
 {
-    [SerializeField] List<Flocking> boids = new List<Flocking>();
+    [SerializeField] private List<Flocking> boids = new List<Flocking>();
 
-    private Vector3 baseRotation;
+    private Vector3 baseRotation = Vector3.zero;
     [SerializeField] private float maxSpeed;
     [SerializeField] private float maxForce;
     [SerializeField] private float checkRadius;
@@ -16,28 +16,34 @@ public class Flocking : MonoBehaviour
     [SerializeField] private float aligmentMultiplayer;
 
     [SerializeField] private Vector3 velocity;
-    private Vector3 acceleration;
+    [SerializeField] private Vector3 acceleration;
 
-    void Start ()
+    private Vector3 Position
     {
-        baseRotation.x = Random.Range(0, 180);
-        baseRotation.y = Random.Range(0, 180);
-        baseRotation.z = Random.Range(0, 180);
+        get { return gameObject.transform.position; }
+        set { gameObject.transform.position = value; }
+    }
 
-        float angle = Random.Range(0, 2.0f * Mathf.PI);
+    private void Start ()
+    {
+        //baseRotation.x = Random.Range(0, 180);
+        //baseRotation.y = Random.Range(0, 180);
+        //baseRotation.z = Random.Range(0, 180);
+
+        float angle = Random.Range(0, 2 * Mathf.PI);
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle) + baseRotation);
         velocity = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle));
     }
 
-    void Update ()
+    private void Update ()
     {
-        Collider[] otherColliders = Physics.OverlapSphere(transform.position, checkRadius);
         boids.Clear();
-        if (otherColliders != null)
+        Collider[] others = Physics.OverlapSphere(Position, checkRadius);
+        if (others != null)
         {
-            for (int i = 0; i < otherColliders.Length; i++)
+            foreach (Collider other in others)
             {
-                Flocking boid = otherColliders[i].GetComponent<Flocking>();
+                Flocking boid = other.GetComponent<Flocking>();
                 if (boid)
                     boids.Add(boid);
             }
@@ -46,53 +52,18 @@ public class Flocking : MonoBehaviour
         }
 
         if (boids.Any())
-            acceleration = Alighmet(boids) * aligmentMultiplayer + Separation(boids) * separationMultiplayer + Cohesion(boids) * cohesionMultiplayer;
+            acceleration = Alignment(boids) * aligmentMultiplayer + Separation(boids) * separationMultiplayer + Cohesion(boids) * cohesionMultiplayer;
         else
             acceleration = Vector3.zero;
 
         velocity += acceleration;
-        velocity = Clamp(velocity, maxSpeed);
-
-        transform.position += velocity * Time.deltaTime;
-
-        float newAngleX = Mathf.Atan2(velocity.y, velocity.z) * Mathf.Rad2Deg;
-        float newAngleY = Mathf.Atan2(velocity.x, velocity.z) * Mathf.Rad2Deg;
-        float newAngleZ = Mathf.Atan2(velocity.x, velocity.y) * Mathf.Rad2Deg;
-
-        transform.rotation = Quaternion.Euler(new Vector3(newAngleX, newAngleY, newAngleZ) + baseRotation);
+        velocity = LimitMagnitude(velocity, maxSpeed);
+        Position += velocity * Time.deltaTime;
+        Quaternion to = Quaternion.Euler(velocity);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, to, 2);
     }
 
-    private Vector3 Cohesion (List<Flocking> boids)
-    {
-        Vector3 position = Vector3.zero;
-
-        foreach (Flocking boid in boids)
-        {
-            position += boid.transform.position;
-        }
-
-        Vector3 avg = position / boids.Count();
-        Vector3 direction = avg - transform.position;
-
-        return Steer(direction.normalized, maxForce);
-    }
-
-    private Vector3 Separation (List<Flocking> boids)
-    {
-        Vector3 direction = Vector3.zero;
-
-        foreach (Flocking boid in boids)
-        {
-            Vector3 diff = transform.position - boid.transform.position;
-            direction += diff.normalized / diff.magnitude;
-        }
-
-        direction /= boids.Count;
-
-        return Steer(direction.normalized, maxForce);
-    }
-
-    private Vector3 Alighmet (List<Flocking> boids)
+    private Vector3 Alignment (IEnumerable<Flocking> boids)
     {
         Vector3 velocity = Vector3.zero;
 
@@ -101,21 +72,59 @@ public class Flocking : MonoBehaviour
             velocity += boid.velocity;
         }
 
-        velocity /= boids.Count;
+        velocity /= boids.Count();
 
-        return Steer(velocity.normalized, maxForce);
+        return Steer(velocity.normalized * maxSpeed);
     }
 
-    private Vector3 Steer (Vector3 desired, float max)
+    private Vector3 Cohesion (IEnumerable<Flocking> boids)
+    {
+        Vector3 sumPositions = Vector3.zero;
+        foreach (Flocking boid in boids)
+        {
+            sumPositions += boid.Position;
+        }
+
+        Vector3 average = sumPositions / boids.Count();
+        Vector3 direction = average - Position;
+
+        return Steer(direction.normalized * maxSpeed);
+    }
+
+    private Vector3 Separation (IEnumerable<Flocking> boids)
+    {
+        Vector3 direction = Vector3.zero;
+        boids = boids.Where(o => DistanceTo(o) <= checkRadius / 2);
+
+        foreach (var boid in boids)
+        {
+            Vector3 difference = Position - boid.Position;
+            direction += difference.normalized / difference.magnitude;
+        }
+
+        direction /= boids.Count();
+
+        return Steer(direction.normalized * maxSpeed);
+    }
+
+    private Vector3 Steer (Vector3 desired)
     {
         Vector3 steer = desired - velocity;
-        return Clamp(steer, max);
+        return LimitMagnitude(steer, maxForce);
     }
 
-    private Vector3 Clamp (Vector3 baseVector, float max)
+    private float DistanceTo (Flocking boid)
     {
-        if (baseVector.sqrMagnitude > max * max)
-            baseVector = baseVector.normalized * max;
+        return Vector3.Distance(boid.transform.position, Position);
+    }
+
+    private Vector3 LimitMagnitude (Vector3 baseVector, float maxMagnitude)
+    {
+        if (baseVector.sqrMagnitude > maxMagnitude * maxMagnitude)
+        {
+            baseVector = baseVector.normalized * maxMagnitude;
+        }
+
         return baseVector;
     }
 
