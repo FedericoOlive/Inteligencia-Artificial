@@ -26,12 +26,10 @@ public class Node
 
     public Node (int newId, Vector3Int newPos)
     {
-        state = NodeState.Ready; 
-        openerId = -1; 
+        Reset();
         id = newId;
         position = newPos;
         adjacentNodeIds = NodeUtils.GetAdjacentsNodeIDs(newPos);
-        viewerId = -1;
         SetNodeForTerrain();
     }
 
@@ -80,6 +78,8 @@ public class Node
             return;
 
         state = NodeState.Ready;
-        
+        viewerId = -1;
+        openerId = -1;
+
     }
 }

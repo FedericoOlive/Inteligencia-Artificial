@@ -68,29 +68,29 @@ public class CustomTerrain : MonoBehaviour
         return CellType.Grass;
     }
 
-    public static Vector3 GetAvailablePosition (Vector2 min, Vector2 max, Vector3 transformPosition)
-    {
-        CellType cellType = CellType.Water;
-        Vector3 randomPos;
-
-        do
-        {
-            randomPos = new Vector3(Random.Range((int) min.x, (int) min.y), 0, Random.Range((int) max.x, (int) max.y));
-            randomPos += new Vector3(100, 0, 100);
-
-            if (Physics.Raycast(randomPos, Vector3.down * 10, out RaycastHit hit))
-            {
-                Cell cell = hit.transform.GetComponent<Cell>();
-                if (cell)
-                {
-                    cellType = cell.cellType;
-                }
-            }
-
-        } while (cellType == CellType.Water);
-
-        return randomPos;
-    }
+    //public static Vector3 GetAvailablePosition (Vector2 min, Vector2 max, Vector3 transformPosition)
+    //{
+    //    CellType cellType = CellType.Water;
+    //    Vector3 randomPos;
+    //
+    //    do
+    //    {
+    //        randomPos = new Vector3(Random.Range((int) min.x, (int) min.y), 0, Random.Range((int) max.x, (int) max.y));
+    //        randomPos += new Vector3(100, 0, 100);
+    //
+    //        if (Physics.Raycast(randomPos, Vector3.down * 10, out RaycastHit hit))
+    //        {
+    //            Cell cell = hit.transform.GetComponent<Cell>();
+    //            if (cell)
+    //            {
+    //                cellType = cell.cellType;
+    //            }
+    //        }
+    //
+    //    } while (cellType == CellType.Water);
+    //
+    //    return randomPos;
+    //}
 }
 
 public enum CellType

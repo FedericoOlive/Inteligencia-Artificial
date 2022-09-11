@@ -18,7 +18,7 @@ public class TerrainTextureDetector : MonoBehaviour
         ThisTerrain = GetComponent<Terrain>();
         CachedTerrainAlphamapData = ThisTerrainData.GetAlphamaps(0, 0, ThisTerrainData.alphamapWidth, ThisTerrainData.alphamapHeight);
     }
-
+    
     /// <summary>
     /// Gets the index of the most visible texture on the terrain at the specified point in world space.
     /// These texture indexes are assigned in the "paint textures" tab of the terrain inspector.
@@ -71,6 +71,19 @@ public class TerrainTextureDetector : MonoBehaviour
     public static TerrainCellType GetTerrainCellType (Vector3 pos)
     {
         return (TerrainCellType) GetDominantTextureIndexAt(pos);
+    }
+
+    public static Vector3Int GetRandomAvailablePosition (Vector3Int distanceSpawn)
+    {
+        Vector3Int randomPos = Vector3Int.zero;
+        do
+        {
+            randomPos.x = Random.Range(0, distanceSpawn.x);
+            randomPos.y = Random.Range(0, distanceSpawn.y);
+            randomPos.z = Random.Range(0, distanceSpawn.z);
+        } while (GetTerrainCellType(randomPos) == TerrainCellType.Rock);
+
+        return randomPos;
     }
 }
 

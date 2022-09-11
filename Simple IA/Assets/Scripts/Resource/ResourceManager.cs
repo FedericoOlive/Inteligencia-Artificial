@@ -4,7 +4,7 @@ using UnityEngine;
 public class ResourceManager : MonoBehaviour
 {
     [SerializeField] private GameObject pfResource;
-    [SerializeField] private Vector2 distanceSpawn = new Vector2(15, 7);
+    [SerializeField] private Vector3Int distanceSpawn = new Vector3Int(15, 0, 7);
     [SerializeField] private List<Resource> resources = new List<Resource>();
     [SerializeField] private float spawnTimeResource = 2f;
     private float currentSpawnTimeResource;
@@ -27,8 +27,7 @@ public class ResourceManager : MonoBehaviour
 
     void CreateResource ()
     {
-        Vector3 randomPos = CustomTerrain.GetAvailablePosition(new Vector2(-distanceSpawn.x, distanceSpawn.x), new Vector2(-distanceSpawn.y, distanceSpawn.y), transform.position);
-
+        Vector3 randomPos = TerrainTextureDetector.GetRandomAvailablePosition(distanceSpawn);
         Resource resource = Instantiate(pfResource, randomPos, Quaternion.identity, transform).GetComponent<Resource>();
         resource.OnEmptyResource += DestroyResource;
         resources.Add(resource);

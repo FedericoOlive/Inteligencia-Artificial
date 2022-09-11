@@ -10,11 +10,12 @@ public class NodeGenerator : MonoBehaviour
 {
     public Vector3Int mapSize;
     private static Node[] map;
-    private Pathfinding pathfinding;
+    private static Pathfinding pathfinding;
 
     public Vector3Int startPos = new Vector3Int();
     public Vector3Int endPos = new Vector3Int();
 
+    [SerializeField] private bool showNodes;
     [SerializeField] private bool showLabel;
     [SerializeField] private int sizeLabel = 10;
     [SerializeField] private Vector3 offsetLabel = new Vector3(-0.45f, -0.45f, 0);
@@ -35,60 +36,33 @@ public class NodeGenerator : MonoBehaviour
                 ID++;
             }
         }
-
-        path = pathfinding.GetPath(map, startPos, endPos);
     }
 
-    public void GetPath (Vector3Int origin, Vector3Int end) => pathfinding.GetPath(map, map[NodeUtils.PositionToIndex(origin)], map[NodeUtils.PositionToIndex(end)]);
-    
-    public static Node[] GetMap () => map;
+    public static List<Vector3Int> GetPath (Vector3Int origin, Vector3Int end)
+    {
+        ResetMap();
+        return pathfinding.GetPath(map, origin, end);
+    }
 
+    private static void ResetMap ()
+    {
+        foreach (Node node in map)
+        {
+            node.Reset();
+        }
+    }
 
 #if UNITY_EDITOR
     private void OnDrawGizmos ()
     {
         if (map == null)
             return;
+        if (!showNodes)
+            return;
+
         Color newColor = Color.black;
         GUIStyle style = new GUIStyle() { fontSize = sizeLabel };
-        //
-        //foreach (Node node in map)
-        //{
-        //    switch (node.viewerId)
-        //    {
-        //        case -1:
-        //            newColor = Color.black;
-        //            break;
-        //        case 0:
-        //            newColor = Color.red;
-        //            break;
-        //        case 1:
-        //            newColor = Color.blue;
-        //            break;
-        //        case 2:
-        //            newColor = Color.green;
-        //            break;
-        //        case 3:
-        //            newColor = Color.yellow;
-        //            break;
-        //        default:
-        //            newColor = Color.magenta;
-        //            break;
-        //    }
-        //
-        //    newColor.a = alphaColor;
-        //    Gizmos.color = newColor;
-        //    Gizmos.DrawCube(node.position, new Vector3(1, 0, 1));
-        //    Vector3Int pos = node.position;
-        //    if (showLabel)
-        //    {
-        //        string label = node.position.ToString() + "\nID: " + node.id + "\n Peso: " + node.weight;
-        //        Handles.Label(pos + offsetLabel, label, style);
-        //    }
-        //}
-        //
-        //
-        //return;
+
         foreach (Node node in map)
         {
             bool dontDraw = false;
@@ -132,8 +106,7 @@ public class NodeGenerator : MonoBehaviour
                 string label = node.position.ToString() + "\nID: " + node.id + "\n Peso: " + node.weight;
                 Handles.Label(nodePosition + offsetLabel, label, style);
             }
-        
-        
+
             Gizmos.color = Color.black;
             Gizmos.DrawWireCube(nodePosition, new Vector3(1, 0, 1));
         }

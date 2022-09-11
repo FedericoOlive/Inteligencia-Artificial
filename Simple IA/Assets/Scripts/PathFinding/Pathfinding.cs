@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Pathfinding
 {
-
     public List<Vector3Int> GetPath (Node[] map, Vector3Int originPosition, Vector3Int destinationPosition)
     {
         Node origin = map[NodeUtils.PositionToIndex(originPosition)];
@@ -45,12 +44,7 @@ public class Pathfinding
         }
 
         List<Vector3Int> path = GeneratePath(map, currentNode);
-
-        //foreach (Node node in map)
-        //{
-        //    node.Reset();
-        //}
-        //openNodesId.Clear();
+        
         return path;
     }
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -16,6 +17,10 @@ public class Ant : MonoBehaviour
 
     private ResourceCharge resourceCharge = new ResourceCharge();
     private FiniteStateMachine finiteStateMachine;
+
+    private List<Vector3Int> path = new List<Vector3Int>();
+    private List<Vector3Int> pathBack = new List<Vector3Int>();
+
 
     private void Awake ()
     {
