@@ -39,6 +39,7 @@ public class EnemyManager : MonoBehaviour
             if (enemies.Count < maxEnemies)
             {
                 Vector3Int randomPos = TerrainTextureDetector.GetRandomAvailablePosition(distanceSpawn);
+                randomPos.y = (int) transform.position.y;
                 GameObject goEnemy = Instantiate(pfEnemy, randomPos, Quaternion.identity, transform);
 
                 Enemy enemy = goEnemy.GetComponent<Enemy>();

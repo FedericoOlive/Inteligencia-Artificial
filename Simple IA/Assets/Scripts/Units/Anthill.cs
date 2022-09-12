@@ -40,7 +40,7 @@ public class Anthill : MonoBehaviour
     private void AddAnt ()
     {
         Vector3 pos = origin.transform.position;
-        pos.y = 0.5f;
+        pos.y = 0;
         GameObject newAnt = Instantiate(pfAnt, pos, Quaternion.identity, origin.transform);
         Ant ant = newAnt.GetComponent<Ant>();
         ants.Add(ant);

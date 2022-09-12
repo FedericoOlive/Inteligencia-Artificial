@@ -63,7 +63,7 @@ public class Ant : MonoBehaviour
         finiteStateMachine.AddBehaviour(States.GoingToAnthill, GoingToAnthillBehaviour);
         finiteStateMachine.AddBehaviour(States.Depositing, DepositingBehaviour);
         finiteStateMachine.AddBehaviour(States.WaitingInstructions, WaitingInstructions);
-
+        
         finiteStateMachine.AddBehaviour(States.WaitingInstructions, () => { Debug.Log("Waiting Instructions"); });
         finiteStateMachine.AddBehaviour(States.Harvesting, () => { Debug.Log("Harvesting..."); });
         finiteStateMachine.AddBehaviour(States.Depositing, () => { Debug.Log("Depositing..."); });
@@ -71,7 +71,20 @@ public class Ant : MonoBehaviour
         finiteStateMachine.AddBehaviour(States.GoingToAnthill, () => { Debug.Log("Going To Anthill"); });
     }
 
+    private void ForceGoingToPositionBehaviour()
+    {
 
+    }
+
+    private void ForceGoingToAnthillBehaviour()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void ForceGoingToIdleBehaviour()
+    {
+        throw new NotImplementedException();
+    }
 
     private void WaitingInstructions ()
     {
@@ -107,7 +120,7 @@ public class Ant : MonoBehaviour
             path.Add(pathBack[0]);
             pathBack.Remove(pathBack[0]);
         }
-
+        
         Vector3 dir = (pathBack[0] - transform.position);
         dir.Normalize();
 
@@ -146,7 +159,7 @@ public class Ant : MonoBehaviour
             pathBack.Add(path[0]);
             path.Remove(path[0]);
         }
-
+        
         Vector3 dir = (path[0] - transform.position);
         dir.Normalize();
 

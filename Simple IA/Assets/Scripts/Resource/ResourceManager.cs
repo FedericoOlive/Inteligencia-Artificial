@@ -28,6 +28,7 @@ public class ResourceManager : MonoBehaviour
     void CreateResource ()
     {
         Vector3 randomPos = TerrainTextureDetector.GetRandomAvailablePosition(distanceSpawn);
+        randomPos.y = transform.position.y;
         Resource resource = Instantiate(pfResource, randomPos, Quaternion.identity, transform).GetComponent<Resource>();
         resource.OnEmptyResource += DestroyResource;
         resources.Add(resource);
