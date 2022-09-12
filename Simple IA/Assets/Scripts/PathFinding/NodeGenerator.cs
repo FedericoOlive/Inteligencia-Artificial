@@ -59,6 +59,8 @@ public class NodeGenerator : MonoBehaviour
         }
     }
 
+    public static Node[] GetMap => map;
+
 #if UNITY_EDITOR
     private void OnDrawGizmos ()
     {

@@ -40,23 +40,17 @@ public class Node
         {
             case TerrainCellType.Grass:
                 state = NodeState.Ready;
-                weight = 1;
                 break;
             case TerrainCellType.Sand:
                 state = NodeState.Ready;
-                weight = 5;
                 break;
             case TerrainCellType.Rock:
-                weight = 99999999;
-                state = NodeState.Block;
-                break;
             default:
                 state = NodeState.Block;
-                weight = 99999999;
                 break;
         }
 
-        weight = 1;
+        weight = TerrainSettings.GetWeightByTerrainType(terrainCellType);
     }
 
     public void SetWeight (int weight)

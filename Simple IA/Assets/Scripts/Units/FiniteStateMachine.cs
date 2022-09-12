@@ -82,7 +82,7 @@ public class FiniteStateMachine
 
 public enum States
 {
-    Idle,
+    WaitingInstructions,
     Harvesting,
     GoingToResource,
     GoingToAnthill,

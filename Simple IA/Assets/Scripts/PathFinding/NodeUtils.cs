@@ -38,4 +38,14 @@ public static class NodeUtils
         Vector2 pos2 = new Vector2(vec3Two.x, vec3Two.z);
         return Vector2.Distance(pos1, pos2);
     }
+
+    public static Vector3Int GetVec3IntFromVector3 (Vector3 vector)
+    {
+        return new Vector3Int
+        {
+            x = Mathf.RoundToInt(vector.x),
+            y = Mathf.RoundToInt(vector.y),
+            z = Mathf.RoundToInt(vector.z)
+        };
+    }
 }

@@ -85,7 +85,7 @@ public class EnemyManager : MonoBehaviour
     private void OnDrawGizmosSelected ()
     {
         Handles.color = Color.red;
-        Handles.DrawWireCube(transform.position, distanceSpawn * 2);
+        Handles.DrawWireCube(transform.position + distanceSpawn / 2, distanceSpawn);
     }
 #endif
 }

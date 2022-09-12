@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -21,6 +22,7 @@ public class Ant : MonoBehaviour
     [SerializeField] private List<Vector3Int> path = new List<Vector3Int>();
     [SerializeField] private List<Vector3Int> pathBack = new List<Vector3Int>();
 
+    private float offsetFailDistance = 0.03f;
 
     private void Awake ()
     {
@@ -48,28 +50,30 @@ public class Ant : MonoBehaviour
     {
         finiteStateMachine = new FiniteStateMachine(States.Last, Flags.Last);
 
-        currentState = States.Idle;
+        currentState = States.WaitingInstructions;
 
         finiteStateMachine.SetRelation(States.GoingToResource, Flags.OnArriveResource, States.Harvesting);
         finiteStateMachine.SetRelation(States.Harvesting, Flags.OnFullInventory, States.GoingToAnthill);
         finiteStateMachine.SetRelation(States.GoingToAnthill, Flags.OnArriveWithResource, States.Depositing);
-        finiteStateMachine.SetRelation(States.Depositing, Flags.OnEmptyInventory, States.Idle);
-        finiteStateMachine.SetRelation(States.Idle, Flags.OnReceiveResource, States.GoingToResource);
+        finiteStateMachine.SetRelation(States.Depositing, Flags.OnEmptyInventory, States.WaitingInstructions);
+        finiteStateMachine.SetRelation(States.WaitingInstructions, Flags.OnReceiveResource, States.GoingToResource);
 
         finiteStateMachine.AddBehaviour(States.Harvesting, HarvestingBehaviour);
         finiteStateMachine.AddBehaviour(States.GoingToResource, GoingToResourceBehaviour);
         finiteStateMachine.AddBehaviour(States.GoingToAnthill, GoingToAnthillBehaviour);
         finiteStateMachine.AddBehaviour(States.Depositing, DepositingBehaviour);
-        finiteStateMachine.AddBehaviour(States.Idle, Idle);
+        finiteStateMachine.AddBehaviour(States.WaitingInstructions, WaitingInstructions);
 
-        finiteStateMachine.AddBehaviour(States.Idle, () => { Debug.Log("Idle"); });
+        finiteStateMachine.AddBehaviour(States.WaitingInstructions, () => { Debug.Log("Waiting Instructions"); });
         finiteStateMachine.AddBehaviour(States.Harvesting, () => { Debug.Log("Harvesting..."); });
         finiteStateMachine.AddBehaviour(States.Depositing, () => { Debug.Log("Depositing..."); });
         finiteStateMachine.AddBehaviour(States.GoingToResource, () => { Debug.Log("Going To Resource"); });
         finiteStateMachine.AddBehaviour(States.GoingToAnthill, () => { Debug.Log("Going To Anthill"); });
     }
 
-    private void Idle ()
+
+
+    private void WaitingInstructions ()
     {
         meshRenderer.material.color = Color.red;
         if (!resource)
@@ -107,15 +111,24 @@ public class Ant : MonoBehaviour
         Vector3 dir = (pathBack[0] - transform.position);
         dir.Normalize();
 
-        if (NodeUtils.GetDistanceXZ(pathBack[0], transform.position) > 0.1f)
+        if (NodeUtils.GetDistanceXZ(pathBack[0], transform.position) > offsetFailDistance)
         {
-            Vector3 movement = dir * stats.speed * Time.deltaTime;
+            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(pathBack[0])) * Time.deltaTime;
             transform.position += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
+            transform.position = pathBack[0];
             path.Add(pathBack[0]);
             pathBack.Remove(pathBack[0]);
+
+            if (pathBack.Count > 0)
+            {
+                dir = (pathBack[0] - path[^1]);
+                dir.Normalize();
+                Vector3 movement = dir * stats.speed * Time.deltaTime;
+                transform.position += new Vector3(movement.x, 0, movement.z);
+            }
         }
     }
 
@@ -137,15 +150,24 @@ public class Ant : MonoBehaviour
         Vector3 dir = (path[0] - transform.position);
         dir.Normalize();
 
-        if (NodeUtils.GetDistanceXZ(path[0], transform.position) > 0.1f)
+        if (NodeUtils.GetDistanceXZ(path[0], transform.position) > offsetFailDistance)
         {
-            Vector3 movement = dir * stats.speed * Time.deltaTime;
+            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(path[0])) * Time.deltaTime;
             transform.position += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
+            transform.position = path[0];
             pathBack.Add(path[0]);
             path.Remove(path[0]);
+
+            if (path.Count > 0)
+            {
+                dir = (path[0] - pathBack[^1]);
+                dir.Normalize();
+                Vector3 movement = dir * stats.speed * Time.deltaTime;
+                transform.position += new Vector3(movement.x, 0, movement.z);
+            }
         }
     }
 
@@ -185,10 +207,33 @@ public class Ant : MonoBehaviour
 
 
 #if UNITY_EDITOR
+
+    private void OnDrawGizmos ()
+    {
+        if (path != null)
+        {
+            Gizmos.color = Color.green;
+
+            for (int i = 0; i < path.Count - 1; i++)
+            {
+                Gizmos.DrawLine(path[i], path[i + 1]);
+            }
+        }
+
+        if (pathBack != null)
+        {
+            Gizmos.color = Color.red;
+            for (int i = 0; i < pathBack.Count - 1; i++)
+            {
+                Gizmos.DrawLine(pathBack[i], pathBack[i + 1]);
+            }
+        }
+    }
+
     private void OnDrawGizmosSelected ()
     {
-        Handles.color = Color.red;
-        Handles.DrawWireDisc(transform.position, Vector3.up, stats.visionRadius);
+        //Handles.color = Color.red;
+        //Handles.DrawWireDisc(transform.position, Vector3.up, stats.visionRadius);
     }
 #endif
 }

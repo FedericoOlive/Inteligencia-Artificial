@@ -78,18 +78,12 @@ public class TerrainTextureDetector : MonoBehaviour
         Vector3Int randomPos = Vector3Int.zero;
         do
         {
-            randomPos.x = Random.Range(0, distanceSpawn.x);
+            randomPos.x = Random.Range(4, distanceSpawn.x);
             randomPos.y = Random.Range(0, distanceSpawn.y);
-            randomPos.z = Random.Range(0, distanceSpawn.z);
+            randomPos.z = Random.Range(4, distanceSpawn.z);
         } while (GetTerrainCellType(randomPos) == TerrainCellType.Rock);
 
         return randomPos;
     }
 }
 
-public enum TerrainCellType
-{
-    Grass,
-    Sand,
-    Rock
-}
