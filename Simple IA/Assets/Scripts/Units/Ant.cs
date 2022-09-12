@@ -71,7 +71,9 @@ public class Ant : MonoBehaviour
         finiteStateMachine.AddBehaviour(States.GoingToAnthill, () => { Debug.Log("Going To Anthill"); });
 
 
-
+        // Hacer Varios FMS y que se pueda intercambiar uno entre otro
+        // Un scriptableObject podría ser la configuracion de donde se tome.
+        // Separar todos los behaviours en scripts (ver como se podría hacer para pasar los parámetros)
         // Todo: Ver clase de distintos FSM: 18/08/2022 Minuto 27.
         finiteStateMachine.SetRelation(States.Idle, Flags.ForceToPosition, States.ForceGoingToPosition);
         finiteStateMachine.SetRelation(States.WaitingInstructions, Flags.ForceToPosition, States.ForceGoingToPosition);
@@ -92,12 +94,12 @@ public class Ant : MonoBehaviour
 
     private void ForceGoingToAnthillBehaviour()
     {
-        throw new NotImplementedException();
+
     }
 
     private void ForceGoingToIdleBehaviour()
     {
-        throw new NotImplementedException();
+
     }
 
     private void WaitingInstructions ()

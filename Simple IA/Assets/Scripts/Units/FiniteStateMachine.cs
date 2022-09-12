@@ -5,7 +5,7 @@ using UnityEngine;
 public class FiniteStateMachine
 {
     private States[,] relations;
-    private Dictionary<States, List<Action>> behaviours;
+    private Dictionary<States, State> behaviours;
 
     public FiniteStateMachine (States states, Flags flags)
     {
@@ -18,7 +18,7 @@ public class FiniteStateMachine
             }
         }
 
-        behaviours = new Dictionary<States, List<Action>>();
+        behaviours = new Dictionary<States, State>();
     }
 
     public void SetRelation (States sourceState, Flags flag, States destinationState)
@@ -37,27 +37,58 @@ public class FiniteStateMachine
         Debug.Log("No existe connexión entre: " + currentState + " y " + flag);
     }
 
-    public void SetBehaviour (States state, Action behaviour)
+    public void SetBehaviour (States state, Action behaviour, Action onEntryBehaviour = null, Action onExitBehaviour = null)
     {
-        List<Action> newBehaviours = new List<Action>();
-        newBehaviours.Add(behaviour);
+        State newState = new State();
+        newState.behaviours = new List<Action>();
+        newState.behaviours.Add(behaviour);
+        newState.OnEntryBehaviour = onEntryBehaviour;
+        newState.OnExitBehaviour = onExitBehaviour;
 
         if (behaviours.ContainsKey(state))
-            behaviours[state] = newBehaviours;
+            behaviours[state] = newState;
         else
-            behaviours.Add(state, newBehaviours);
+            behaviours.Add(state, newState);
     }
 
-    public void AddBehaviour (States state, Action behaviour)
+    public void AddBehaviour (States state, Action behaviour, Action onEntryBehaviour = null, Action onExitBehaviour = null)
     {
-
         if (behaviours.ContainsKey(state))
-            behaviours[state].Add(behaviour);
+        {
+            behaviours[state].behaviours.Add(behaviour);
+        }
         else
         {
-            List<Action> newBehaviours = new List<Action>();
-            newBehaviours.Add(behaviour);
-            behaviours.Add(state, newBehaviours);
+            State newState = new State();
+            newState.behaviours = new List<Action>();
+            newState.behaviours.Add(behaviour);
+            newState.OnEntryBehaviour = onEntryBehaviour;
+            newState.OnExitBehaviour = onExitBehaviour;
+            behaviours.Add(state, newState);
+        }
+    }
+
+    public void Entry (ref States currentState)
+    {
+        if (behaviours.ContainsKey(currentState))
+        {
+            Action onExit = behaviours[currentState].OnEntryBehaviour;
+            if (onExit != null)
+            {
+                onExit.Invoke();
+            }
+        }
+    }
+
+    public void Exit (ref States currentState)
+    {
+        if (behaviours.ContainsKey(currentState))
+        {
+            Action onExit = behaviours[currentState].OnExitBehaviour;
+            if (onExit != null)
+            {
+                onExit.Invoke();
+            }
         }
     }
 
@@ -65,7 +96,7 @@ public class FiniteStateMachine
     {
         if (behaviours.ContainsKey(currentState))
         {
-            List<Action> actions = behaviours[currentState];
+            List<Action> actions = behaviours[currentState].behaviours;
             if (actions != null)
             {
                 for (int i = 0; i < actions.Count; i++)
