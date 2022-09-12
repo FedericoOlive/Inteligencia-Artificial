@@ -84,8 +84,8 @@ public enum States
 {
     Idle,
     Harvesting,
-    GoToMine,
-    GoToAnthill,
+    GoingToResource,
+    GoingToAnthill,
     Depositing,
     Last
 }
@@ -93,9 +93,9 @@ public enum States
 public enum Flags
 {
     OnFullInventory,
-    OnReachMine,
-    OnReachDeposit,
-    OnEmpyMine,
+    OnArriveResource,
+    OnArriveWithResource,
+    OnReceiveResource,
     OnEmptyInventory,
 
     ForceToIdle,

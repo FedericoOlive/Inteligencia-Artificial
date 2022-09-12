@@ -50,21 +50,23 @@ public class Ant : MonoBehaviour
 
         currentState = States.Idle;
 
-        finiteStateMachine.SetRelation(States.GoToMine, Flags.OnReachMine, States.Harvesting);
-        finiteStateMachine.SetRelation(States.Harvesting, Flags.OnFullInventory, States.GoToAnthill);
-        finiteStateMachine.SetRelation(States.GoToAnthill, Flags.OnEmpyMine, States.Idle);
-        finiteStateMachine.SetRelation(States.GoToAnthill, Flags.OnReachDeposit, States.GoToMine);
-        finiteStateMachine.SetRelation(States.Idle, Flags.OnReachDeposit, States.GoToMine);
+        finiteStateMachine.SetRelation(States.GoingToResource, Flags.OnArriveResource, States.Harvesting);
+        finiteStateMachine.SetRelation(States.Harvesting, Flags.OnFullInventory, States.GoingToAnthill);
+        finiteStateMachine.SetRelation(States.GoingToAnthill, Flags.OnArriveWithResource, States.Depositing);
+        finiteStateMachine.SetRelation(States.Depositing, Flags.OnEmptyInventory, States.Idle);
+        finiteStateMachine.SetRelation(States.Idle, Flags.OnReceiveResource, States.GoingToResource);
 
         finiteStateMachine.AddBehaviour(States.Harvesting, HarvestingBehaviour);
-        finiteStateMachine.AddBehaviour(States.GoToMine, GoingToResourceBehaviour);
-        finiteStateMachine.AddBehaviour(States.GoToAnthill, GoingToAnthillBehaviour);
+        finiteStateMachine.AddBehaviour(States.GoingToResource, GoingToResourceBehaviour);
+        finiteStateMachine.AddBehaviour(States.GoingToAnthill, GoingToAnthillBehaviour);
+        finiteStateMachine.AddBehaviour(States.Depositing, DepositingBehaviour);
         finiteStateMachine.AddBehaviour(States.Idle, Idle);
 
         finiteStateMachine.AddBehaviour(States.Idle, () => { Debug.Log("Idle"); });
-        finiteStateMachine.AddBehaviour(States.Harvesting, () => { Debug.Log("Taking"); });
-        finiteStateMachine.AddBehaviour(States.GoToMine, () => { Debug.Log("Go To Mine"); });
-        finiteStateMachine.AddBehaviour(States.GoToAnthill, () => { Debug.Log("Go To Anthill"); });
+        finiteStateMachine.AddBehaviour(States.Harvesting, () => { Debug.Log("Harvesting..."); });
+        finiteStateMachine.AddBehaviour(States.Depositing, () => { Debug.Log("Depositing..."); });
+        finiteStateMachine.AddBehaviour(States.GoingToResource, () => { Debug.Log("Going To Resource"); });
+        finiteStateMachine.AddBehaviour(States.GoingToAnthill, () => { Debug.Log("Going To Anthill"); });
     }
 
     private void Idle ()
@@ -79,21 +81,21 @@ public class Ant : MonoBehaviour
         }
         meshRenderer.material.color = Color.white;
 
-        finiteStateMachine.SetFlag(ref currentState, Flags.OnReachDeposit);
+        finiteStateMachine.SetFlag(ref currentState, Flags.OnReceiveResource);
     }
 
     private void GoingToAnthillBehaviour ()
     {
         Vector3 dir = (anthill.transform.position - transform.position).normalized;
 
-        if (Vector3.Distance(anthill.transform.position, transform.position) > 0.1f)
+        if (GetDistanceXZ(anthill.transform.position, transform.position) > 0.1f)
         {
             Vector3 movement = dir * stats.speed * Time.deltaTime;
             transform.position += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
-            finiteStateMachine.SetFlag(ref currentState, Flags.OnReachDeposit);
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnArriveWithResource);
         }
     }
 
@@ -101,20 +103,20 @@ public class Ant : MonoBehaviour
     {
         if (!resource)
         {
-            finiteStateMachine.SetFlag(ref currentState, Flags.OnReachMine);
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnArriveResource);
             return;
         }
 
         Vector3 dir = (resource.transform.position - transform.position).normalized;
 
-        if (Vector3.Distance(resource.transform.position, transform.position) > 0.1f)
+        if (GetDistanceXZ(resource.transform.position, transform.position) > 0.1f)
         {
             Vector3 movement = dir * stats.speed * Time.deltaTime;
             transform.position += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
-            finiteStateMachine.SetFlag(ref currentState, Flags.OnReachMine);
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnArriveResource);
         }
     }
 
@@ -150,6 +152,13 @@ public class Ant : MonoBehaviour
     public void SetFlag (Flags flag)
     {
         finiteStateMachine.SetFlag(ref currentState, flag);
+    }
+
+    private float GetDistanceXZ (Vector3 vec3One, Vector3 vec3Two)
+    {
+        Vector2 pos1 = new Vector2(vec3One.x, vec3One.z);
+        Vector2 pos2 = new Vector2(vec3Two.x, vec3Two.z);
+        return Vector2.Distance(pos1, pos2);
     }
 
 #if UNITY_EDITOR

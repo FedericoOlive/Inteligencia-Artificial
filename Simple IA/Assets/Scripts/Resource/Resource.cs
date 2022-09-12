@@ -15,7 +15,7 @@ public class Resource : MonoBehaviour
     private void Start ()
     {
         resourceCharge.resourceType = (ResourceType) Random.Range(0, (int) ResourceType.Last);
-        resourceCharge.resourceAmount = Random.Range(1, 11);
+        resourceCharge.resourceAmount = 3;
     }
 
     public void TakeResource (ref ResourceCharge antResourceCharge, float maxResourceCharge)
