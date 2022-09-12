@@ -42,6 +42,24 @@ public class ResourceManager : MonoBehaviour
 
     public List<Resource> GetResources () => resources;
 
+    public Resource GetNearResource (Vector3 pos, float visionRadius)
+    {
+        Resource nearResource = null;
+        float distance = visionRadius;
+
+        for (int i = 0; i < resources.Count; i++)
+        {
+            float currentDistance = NodeUtils.GetDistanceXZ(pos, resources[i].transform.position);
+            if (currentDistance < distance)
+            {
+                distance = currentDistance;
+                nearResource = resources[i];
+            }
+        }
+
+        return nearResource;
+    }
+
     public Resource GetRandomResource ()
     {
         if (resources.Count > 0)

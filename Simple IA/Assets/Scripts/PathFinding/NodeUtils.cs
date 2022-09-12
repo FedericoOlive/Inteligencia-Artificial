@@ -31,4 +31,11 @@ public static class NodeUtils
         int aux = position.z * MapSize.x + position.x;
         return aux;
     }
+
+    public static float GetDistanceXZ(Vector3 vec3One, Vector3 vec3Two)
+    {
+        Vector2 pos1 = new Vector2(vec3One.x, vec3One.z);
+        Vector2 pos2 = new Vector2(vec3Two.x, vec3Two.z);
+        return Vector2.Distance(pos1, pos2);
+    }
 }

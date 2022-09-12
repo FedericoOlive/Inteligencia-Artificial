@@ -1767,7 +1767,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 1}
+  m_Color: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -1826,7 +1826,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 80, y: 10, z: 100}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2172,11 +2172,11 @@ MonoBehaviour:
   mapSize: {x: 36, y: 0, z: 20}
   startPos: {x: 8, y: 0, z: 0}
   endPos: {x: 17, y: 0, z: 18}
-  showNodes: 0
+  showNodes: 1
   showLabel: 0
   sizeLabel: 10
   offsetLabel: {x: -0.3, y: 0, z: 0.2}
-  alphaColor: 1
+  alphaColor: 0.3
 --- !u!4 &1168158567
 Transform:
   m_ObjectHideFlags: 0

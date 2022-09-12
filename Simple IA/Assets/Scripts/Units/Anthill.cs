@@ -13,7 +13,7 @@ public class Anthill : MonoBehaviour
 
     private Anthill origin;
     private List<Ant> ants = new List<Ant>();
-    private float visionRadius = 20.0f;
+    private float visionRadius = 25.0f;
     [SerializeField] private float timeToSpawningAnts = 0.1f;
 
     private void Awake ()
@@ -49,7 +49,8 @@ public class Anthill : MonoBehaviour
 
     public Transform GetNewResource ()
     {
-        Resource resource = resourceManager.GetRandomResource();
+        Resource resource = resourceManager.GetNearResource(origin.transform.position, visionRadius);//.GetRandomResource();
+
         if (resource != null)
             return resource.transform;
         return null;

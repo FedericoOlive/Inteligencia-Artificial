@@ -80,6 +80,5 @@ public class Node
         state = NodeState.Ready;
         viewerId = -1;
         openerId = -1;
-
     }
 }

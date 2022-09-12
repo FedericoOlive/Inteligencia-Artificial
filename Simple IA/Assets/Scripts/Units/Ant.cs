@@ -18,8 +18,8 @@ public class Ant : MonoBehaviour
     private ResourceCharge resourceCharge = new ResourceCharge();
     private FiniteStateMachine finiteStateMachine;
 
-    private List<Vector3Int> path = new List<Vector3Int>();
-    private List<Vector3Int> pathBack = new List<Vector3Int>();
+    [SerializeField] private List<Vector3Int> path = new List<Vector3Int>();
+    [SerializeField] private List<Vector3Int> pathBack = new List<Vector3Int>();
 
 
     private void Awake ()
@@ -76,9 +76,14 @@ public class Ant : MonoBehaviour
         {
             Transform newResource = anthill.GetNewResource();
             if (newResource)
+            {
                 resource = newResource.GetComponent<Resource>();
+                path = NodeGenerator.GetPath(transform.position, resource.transform.position);
+            }
+
             return;
         }
+
         meshRenderer.material.color = Color.white;
 
         finiteStateMachine.SetFlag(ref currentState, Flags.OnReceiveResource);
@@ -86,37 +91,61 @@ public class Ant : MonoBehaviour
 
     private void GoingToAnthillBehaviour ()
     {
-        Vector3 dir = (anthill.transform.position - transform.position).normalized;
+        if (pathBack.Count < 1)
+        {
+            finiteStateMachine.SetFlag(ref currentState, Flags.OnArriveWithResource);
+            path.Reverse();
+            return;
+        }
 
-        if (GetDistanceXZ(anthill.transform.position, transform.position) > 0.1f)
+        if (path.Count < 1)
+        {
+            path.Add(pathBack[0]);
+            pathBack.Remove(pathBack[0]);
+        }
+
+        Vector3 dir = (pathBack[0] - transform.position);
+        dir.Normalize();
+
+        if (NodeUtils.GetDistanceXZ(pathBack[0], transform.position) > 0.1f)
         {
             Vector3 movement = dir * stats.speed * Time.deltaTime;
             transform.position += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
-            finiteStateMachine.SetFlag(ref currentState, Flags.OnArriveWithResource);
+            path.Add(pathBack[0]);
+            pathBack.Remove(pathBack[0]);
         }
     }
 
     private void GoingToResourceBehaviour ()
     {
-        if (!resource)
+        if (path.Count < 1)
         {
             finiteStateMachine.SetFlag(ref currentState, Flags.OnArriveResource);
+            pathBack.Reverse();
             return;
         }
 
-        Vector3 dir = (resource.transform.position - transform.position).normalized;
+        if (pathBack.Count < 1)
+        {
+            pathBack.Add(path[0]);
+            path.Remove(path[0]);
+        }
 
-        if (GetDistanceXZ(resource.transform.position, transform.position) > 0.1f)
+        Vector3 dir = (path[0] - transform.position);
+        dir.Normalize();
+
+        if (NodeUtils.GetDistanceXZ(path[0], transform.position) > 0.1f)
         {
             Vector3 movement = dir * stats.speed * Time.deltaTime;
             transform.position += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
-            finiteStateMachine.SetFlag(ref currentState, Flags.OnArriveResource);
+            pathBack.Add(path[0]);
+            path.Remove(path[0]);
         }
     }
 
@@ -154,12 +183,6 @@ public class Ant : MonoBehaviour
         finiteStateMachine.SetFlag(ref currentState, flag);
     }
 
-    private float GetDistanceXZ (Vector3 vec3One, Vector3 vec3Two)
-    {
-        Vector2 pos1 = new Vector2(vec3One.x, vec3One.z);
-        Vector2 pos2 = new Vector2(vec3Two.x, vec3Two.z);
-        return Vector2.Distance(pos1, pos2);
-    }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected ()

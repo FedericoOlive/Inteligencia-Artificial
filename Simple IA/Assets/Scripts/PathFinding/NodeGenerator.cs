@@ -11,7 +11,7 @@ public class NodeGenerator : MonoBehaviour
     public Vector3Int mapSize;
     private static Node[] map;
     private static Pathfinding pathfinding;
-
+    public static int AuxDelete = 11;
     public Vector3Int startPos = new Vector3Int();
     public Vector3Int endPos = new Vector3Int();
 
@@ -36,6 +36,13 @@ public class NodeGenerator : MonoBehaviour
                 ID++;
             }
         }
+    }
+
+    public static List<Vector3Int> GetPath (Vector3 origin, Vector3 end)
+    {
+        Vector3Int originPos = new Vector3Int(Mathf.RoundToInt(origin.x), Mathf.RoundToInt(origin.y), Mathf.RoundToInt(origin.z));
+        Vector3Int endPos = new Vector3Int(Mathf.RoundToInt(end.x), Mathf.RoundToInt(end.y), Mathf.RoundToInt(end.z));
+        return GetPath(originPos, endPos);
     }
 
     public static List<Vector3Int> GetPath (Vector3Int origin, Vector3Int end)
