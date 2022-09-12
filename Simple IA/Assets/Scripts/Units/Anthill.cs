@@ -14,6 +14,7 @@ public class Anthill : MonoBehaviour
     private Anthill origin;
     private List<Ant> ants = new List<Ant>();
     private float visionRadius = 20.0f;
+    [SerializeField] private float timeToSpawningAnts = 0.1f;
 
     private void Awake ()
     {
@@ -25,28 +26,14 @@ public class Anthill : MonoBehaviour
         GetNewResource();
     }
 
-    private void Update ()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftControl))
-        {
-            StartCoroutine(SpawnMultipleAnts(100));
-        }
-        else if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift))
-        {
-            StartCoroutine(SpawnMultipleAnts(10));
-        }
-        else if (Input.GetKeyDown(KeyCode.Space))
-        {
-            StartCoroutine(SpawnMultipleAnts(1));
-        }
-    }
-
+    public void SpawnAnts (int amount) => StartCoroutine(SpawnMultipleAnts(amount));
+    
     private IEnumerator SpawnMultipleAnts (int amount)
     {
         for (int i = 0; i < amount; i++)
         {
             AddAnt();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(timeToSpawningAnts);
         }
     }
 
@@ -64,6 +51,14 @@ public class Anthill : MonoBehaviour
         if (resource != null)
             return resource.transform;
         return null;
+    }
+
+    public void SetOrderToAnt (Flags flag)
+    {
+        for (int i = 0; i < ants.Count; i++)
+        {
+            ants[i].SetFlag(flag);
+        }
     }
 
 #if UNITY_EDITOR

@@ -97,5 +97,10 @@ public enum Flags
     OnReachDeposit,
     OnEmpyMine,
     OnEmptyInventory,
+
+    ForceToIdle,
+    ForceToAnthill,
+    ForceToHarvesting,
+
     Last
 }

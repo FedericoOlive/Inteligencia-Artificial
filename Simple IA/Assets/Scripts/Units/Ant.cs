@@ -56,10 +56,10 @@ public class Ant : MonoBehaviour
         finiteStateMachine.SetRelation(States.GoToAnthill, Flags.OnReachDeposit, States.GoToMine);
         finiteStateMachine.SetRelation(States.Idle, Flags.OnReachDeposit, States.GoToMine);
 
-        finiteStateMachine.AddBehaviour(States.Harvesting, MiningBehaviour);
+        finiteStateMachine.AddBehaviour(States.Harvesting, HarvestingBehaviour);
         finiteStateMachine.AddBehaviour(States.GoToMine, GoingToResourceBehaviour);
         finiteStateMachine.AddBehaviour(States.GoToAnthill, GoingToAnthillBehaviour);
-        finiteStateMachine.AddBehaviour(States.Idle, WaitingInstruction);
+        finiteStateMachine.AddBehaviour(States.Idle, Idle);
 
         finiteStateMachine.AddBehaviour(States.Idle, () => { Debug.Log("Idle"); });
         finiteStateMachine.AddBehaviour(States.Harvesting, () => { Debug.Log("Taking"); });
@@ -67,8 +67,9 @@ public class Ant : MonoBehaviour
         finiteStateMachine.AddBehaviour(States.GoToAnthill, () => { Debug.Log("Go To Anthill"); });
     }
 
-    private void WaitingInstruction ()
+    private void Idle ()
     {
+        meshRenderer.material.color = Color.red;
         if (!resource)
         {
             Transform newResource = anthill.GetNewResource();
@@ -76,6 +77,7 @@ public class Ant : MonoBehaviour
                 resource = newResource.GetComponent<Resource>();
             return;
         }
+        meshRenderer.material.color = Color.white;
 
         finiteStateMachine.SetFlag(ref currentState, Flags.OnReachDeposit);
     }
@@ -116,7 +118,7 @@ public class Ant : MonoBehaviour
         }
     }
 
-    private void MiningBehaviour ()
+    private void HarvestingBehaviour ()
     {
         if (currentActionTime < stats.pickTime)
         {
@@ -143,6 +145,11 @@ public class Ant : MonoBehaviour
             currentActionTime = 0.0f;
             finiteStateMachine.SetFlag(ref currentState, Flags.OnEmptyInventory);
         }
+    }
+
+    public void SetFlag (Flags flag)
+    {
+        finiteStateMachine.SetFlag(ref currentState, flag);
     }
 
 #if UNITY_EDITOR
