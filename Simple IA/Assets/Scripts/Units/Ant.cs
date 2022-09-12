@@ -69,6 +69,20 @@ public class Ant : MonoBehaviour
         finiteStateMachine.AddBehaviour(States.Depositing, () => { Debug.Log("Depositing..."); });
         finiteStateMachine.AddBehaviour(States.GoingToResource, () => { Debug.Log("Going To Resource"); });
         finiteStateMachine.AddBehaviour(States.GoingToAnthill, () => { Debug.Log("Going To Anthill"); });
+
+
+
+        // Todo: Ver clase de distintos FSM: 18/08/2022 Minuto 27.
+        finiteStateMachine.SetRelation(States.Idle, Flags.ForceToPosition, States.ForceGoingToPosition);
+        finiteStateMachine.SetRelation(States.WaitingInstructions, Flags.ForceToPosition, States.ForceGoingToPosition);
+        finiteStateMachine.SetRelation(States.Harvesting, Flags.ForceToPosition, States.ForceGoingToPosition);
+        finiteStateMachine.SetRelation(States.GoingToResource, Flags.ForceToPosition, States.ForceGoingToPosition);
+        finiteStateMachine.SetRelation(States.GoingToAnthill, Flags.ForceToPosition, States.ForceGoingToPosition);
+        finiteStateMachine.SetRelation(States.Depositing, Flags.ForceToPosition, States.ForceGoingToPosition);
+
+        finiteStateMachine.AddBehaviour(States.ForceGoingToPosition, ForceGoingToPositionBehaviour);
+        finiteStateMachine.AddBehaviour(States.ForceGoingToAnthill, ForceGoingToAnthillBehaviour);
+        finiteStateMachine.AddBehaviour(States.ForceGoingToIdle, ForceGoingToIdleBehaviour);
     }
 
     private void ForceGoingToPositionBehaviour()
