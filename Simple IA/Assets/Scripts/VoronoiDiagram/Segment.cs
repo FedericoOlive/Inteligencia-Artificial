@@ -8,11 +8,13 @@ public class Segment
 
     private Vector3 direction;
     private Vector3 mediatrix;
+    public float distance;
 
     public Segment (Vector3 newOrigin, Vector3 newFinal)
     {
         origin = newOrigin;
         final = newFinal;
+        distance = Vector3.Distance(origin, final);
 
         mediatrix = new Vector3((origin.x + final.x) / 2, (origin.y + final.y) / 2, (origin.z + final.z) / 2);
 

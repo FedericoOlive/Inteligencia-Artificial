@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,12 +8,14 @@ using UnityEditor;
 [ExecuteAlways]
 public class VoronoiDiagram : MonoBehaviour
 {
+    [SerializeField] private List<PoligonsVoronoi> polis = new List<PoligonsVoronoi>();
     [SerializeField] private List<Transform> transformPoints = new List<Transform>();
     [SerializeField] private List<Transform> transformLimits = new List<Transform>();
     [SerializeField] private List<Segment> segments = new List<Segment>();
     public bool createSegments;
     public int distanceSegment;
     public float radiusMediatrix = 0.5f;
+    public bool drawSegments;
 
     private void Update ()
     {
@@ -28,26 +29,30 @@ public class VoronoiDiagram : MonoBehaviour
     private void CreateSegments ()
     {
         segments.Clear();
+        polis.Clear();
+        for (int i = 0; i < transformPoints.Count; i++)
+        {
+            PoligonsVoronoi poli = new PoligonsVoronoi();
+            polis.Add(poli);
+        }
+
         for (int i = 0; i < transformPoints.Count; i++)
         {
             for (int j = i + 1; j < transformPoints.Count; j++)
             {
-                Segment segment;
-                if (j >= transformPoints.Count)
-                    segment = new Segment(transformPoints[i].localPosition, transformPoints[0].localPosition);
-                else
-                    segment = new Segment(transformPoints[i].localPosition, transformPoints[j].localPosition);
-
+                Segment segment = new Segment(transformPoints[i].position, transformPoints[j].position);
                 segments.Add(segment);
+                polis[i].segments.Add(segment);
+                polis[j].segments.Add(segment);
             }
         }
 
-        DeleteUnusedSegments();
-    }
+        for (int i = 0; i < polis.Count; i++)
+        {
+            polis[i].segments.Sort((p1, p2) => p1.distance.CompareTo(p2.distance));
+        }
 
-    private void DeleteUnusedSegments ()
-    {
-
+        segments.Sort((p1, p2) => p1.distance.CompareTo(p2.distance));
     }
 
     private bool CheckMediatixIsNearOtherPoint (Segment segment, Vector3 point1, Vector3 point2)
@@ -71,6 +76,14 @@ public class VoronoiDiagram : MonoBehaviour
 
     private void OnDrawGizmos ()
     {
+        if (polis != null)
+        {
+            foreach (PoligonsVoronoi poli in polis)
+            {
+                poli.DrawPoli(distanceSegment, Color.red);
+            }
+        }
+
         DrawLimits();
         DrawSegments();
         DrawPointMediatrix();
@@ -81,8 +94,8 @@ public class VoronoiDiagram : MonoBehaviour
         if (transformLimits != null)
             for (int i = 0; i < transformLimits.Count; i++)
             {
-                Vector3 origin = transformLimits[i].localPosition;
-                Vector3 final = i < transformLimits.Count - 1 ? transformLimits[i + 1].localPosition : transformLimits[0].localPosition;
+                Vector3 origin = transformLimits[i].position;
+                Vector3 final = i < transformLimits.Count - 1 ? transformLimits[i + 1].position : transformLimits[0].position;
                 Gizmos.color = Color.red;
                 Gizmos.DrawLine(origin, final);
             }
@@ -90,13 +103,17 @@ public class VoronoiDiagram : MonoBehaviour
 
     private void DrawSegments ()
     {
+        if (!drawSegments)
+            return;
         Gizmos.color = Color.blue;
         if (segments != null)
+        {
             foreach (Segment segment in segments)
             {
                 Gizmos.DrawRay(segment.Mediatrix, segment.Direction * distanceSegment);
                 Gizmos.DrawRay(segment.Mediatrix, -segment.Direction * distanceSegment);
             }
+        }
     }
 
     private void DrawPointMediatrix ()
