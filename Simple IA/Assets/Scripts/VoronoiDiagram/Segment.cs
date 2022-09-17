@@ -5,19 +5,15 @@ public class Segment
 {
     public static int amountSegments = 0;
     public int id = 0;
-    private Vector3 origin;
-    private Vector3 final;
+
+    public Vector3 origin;
+    public Vector3 final;
 
     public Vector3 direction;
     public Vector3 mediatrix;
     public float distance;
 
-    public Vector3 nearIntersection;
-    public Vector3 pointFrom;
-    public Vector3 pointTo;
 
-    public int idIntersection = 0;
-    public Segment segmentIntersection;
 
     public Segment (Vector3 newOrigin, Vector3 newFinal)
     {
@@ -34,7 +30,6 @@ public class Segment
         direction.x = perpendicular.x;
         direction.y = 0;
         direction.z = perpendicular.y;
-        nearIntersection = Vector3.zero;
     }
 
     public Vector3 Direction => direction;
