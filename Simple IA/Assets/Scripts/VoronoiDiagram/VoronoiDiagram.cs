@@ -16,6 +16,7 @@ public class VoronoiDiagram : MonoBehaviour
     public int distanceSegment;
     public float radiusMediatrix = 0.5f;
     public bool drawSegments;
+    [SerializeField] private List<Vector2> intersections = new List<Vector2>();
 
     private void Update ()
     {
@@ -28,6 +29,7 @@ public class VoronoiDiagram : MonoBehaviour
 
     private void CreateSegments ()
     {
+        Segment.amountSegments = 0;
         segments.Clear();
         polis.Clear();
         for (int i = 0; i < transformPoints.Count; i++)
@@ -42,17 +44,31 @@ public class VoronoiDiagram : MonoBehaviour
             {
                 Segment segment = new Segment(transformPoints[i].position, transformPoints[j].position);
                 segments.Add(segment);
-                polis[i].segments.Add(segment);
-                polis[j].segments.Add(segment);
+                polis[i].AddSegment(segment);
+                polis[j].AddSegment(segment);
             }
         }
 
         for (int i = 0; i < polis.Count; i++)
         {
-            polis[i].segments.Sort((p1, p2) => p1.distance.CompareTo(p2.distance));
+            polis[i].SortSegment();
+            polis[i].SetIntersections();
         }
 
         segments.Sort((p1, p2) => p1.distance.CompareTo(p2.distance));
+
+
+        intersections.Clear();
+        for (int i = 0; i < segments.Count; i++)
+        {
+            for (int j = i + 1; j < segments.Count - 1; j++)
+            {
+                segments[i].GetTwoPoints(out Vector2 p1, out Vector2 p2);
+                segments[j].GetTwoPoints(out Vector2 p3, out Vector2 p4);
+
+                intersections.Add(Segment.Intersection(p1, p2, p3, p4));
+            }
+        }
     }
 
     private bool CheckMediatixIsNearOtherPoint (Segment segment, Vector3 point1, Vector3 point2)
@@ -84,9 +100,24 @@ public class VoronoiDiagram : MonoBehaviour
             }
         }
 
+        return;
         DrawLimits();
         DrawSegments();
         DrawPointMediatrix();
+        DrawIntersections();
+    }
+
+    private void DrawIntersections ()
+    {
+        //Gizmos.color = Color.red;
+        //if (intersections != null)
+        //{
+        //    foreach (Vector2 intersection in intersections)
+        //    {
+        //        Vector3 pos = new Vector3(intersection.x, 0, intersection.y);
+        //        Gizmos.DrawSphere(pos, radiusMediatrix);
+        //    }
+        //}
     }
 
     private void DrawLimits ()
@@ -118,12 +149,12 @@ public class VoronoiDiagram : MonoBehaviour
 
     private void DrawPointMediatrix ()
     {
-        Gizmos.color = Color.cyan;
-        if (segments != null)
-            foreach (Segment segment in segments)
-            {
-                Gizmos.DrawSphere(segment.Mediatrix, radiusMediatrix);
-            }
+        //Gizmos.color = Color.cyan;
+        //if (segments != null)
+        //    foreach (Segment segment in segments)
+        //    {
+        //        Gizmos.DrawSphere(segment.Mediatrix, radiusMediatrix);
+        //    }
     }
 #endif
 }
