@@ -637,9 +637,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   createSegments: 0
-  distanceSegment: 10
+  drawPolis: 1
   polis:
-  - drawPoli: 1
+  - drawPoli: 0
     segments:
     - id: 40
       isLimit: 0
@@ -648,6 +648,9 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: -10}
       mediatrix: {x: 100, y: 0, z: 105}
       distance: 10
+      intersection:
+      - {x: 100, y: 0, z: 100}
+      - {x: 100, y: 0, z: 110.55}
     - id: 43
       isLimit: 0
       origin: {x: 105, y: 0, z: 105}
@@ -655,6 +658,9 @@ MonoBehaviour:
       direction: {x: 10, y: 0, z: 0}
       mediatrix: {x: 105, y: 0, z: 100}
       distance: 10
+      intersection:
+      - {x: 100, y: 0, z: 100}
+      - {x: 114.21875, y: 0, z: 100}
     - id: 5
       isLimit: 0
       origin: {x: 105, y: 0, z: 105}
@@ -662,6 +668,9 @@ MonoBehaviour:
       direction: {x: -10, y: 0, z: 1}
       mediatrix: {x: 105.5, y: 0, z: 110}
       distance: 10.049875
+      intersection:
+      - {x: 100, y: 0, z: 110.55}
+      - {x: 110.5, y: 0, z: 109.5}
     - id: 3
       isLimit: 0
       origin: {x: 105, y: 0, z: 105}
@@ -669,6 +678,9 @@ MonoBehaviour:
       direction: {x: -9, y: 0, z: 11}
       mediatrix: {x: 110.5, y: 0, z: 109.5}
       distance: 14.21267
+      intersection:
+      - {x: 110.5, y: 0, z: 109.5}
+      - {x: 113.01351, y: 0, z: 106.427925}
     - id: 1
       isLimit: 0
       origin: {x: 105, y: 0, z: 105}
@@ -676,27 +688,9 @@ MonoBehaviour:
       direction: {x: -3, y: 0, z: 16}
       mediatrix: {x: 113, y: 0, z: 106.5}
       distance: 16.27882
-    - id: 7
-      isLimit: 0
-      origin: {x: 105, y: 0, z: 105}
-      final: {x: 124, y: 0, z: 115}
-      direction: {x: -10, y: 0, z: 19}
-      mediatrix: {x: 114.5, y: 0, z: 110}
-      distance: 21.470911
-    - id: 41
-      isLimit: 0
-      origin: {x: 105, y: 0, z: 105}
-      final: {x: 105, y: 0, z: 135}
-      direction: {x: -30, y: 0, z: 0}
-      mediatrix: {x: 105, y: 0, z: 120}
-      distance: 30
-    - id: 42
-      isLimit: 0
-      origin: {x: 105, y: 0, z: 105}
-      final: {x: 167, y: 0, z: 105}
-      direction: {x: -0, y: 0, z: 62}
-      mediatrix: {x: 136, y: 0, z: 105}
-      distance: 62
+      intersection:
+      - {x: 114.21875, y: 0, z: 100}
+      - {x: 113.01351, y: 0, z: 106.427925}
     limits:
     - id: 40
       isLimit: 0
@@ -705,6 +699,9 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: -10}
       mediatrix: {x: 100, y: 0, z: 105}
       distance: 10
+      intersection:
+      - {x: 100, y: 0, z: 100}
+      - {x: 100, y: 0, z: 110.55}
     - id: 41
       isLimit: 0
       origin: {x: 105, y: 0, z: 105}
@@ -712,6 +709,7 @@ MonoBehaviour:
       direction: {x: -30, y: 0, z: 0}
       mediatrix: {x: 105, y: 0, z: 120}
       distance: 30
+      intersection: []
     - id: 42
       isLimit: 0
       origin: {x: 105, y: 0, z: 105}
@@ -719,6 +717,7 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: 62}
       mediatrix: {x: 136, y: 0, z: 105}
       distance: 62
+      intersection: []
     - id: 43
       isLimit: 0
       origin: {x: 105, y: 0, z: 105}
@@ -726,12 +725,15 @@ MonoBehaviour:
       direction: {x: 10, y: 0, z: 0}
       mediatrix: {x: 105, y: 0, z: 100}
       distance: 10
+      intersection:
+      - {x: 100, y: 0, z: 100}
+      - {x: 114.21875, y: 0, z: 100}
     intersections:
-    - {x: 100, y: 0, z: 110.55}
     - {x: 100, y: 0, z: 100}
     - {x: 114.21875, y: 0, z: 100}
     - {x: 113.01351, y: 0, z: 106.427925}
     - {x: 110.5, y: 0, z: 109.5}
+    - {x: 100, y: 0, z: 110.55}
   - drawPoli: 0
     segments:
     - id: 15
@@ -741,6 +743,9 @@ MonoBehaviour:
       direction: {x: -7, y: 0, z: 3}
       mediatrix: {x: 122.5, y: 0, z: 111.5}
       distance: 7.615773
+      intersection:
+      - {x: 120.254715, y: 0, z: 112.462265}
+      - {x: 136, y: 0, z: 105.71429}
     - id: 11
       isLimit: 0
       origin: {x: 121, y: 0, z: 108}
@@ -748,6 +753,9 @@ MonoBehaviour:
       direction: {x: -6, y: 0, z: -5}
       mediatrix: {x: 118.5, y: 0, z: 111}
       distance: 7.81025
+      intersection:
+      - {x: 120.254715, y: 0, z: 112.462265}
+      - {x: 113.01351, y: 0, z: 106.427925}
     - id: 47
       isLimit: 0
       origin: {x: 121, y: 0, z: 108}
@@ -755,6 +763,9 @@ MonoBehaviour:
       direction: {x: 16, y: 0, z: 0}
       mediatrix: {x: 121, y: 0, z: 100}
       distance: 16
+      intersection:
+      - {x: 114.21875, y: 0, z: 100}
+      - {x: 136, y: 0, z: 100}
     - id: 9
       isLimit: 0
       origin: {x: 121, y: 0, z: 108}
@@ -762,20 +773,9 @@ MonoBehaviour:
       direction: {x: 3, y: 0, z: -16}
       mediatrix: {x: 113, y: 0, z: 106.5}
       distance: 16.27882
-    - id: 13
-      isLimit: 0
-      origin: {x: 121, y: 0, z: 108}
-      final: {x: 106, y: 0, z: 115}
-      direction: {x: -7, y: 0, z: -15}
-      mediatrix: {x: 113.5, y: 0, z: 111.5}
-      distance: 16.552946
-    - id: 45
-      isLimit: 0
-      origin: {x: 121, y: 0, z: 108}
-      final: {x: 121, y: 0, z: 132}
-      direction: {x: -24, y: 0, z: 0}
-      mediatrix: {x: 121, y: 0, z: 120}
-      distance: 24
+      intersection:
+      - {x: 113.01351, y: 0, z: 106.427925}
+      - {x: 114.21875, y: 0, z: 100}
     - id: 46
       isLimit: 0
       origin: {x: 121, y: 0, z: 108}
@@ -783,13 +783,9 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: 30}
       mediatrix: {x: 136, y: 0, z: 108}
       distance: 30
-    - id: 44
-      isLimit: 0
-      origin: {x: 121, y: 0, z: 108}
-      final: {x: 79, y: 0, z: 108}
-      direction: {x: -0, y: 0, z: -42}
-      mediatrix: {x: 100, y: 0, z: 108}
-      distance: 42
+      intersection:
+      - {x: 136, y: 0, z: 105.71429}
+      - {x: 136, y: 0, z: 100}
     limits:
     - id: 44
       isLimit: 0
@@ -798,6 +794,7 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: -42}
       mediatrix: {x: 100, y: 0, z: 108}
       distance: 42
+      intersection: []
     - id: 45
       isLimit: 0
       origin: {x: 121, y: 0, z: 108}
@@ -805,6 +802,7 @@ MonoBehaviour:
       direction: {x: -24, y: 0, z: 0}
       mediatrix: {x: 121, y: 0, z: 120}
       distance: 24
+      intersection: []
     - id: 46
       isLimit: 0
       origin: {x: 121, y: 0, z: 108}
@@ -812,6 +810,9 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: 30}
       mediatrix: {x: 136, y: 0, z: 108}
       distance: 30
+      intersection:
+      - {x: 136, y: 0, z: 105.71429}
+      - {x: 136, y: 0, z: 100}
     - id: 47
       isLimit: 0
       origin: {x: 121, y: 0, z: 108}
@@ -819,12 +820,15 @@ MonoBehaviour:
       direction: {x: 16, y: 0, z: 0}
       mediatrix: {x: 121, y: 0, z: 100}
       distance: 16
+      intersection:
+      - {x: 114.21875, y: 0, z: 100}
+      - {x: 136, y: 0, z: 100}
     intersections:
     - {x: 120.254715, y: 0, z: 112.462265}
-    - {x: 136, y: 0, z: 105.71429}
-    - {x: 136, y: 0, z: 100}
-    - {x: 114.21875, y: 0, z: 100}
     - {x: 113.01351, y: 0, z: 106.427925}
+    - {x: 114.21875, y: 0, z: 100}
+    - {x: 136, y: 0, z: 100}
+    - {x: 136, y: 0, z: 105.71429}
   - drawPoli: 0
     segments:
     - id: 19
@@ -834,6 +838,9 @@ MonoBehaviour:
       direction: {x: 6, y: 0, z: 5}
       mediatrix: {x: 118.5, y: 0, z: 111}
       distance: 7.81025
+      intersection:
+      - {x: 120.254715, y: 0, z: 112.462265}
+      - {x: 113.01351, y: 0, z: 106.427925}
     - id: 23
       isLimit: 0
       origin: {x: 116, y: 0, z: 114}
@@ -841,6 +848,9 @@ MonoBehaviour:
       direction: {x: -1, y: 0, z: 8}
       mediatrix: {x: 120, y: 0, z: 114.5}
       distance: 8.062258
+      intersection:
+      - {x: 120.254715, y: 0, z: 112.462265}
+      - {x: 119.3125, y: 0, z: 120}
     - id: 21
       isLimit: 0
       origin: {x: 116, y: 0, z: 114}
@@ -848,6 +858,9 @@ MonoBehaviour:
       direction: {x: -1, y: 0, z: -10}
       mediatrix: {x: 111, y: 0, z: 114.5}
       distance: 10.049875
+      intersection:
+      - {x: 111.55, y: 0, z: 120}
+      - {x: 110.5, y: 0, z: 109.5}
     - id: 49
       isLimit: 0
       origin: {x: 116, y: 0, z: 114}
@@ -855,6 +868,9 @@ MonoBehaviour:
       direction: {x: -12, y: 0, z: 0}
       mediatrix: {x: 116, y: 0, z: 120}
       distance: 12
+      intersection:
+      - {x: 119.3125, y: 0, z: 120}
+      - {x: 111.55, y: 0, z: 120}
     - id: 17
       isLimit: 0
       origin: {x: 116, y: 0, z: 114}
@@ -862,27 +878,9 @@ MonoBehaviour:
       direction: {x: 9, y: 0, z: -11}
       mediatrix: {x: 110.5, y: 0, z: 109.5}
       distance: 14.21267
-    - id: 51
-      isLimit: 0
-      origin: {x: 116, y: 0, z: 114}
-      final: {x: 116, y: 0, z: 86}
-      direction: {x: 28, y: 0, z: 0}
-      mediatrix: {x: 116, y: 0, z: 100}
-      distance: 28
-    - id: 48
-      isLimit: 0
-      origin: {x: 116, y: 0, z: 114}
-      final: {x: 84, y: 0, z: 114}
-      direction: {x: -0, y: 0, z: -32}
-      mediatrix: {x: 100, y: 0, z: 114}
-      distance: 32
-    - id: 50
-      isLimit: 0
-      origin: {x: 116, y: 0, z: 114}
-      final: {x: 156, y: 0, z: 114}
-      direction: {x: -0, y: 0, z: 40}
-      mediatrix: {x: 136, y: 0, z: 114}
-      distance: 40
+      intersection:
+      - {x: 113.01351, y: 0, z: 106.427925}
+      - {x: 110.5, y: 0, z: 109.5}
     limits:
     - id: 48
       isLimit: 0
@@ -891,6 +889,7 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: -32}
       mediatrix: {x: 100, y: 0, z: 114}
       distance: 32
+      intersection: []
     - id: 49
       isLimit: 0
       origin: {x: 116, y: 0, z: 114}
@@ -898,6 +897,9 @@ MonoBehaviour:
       direction: {x: -12, y: 0, z: 0}
       mediatrix: {x: 116, y: 0, z: 120}
       distance: 12
+      intersection:
+      - {x: 119.3125, y: 0, z: 120}
+      - {x: 111.55, y: 0, z: 120}
     - id: 50
       isLimit: 0
       origin: {x: 116, y: 0, z: 114}
@@ -905,6 +907,7 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: 40}
       mediatrix: {x: 136, y: 0, z: 114}
       distance: 40
+      intersection: []
     - id: 51
       isLimit: 0
       origin: {x: 116, y: 0, z: 114}
@@ -912,12 +915,13 @@ MonoBehaviour:
       direction: {x: 28, y: 0, z: 0}
       mediatrix: {x: 116, y: 0, z: 100}
       distance: 28
+      intersection: []
     intersections:
-    - {x: 111.55, y: 0, z: 120}
-    - {x: 119.3125, y: 0, z: 120}
     - {x: 120.254715, y: 0, z: 112.462265}
-    - {x: 113.01351, y: 0, z: 106.427925}
+    - {x: 119.3125, y: 0, z: 120}
+    - {x: 111.55, y: 0, z: 120}
     - {x: 110.5, y: 0, z: 109.5}
+    - {x: 113.01351, y: 0, z: 106.427925}
   - drawPoli: 0
     segments:
     - id: 53
@@ -927,6 +931,9 @@ MonoBehaviour:
       direction: {x: -10, y: 0, z: 0}
       mediatrix: {x: 106, y: 0, z: 120}
       distance: 10
+      intersection:
+      - {x: 111.55, y: 0, z: 120}
+      - {x: 100, y: 0, z: 120}
     - id: 25
       isLimit: 0
       origin: {x: 106, y: 0, z: 115}
@@ -934,6 +941,9 @@ MonoBehaviour:
       direction: {x: 10, y: 0, z: -1}
       mediatrix: {x: 105.5, y: 0, z: 110}
       distance: 10.049875
+      intersection:
+      - {x: 110.5, y: 0, z: 109.5}
+      - {x: 100, y: 0, z: 110.55}
     - id: 29
       isLimit: 0
       origin: {x: 106, y: 0, z: 115}
@@ -941,6 +951,9 @@ MonoBehaviour:
       direction: {x: 1, y: 0, z: 10}
       mediatrix: {x: 111, y: 0, z: 114.5}
       distance: 10.049875
+      intersection:
+      - {x: 111.55, y: 0, z: 120}
+      - {x: 110.5, y: 0, z: 109.5}
     - id: 52
       isLimit: 0
       origin: {x: 106, y: 0, z: 115}
@@ -948,34 +961,9 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: -12}
       mediatrix: {x: 100, y: 0, z: 115}
       distance: 12
-    - id: 27
-      isLimit: 0
-      origin: {x: 106, y: 0, z: 115}
-      final: {x: 121, y: 0, z: 108}
-      direction: {x: 7, y: 0, z: 15}
-      mediatrix: {x: 113.5, y: 0, z: 111.5}
-      distance: 16.552946
-    - id: 31
-      isLimit: 0
-      origin: {x: 106, y: 0, z: 115}
-      final: {x: 124, y: 0, z: 115}
-      direction: {x: -0, y: 0, z: 18}
-      mediatrix: {x: 115, y: 0, z: 115}
-      distance: 18
-    - id: 55
-      isLimit: 0
-      origin: {x: 106, y: 0, z: 115}
-      final: {x: 106, y: 0, z: 85}
-      direction: {x: 30, y: 0, z: 0}
-      mediatrix: {x: 106, y: 0, z: 100}
-      distance: 30
-    - id: 54
-      isLimit: 0
-      origin: {x: 106, y: 0, z: 115}
-      final: {x: 166, y: 0, z: 115}
-      direction: {x: -0, y: 0, z: 60}
-      mediatrix: {x: 136, y: 0, z: 115}
-      distance: 60
+      intersection:
+      - {x: 100, y: 0, z: 120}
+      - {x: 100, y: 0, z: 110.55}
     limits:
     - id: 52
       isLimit: 0
@@ -984,6 +972,9 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: -12}
       mediatrix: {x: 100, y: 0, z: 115}
       distance: 12
+      intersection:
+      - {x: 100, y: 0, z: 120}
+      - {x: 100, y: 0, z: 110.55}
     - id: 53
       isLimit: 0
       origin: {x: 106, y: 0, z: 115}
@@ -991,6 +982,9 @@ MonoBehaviour:
       direction: {x: -10, y: 0, z: 0}
       mediatrix: {x: 106, y: 0, z: 120}
       distance: 10
+      intersection:
+      - {x: 111.55, y: 0, z: 120}
+      - {x: 100, y: 0, z: 120}
     - id: 54
       isLimit: 0
       origin: {x: 106, y: 0, z: 115}
@@ -998,6 +992,7 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: 60}
       mediatrix: {x: 136, y: 0, z: 115}
       distance: 60
+      intersection: []
     - id: 55
       isLimit: 0
       origin: {x: 106, y: 0, z: 115}
@@ -1005,11 +1000,12 @@ MonoBehaviour:
       direction: {x: 30, y: 0, z: 0}
       mediatrix: {x: 106, y: 0, z: 100}
       distance: 30
+      intersection: []
     intersections:
     - {x: 111.55, y: 0, z: 120}
-    - {x: 100, y: 0, z: 120}
-    - {x: 100, y: 0, z: 110.55}
     - {x: 110.5, y: 0, z: 109.5}
+    - {x: 100, y: 0, z: 110.55}
+    - {x: 100, y: 0, z: 120}
   - drawPoli: 0
     segments:
     - id: 35
@@ -1019,6 +1015,9 @@ MonoBehaviour:
       direction: {x: 7, y: 0, z: -3}
       mediatrix: {x: 122.5, y: 0, z: 111.5}
       distance: 7.615773
+      intersection:
+      - {x: 120.254715, y: 0, z: 112.462265}
+      - {x: 136, y: 0, z: 105.71429}
     - id: 37
       isLimit: 0
       origin: {x: 124, y: 0, z: 115}
@@ -1026,6 +1025,9 @@ MonoBehaviour:
       direction: {x: 1, y: 0, z: -8}
       mediatrix: {x: 120, y: 0, z: 114.5}
       distance: 8.062258
+      intersection:
+      - {x: 120.254715, y: 0, z: 112.462265}
+      - {x: 119.3125, y: 0, z: 120}
     - id: 57
       isLimit: 0
       origin: {x: 124, y: 0, z: 115}
@@ -1033,20 +1035,9 @@ MonoBehaviour:
       direction: {x: -10, y: 0, z: 0}
       mediatrix: {x: 124, y: 0, z: 120}
       distance: 10
-    - id: 39
-      isLimit: 0
-      origin: {x: 124, y: 0, z: 115}
-      final: {x: 106, y: 0, z: 115}
-      direction: {x: -0, y: 0, z: -18}
-      mediatrix: {x: 115, y: 0, z: 115}
-      distance: 18
-    - id: 33
-      isLimit: 0
-      origin: {x: 124, y: 0, z: 115}
-      final: {x: 105, y: 0, z: 105}
-      direction: {x: 10, y: 0, z: -19}
-      mediatrix: {x: 114.5, y: 0, z: 110}
-      distance: 21.470911
+      intersection:
+      - {x: 119.3125, y: 0, z: 120}
+      - {x: 136, y: 0, z: 120}
     - id: 58
       isLimit: 0
       origin: {x: 124, y: 0, z: 115}
@@ -1054,20 +1045,9 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: 24}
       mediatrix: {x: 136, y: 0, z: 115}
       distance: 24
-    - id: 59
-      isLimit: 0
-      origin: {x: 124, y: 0, z: 115}
-      final: {x: 124, y: 0, z: 85}
-      direction: {x: 30, y: 0, z: 0}
-      mediatrix: {x: 124, y: 0, z: 100}
-      distance: 30
-    - id: 56
-      isLimit: 0
-      origin: {x: 124, y: 0, z: 115}
-      final: {x: 76, y: 0, z: 115}
-      direction: {x: -0, y: 0, z: -48}
-      mediatrix: {x: 100, y: 0, z: 115}
-      distance: 48
+      intersection:
+      - {x: 136, y: 0, z: 105.71429}
+      - {x: 136, y: 0, z: 120}
     limits:
     - id: 56
       isLimit: 0
@@ -1076,6 +1056,7 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: -48}
       mediatrix: {x: 100, y: 0, z: 115}
       distance: 48
+      intersection: []
     - id: 57
       isLimit: 0
       origin: {x: 124, y: 0, z: 115}
@@ -1083,6 +1064,9 @@ MonoBehaviour:
       direction: {x: -10, y: 0, z: 0}
       mediatrix: {x: 124, y: 0, z: 120}
       distance: 10
+      intersection:
+      - {x: 119.3125, y: 0, z: 120}
+      - {x: 136, y: 0, z: 120}
     - id: 58
       isLimit: 0
       origin: {x: 124, y: 0, z: 115}
@@ -1090,6 +1074,9 @@ MonoBehaviour:
       direction: {x: -0, y: 0, z: 24}
       mediatrix: {x: 136, y: 0, z: 115}
       distance: 24
+      intersection:
+      - {x: 136, y: 0, z: 105.71429}
+      - {x: 136, y: 0, z: 120}
     - id: 59
       isLimit: 0
       origin: {x: 124, y: 0, z: 115}
@@ -1097,11 +1084,12 @@ MonoBehaviour:
       direction: {x: 30, y: 0, z: 0}
       mediatrix: {x: 124, y: 0, z: 100}
       distance: 30
+      intersection: []
     intersections:
+    - {x: 120.254715, y: 0, z: 112.462265}
     - {x: 119.3125, y: 0, z: 120}
     - {x: 136, y: 0, z: 120}
     - {x: 136, y: 0, z: 105.71429}
-    - {x: 120.254715, y: 0, z: 112.462265}
   transformPoints:
   - {fileID: 952410687}
   - {fileID: 990290878}

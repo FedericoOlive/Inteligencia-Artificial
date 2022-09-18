@@ -10,7 +10,7 @@ using UnityEditor;
 public class VoronoiDiagram : MonoBehaviour
 {
     public bool createSegments;
-    [SerializeField] private int distanceSegment = 10;
+    public bool drawPolis;
 
     [Space(15), SerializeField] private List<PoligonsVoronoi> polis = new List<PoligonsVoronoi>();
     [SerializeField] private List<Transform> transformPoints = new List<Transform>();
@@ -53,37 +53,20 @@ public class VoronoiDiagram : MonoBehaviour
         }
     }
 
-    private bool CheckMediatixIsNearOtherPoint (Segment segment, Vector3 point1, Vector3 point2)
-    {
-        float distance = Vector3.Distance(point1, point2);
-
-        foreach (Transform point in transformPoints)
-        {
-            if (point.localPosition == point1) continue;
-            if (point.localPosition == point2) continue;
-
-            float distanceToSegment = Vector3.Distance(segment.Mediatrix, point.localPosition);
-            if (distanceToSegment < distance)
-                return true;
-        }
-
-        return false;
-    }
-
 #if UNITY_EDITOR
-
+    
     private void OnDrawGizmos ()
     {
-        DrawPolis();
+        DrawPolis(drawPolis);
     }
 
-    private void DrawPolis ()
+    private void DrawPolis (bool drawPolis)
     {
         if (polis != null)
         {
             foreach (PoligonsVoronoi poli in polis)
             {
-                poli.DrawPoli(distanceSegment);
+                poli.DrawPoli(drawPolis);
             }
         }
     }

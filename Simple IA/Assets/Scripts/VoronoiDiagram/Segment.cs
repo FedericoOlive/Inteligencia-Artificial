@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -12,8 +13,8 @@ public class Segment
     [SerializeField] private Vector3 direction;
     [SerializeField] private Vector3 mediatrix;
     [SerializeField] private float distance;
-    
 
+    public List<Vector3> intersection = new List<Vector3>();
 
     public Segment (Vector3 newOrigin, Vector3 newFinal)
     {
