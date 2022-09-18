@@ -5,14 +5,14 @@ public class Segment
 {
     public static int amountSegments = 0;
     public int id = 0;
+    public bool isLimit;
+    [SerializeField] private Vector3 origin;
+    [SerializeField] private Vector3 final;
 
-    public Vector3 origin;
-    public Vector3 final;
-
-    public Vector3 direction;
-    public Vector3 mediatrix;
-    public float distance;
-
+    [SerializeField] private Vector3 direction;
+    [SerializeField] private Vector3 mediatrix;
+    [SerializeField] private float distance;
+    
 
 
     public Segment (Vector3 newOrigin, Vector3 newFinal)
@@ -36,12 +36,12 @@ public class Segment
     public Vector3 Mediatrix => mediatrix;
     public Vector3 Origin => origin;
     public Vector3 Final => final;
+    public float Distance => distance;
 
-    public void GetTwoPoints (out Vector2 p1, out Vector2 p2)
+    public void GetTwoPoints (out Vector3 p1, out Vector3 p2)
     {
-        p1 = new Vector2(mediatrix.x, mediatrix.z);
-        Vector3 aux = mediatrix + direction * 10;
-        p2 = new Vector2(aux.x, aux.z);
+        p1 = mediatrix;
+        p2 = mediatrix + direction * 10;
     }
 
     /// <summary>
@@ -52,16 +52,23 @@ public class Segment
     /// <param name="bp1">Recta 2 Punto 1</param>
     /// <param name="bp2">Recta 2 Punto 2</param>
     /// <returns></returns>
-    public static Vector2 Intersection(Vector2 ap1, Vector2 ap2, Vector2 bp1, Vector2 bp2)
+    public static Vector3 Intersection(Vector3 ap1, Vector3 ap2, Vector3 bp1, Vector3 bp2)
     {
         // https://es.wikipedia.org/wiki/Intersección_de_dos_rectas o https://en.wikipedia.org/wiki/Line–line_intersection
-        Vector2 intersection = Vector2.zero;
-        if (((ap1.x - ap2.x) * (bp1.y - bp2.y) - (ap1.y - ap2.y) * (bp1.x - bp2.x)) == 0)
+        Vector3 intersection = Vector3.zero;
+        if (((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x)) == 0)
             return intersection;
 
-        intersection.x = ((ap1.x * ap2.y - ap1.y * ap2.x) * (bp1.x - bp2.x) - (ap1.x - ap2.x) * (bp1.x * bp2.y - bp1.y * bp2.x)) / ((ap1.x - ap2.x) * (bp1.y - bp2.y) - (ap1.y - ap2.y) * (bp1.x - bp2.x));
-        intersection.y = ((ap1.x * ap2.y - ap1.y * ap2.x) * (bp1.y - bp2.y) - (ap1.y - ap2.y) * (bp1.x * bp2.y - bp1.y * bp2.x)) / ((ap1.x - ap2.x) * (bp1.y - bp2.y) - (ap1.y - ap2.y) * (bp1.x - bp2.x));
+        intersection.x = ((ap1.x * ap2.z - ap1.z * ap2.x) * (bp1.x - bp2.x) - (ap1.x - ap2.x) * (bp1.x * bp2.z - bp1.z * bp2.x)) / ((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x));
+        intersection.z = ((ap1.x * ap2.z - ap1.z * ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x * bp2.z - bp1.z * bp2.x)) / ((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x));
 
         return intersection;
+    }
+
+    public void DrawSegment (float distanceSegment)
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawRay(mediatrix, direction * distanceSegment);
+        Gizmos.DrawRay(mediatrix, -direction * distanceSegment);
     }
 }

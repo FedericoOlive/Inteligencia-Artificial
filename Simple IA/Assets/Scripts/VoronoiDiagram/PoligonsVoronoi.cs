@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [System.Serializable]
@@ -6,10 +7,10 @@ public class PoligonsVoronoi
 {
     public bool drawPoli;
     [SerializeField] private List<Segment> segments = new List<Segment>();
-    [SerializeField] private List<Vector2> intersections = new List<Vector2>();
-
-    public List<Segment> Segments => segments;
-    public void SortSegment () => segments.Sort((p1, p2) => p1.distance.CompareTo(p2.distance));
+    [SerializeField] private List<Segment> limits = new List<Segment>();
+    [SerializeField] private List<Vector3> intersections = new List<Vector3>();
+    
+    public void SortSegment () => segments.Sort((p1, p2) => p1.Distance.CompareTo(p2.Distance));
 
     public void AddSegment (Segment refSegment)
     {
@@ -17,28 +18,36 @@ public class PoligonsVoronoi
         segments.Add(segment);
     }
 
-    public void SetIntersections ()
+    public void SetIntersections (List<SegmentLimit> limits)
     {
-        SortSegment();
         intersections.Clear();
+
+        AddSegmentsWithLimits(limits);
+        SortSegment();
 
         for (int i = 0; i < segments.Count; i++)
         {
-            for (int j = i + 1; j < segments.Count - 1; j++)
+            for (int j = 0; j < segments.Count; j++)
             {
+                if (i == j)
+                    continue;
                 if (segments[i].id == segments[j].id)
                     continue;
 
-                segments[i].GetTwoPoints(out Vector2 p1, out Vector2 p2);
-                segments[j].GetTwoPoints(out Vector2 p3, out Vector2 p4);
-                Vector2 centerCircle = Segment.Intersection(p1, p2, p3, p4);
+                segments[i].GetTwoPoints(out Vector3 p1, out Vector3 p2);
+                segments[j].GetTwoPoints(out Vector3 p3, out Vector3 p4);
+                Vector3 centerCircle = Segment.Intersection(p1, p2, p3, p4);
 
-                Vector2 vec2Origin = new Vector2(segments[i].Origin.x, segments[i].Origin.z);
-                float maxDistance = Vector2.Distance(centerCircle, vec2Origin);
+                if (intersections.Contains(centerCircle))
+                    continue;
+
+                float maxDistance = Vector3.Distance(centerCircle, segments[i].Origin);
 
                 bool hasOtherPoint = false;
                 for (int k = 0; k < segments.Count; k++)
                 {
+                    if (k == i || k == j)
+                        continue;
                     if (HasOtherPointInCircle(centerCircle, segments[k], maxDistance))
                     {
                         hasOtherPoint = true;
@@ -50,12 +59,26 @@ public class PoligonsVoronoi
                     intersections.Add(centerCircle);
             }
         }
+
     }
 
-    private bool HasOtherPointInCircle (Vector2 centerCircle, Segment segment, float maxDistance)
+    void AddSegmentsWithLimits(List<SegmentLimit> limits)
     {
-        Vector3 centerCir = new Vector3(centerCircle.x, 0, centerCircle.y);
-        float distance = Vector3.Distance(centerCir, segment.Final);
+        foreach (SegmentLimit limit in limits)
+        {
+            Vector3 origin = segments[0].Origin;
+            Vector3 final = limit.GetOpositePosition(origin);
+
+            Segment segment = new Segment(origin, final);
+            this.limits.Add(segment);
+            segments.Add(segment);
+        }
+    }
+
+
+    private bool HasOtherPointInCircle (Vector3 centerCircle, Segment segment, float maxDistance)
+    {
+        float distance = Vector3.Distance(centerCircle, segment.Final);
         return distance < maxDistance;
     }
 
@@ -65,19 +88,42 @@ public class PoligonsVoronoi
         {
             DrawSegments(distanceSegment);
             DrawIntersections();
-            DrawMediatrix();
+            //DrawMediatrix();
+            DrawOpposite();
+            DrawPolygon();
         }
+    }
+
+    void DrawOpposite ()
+    {
+        foreach (Segment limit in limits)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(limit.Final, 0.75f);
+        }
+    }
+
+    void DrawPolygon ()
+    {
+        Vector3[] points = new Vector3[intersections.Count];
+        Color color = Color.yellow;
+        color.a = 0.2f;
+        for (int i = 0; i < intersections.Count; i++)
+        {
+            points[i] = intersections[i];
+        }
+        
+        Handles.color = color;
+        Handles.DrawAAConvexPolygon(points);
     }
 
     void DrawSegments (float distanceSegment)
     {
         if (segments != null)
         {
-            Gizmos.color = Color.cyan;
             foreach (Segment segment in segments)
             {
-                Gizmos.DrawRay(segment.Mediatrix, segment.Direction * distanceSegment);
-                Gizmos.DrawRay(segment.Mediatrix, -segment.Direction * distanceSegment);
+                segment.DrawSegment(distanceSegment);
             }
         }
     }
@@ -87,10 +133,9 @@ public class PoligonsVoronoi
         Gizmos.color = Color.red;
         if (intersections != null)
         {
-            foreach (Vector2 intersection in intersections)
+            foreach (Vector3 intersection in intersections)
             {
-                Vector3 pos = new Vector3(intersection.x, 0, intersection.y);
-                Gizmos.DrawSphere(pos, 0.5f);
+                Gizmos.DrawSphere(intersection, 0.5f);
             }
         }
     }

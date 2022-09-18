@@ -14,7 +14,8 @@ public class VoronoiDiagram : MonoBehaviour
 
     [Space(15), SerializeField] private List<PoligonsVoronoi> polis = new List<PoligonsVoronoi>();
     [SerializeField] private List<Transform> transformPoints = new List<Transform>();
-    [SerializeField] private List<Transform> transformLimits = new List<Transform>();
+    [SerializeField] private List<SegmentLimit> segmentLimit = new List<SegmentLimit>();
+
 
     private void Update ()
     {
@@ -37,18 +38,18 @@ public class VoronoiDiagram : MonoBehaviour
 
         for (int i = 0; i < transformPoints.Count; i++)
         {
-            for (int j = i + 1; j < transformPoints.Count; j++)
+            for (int j = 0; j < transformPoints.Count; j++)
             {
+                if (i == j)
+                    continue;
                 Segment segment = new Segment(transformPoints[i].position, transformPoints[j].position);
                 polis[i].AddSegment(segment);
-                polis[j].AddSegment(segment);
             }
         }
 
         for (int i = 0; i < polis.Count; i++)
         {
-            polis[i].SortSegment();
-            polis[i].SetIntersections();
+            polis[i].SetIntersections(segmentLimit);
         }
     }
 
@@ -74,7 +75,6 @@ public class VoronoiDiagram : MonoBehaviour
     private void OnDrawGizmos ()
     {
         DrawPolis();
-        DrawLimits();
     }
 
     private void DrawPolis ()
@@ -86,18 +86,6 @@ public class VoronoiDiagram : MonoBehaviour
                 poli.DrawPoli(distanceSegment);
             }
         }
-    }
-
-    private void DrawLimits ()
-    {
-        if (transformLimits != null)
-            for (int i = 0; i < transformLimits.Count; i++)
-            {
-                Vector3 origin = transformLimits[i].position;
-                Vector3 final = i < transformLimits.Count - 1 ? transformLimits[i + 1].position : transformLimits[0].position;
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(origin, final);
-            }
     }
 #endif
 }
