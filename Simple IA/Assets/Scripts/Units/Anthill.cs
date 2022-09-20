@@ -13,7 +13,8 @@ public class Anthill : MonoBehaviour
 
     private Anthill origin;
     private List<Ant> ants = new List<Ant>();
-    private float visionRadius = 20.0f;
+    private float visionRadius = 25.0f;
+    [SerializeField] private float timeToSpawningAnts = 0.1f;
 
     private void Awake ()
     {
@@ -25,34 +26,22 @@ public class Anthill : MonoBehaviour
         GetNewResource();
     }
 
-    private void Update ()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftControl))
-        {
-            StartCoroutine(SpawnMultipleAnts(100));
-        }
-        else if (Input.GetKeyDown(KeyCode.Space) && Input.GetKey(KeyCode.LeftShift))
-        {
-            StartCoroutine(SpawnMultipleAnts(10));
-        }
-        else if (Input.GetKeyDown(KeyCode.Space))
-        {
-            StartCoroutine(SpawnMultipleAnts(1));
-        }
-    }
-
+    public void SpawnAnts (int amount) => StartCoroutine(SpawnMultipleAnts(amount));
+    
     private IEnumerator SpawnMultipleAnts (int amount)
     {
         for (int i = 0; i < amount; i++)
         {
             AddAnt();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(timeToSpawningAnts);
         }
     }
 
     private void AddAnt ()
     {
-        GameObject newAnt = Instantiate(pfAnt, origin.transform.position, Quaternion.identity, origin.transform);
+        Vector3 pos = origin.transform.position;
+        pos.y = 0;
+        GameObject newAnt = Instantiate(pfAnt, pos, Quaternion.identity, origin.transform);
         Ant ant = newAnt.GetComponent<Ant>();
         ants.Add(ant);
         ant.Init(origin, GetNewResource());
@@ -60,10 +49,19 @@ public class Anthill : MonoBehaviour
 
     public Transform GetNewResource ()
     {
-        Resource resource = resourceManager.GetRandomResource();
+        Resource resource = resourceManager.GetNearResource(origin.transform.position, visionRadius);//.GetRandomResource();
+
         if (resource != null)
             return resource.transform;
         return null;
+    }
+
+    public void SetOrderToAnt (Flags flag)
+    {
+        for (int i = 0; i < ants.Count; i++)
+        {
+            ants[i].SetFlag(flag);
+        }
     }
 
 #if UNITY_EDITOR

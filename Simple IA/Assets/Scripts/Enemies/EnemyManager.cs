@@ -10,7 +10,7 @@ public class EnemyManager : MonoBehaviour
 {
     [SerializeField] private GameObject pfEnemy;
     [SerializeField] private float randomWaitTime;
-    [SerializeField] private Vector3 distanceSpawn = new Vector3(14, 0, 7);
+    [SerializeField] private Vector3Int distanceSpawn = new Vector3Int(14, 0, 7);
 
     private List<Enemy> enemies = new List<Enemy>();
     private IEnumerator spawnEnemy;
@@ -18,10 +18,10 @@ public class EnemyManager : MonoBehaviour
 
     private void OnEnable ()
     {
-        if (spawnEnemy != null)
-            StopCoroutine(spawnEnemy);
-        spawnEnemy = SpawnEnemy();
-        StartCoroutine(spawnEnemy);
+        //if (spawnEnemy != null)
+        //    StopCoroutine(spawnEnemy);
+        //spawnEnemy = SpawnEnemy();
+        //StartCoroutine(spawnEnemy);
     }
 
     private IEnumerator SpawnEnemy ()
@@ -38,8 +38,8 @@ public class EnemyManager : MonoBehaviour
 
             if (enemies.Count < maxEnemies)
             {
-                Vector3 randomPos = Terrain.GetAvailablePosition(new Vector2(-distanceSpawn.x, distanceSpawn.x), new Vector2(-distanceSpawn.y, distanceSpawn.y), transform.position);
-
+                Vector3Int randomPos = TerrainTextureDetector.GetRandomAvailablePosition(distanceSpawn);
+                randomPos.y = (int) transform.position.y;
                 GameObject goEnemy = Instantiate(pfEnemy, randomPos, Quaternion.identity, transform);
 
                 Enemy enemy = goEnemy.GetComponent<Enemy>();
@@ -71,6 +71,8 @@ public class EnemyManager : MonoBehaviour
                 Enemy enemy = goEnemy.GetComponent<Enemy>();
                 enemies.Add(enemy);
             }
+
+            yield return null;
         }
     }
 
@@ -84,7 +86,7 @@ public class EnemyManager : MonoBehaviour
     private void OnDrawGizmosSelected ()
     {
         Handles.color = Color.red;
-        Handles.DrawWireCube(transform.position, distanceSpawn * 2);
+        Handles.DrawWireCube(transform.position + distanceSpawn / 2, distanceSpawn);
     }
 #endif
 }

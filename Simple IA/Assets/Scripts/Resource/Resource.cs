@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Resource : MonoBehaviour
 {
+    public int id;
+
     [SerializeField] private ResourceCharge resourceCharge=new ResourceCharge();
     public event Action<Resource> OnEmptyResource;
     public float GetAmount () => resourceCharge.resourceAmount;
@@ -12,7 +15,7 @@ public class Resource : MonoBehaviour
     private void Start ()
     {
         resourceCharge.resourceType = (ResourceType) Random.Range(0, (int) ResourceType.Last);
-        resourceCharge.resourceAmount = Random.Range(1, 11);
+        resourceCharge.resourceAmount = 3;
     }
 
     public void TakeResource (ref ResourceCharge antResourceCharge, float maxResourceCharge)

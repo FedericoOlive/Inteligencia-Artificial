@@ -83,19 +83,30 @@ public class FiniteStateMachine
 public enum States
 {
     Idle,
+    WaitingInstructions,
     Harvesting,
-    GoToMine,
-    GoToAnthill,
+    GoingToResource,
+    GoingToAnthill,
     Depositing,
+    ForceGoingToPosition,
+    ForceGoingToAnthill,
+    ForceGoingToIdle,
+
     Last
 }
 
 public enum Flags
 {
     OnFullInventory,
-    OnReachMine,
-    OnReachDeposit,
-    OnEmpyMine,
+    OnArriveResource,
+    OnArriveWithResource,
+    OnReceiveResource,
     OnEmptyInventory,
+
+    ForceToPosition,
+    ForceToIdle,
+    ForceToAnthill,
+    ForceToHarvesting,
+
     Last
 }

@@ -115,7 +115,7 @@ MonoBehaviour:
   stats:
     life: 100
     damage: 10
-    speed: 10
+    speed: 5
     maxChargeResource: 1
     pickTime: 3
     dropTime: 1

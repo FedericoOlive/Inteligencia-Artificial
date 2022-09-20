@@ -4,7 +4,7 @@ using UnityEngine;
 public class ResourceManager : MonoBehaviour
 {
     [SerializeField] private GameObject pfResource;
-    [SerializeField] private Vector2 distanceSpawn = new Vector2(15, 7);
+    [SerializeField] private Vector3Int distanceSpawn = new Vector3Int(15, 0, 7);
     [SerializeField] private List<Resource> resources = new List<Resource>();
     [SerializeField] private float spawnTimeResource = 2f;
     private float currentSpawnTimeResource;
@@ -27,8 +27,8 @@ public class ResourceManager : MonoBehaviour
 
     void CreateResource ()
     {
-        Vector3 randomPos = Terrain.GetAvailablePosition(new Vector2(-distanceSpawn.x, distanceSpawn.x), new Vector2(-distanceSpawn.y, distanceSpawn.y), transform.position);
-
+        Vector3 randomPos = TerrainTextureDetector.GetRandomAvailablePosition(distanceSpawn);
+        randomPos.y = transform.position.y;
         Resource resource = Instantiate(pfResource, randomPos, Quaternion.identity, transform).GetComponent<Resource>();
         resource.OnEmptyResource += DestroyResource;
         resources.Add(resource);
@@ -42,6 +42,24 @@ public class ResourceManager : MonoBehaviour
     }
 
     public List<Resource> GetResources () => resources;
+
+    public Resource GetNearResource (Vector3 pos, float visionRadius)
+    {
+        Resource nearResource = null;
+        float distance = visionRadius;
+
+        for (int i = 0; i < resources.Count; i++)
+        {
+            float currentDistance = NodeUtils.GetDistanceXZ(pos, resources[i].transform.position);
+            if (currentDistance < distance)
+            {
+                distance = currentDistance;
+                nearResource = resources[i];
+            }
+        }
+
+        return nearResource;
+    }
 
     public Resource GetRandomResource ()
     {
