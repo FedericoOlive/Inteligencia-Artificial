@@ -113,12 +113,14 @@ public class FiniteStateMachine
 
 public enum States
 {
+    Automatic,
     Idle,
     WaitingInstructions,
     Harvesting,
     GoingToResource,
     GoingToAnthill,
     Depositing,
+    ForceIndication,
     ForceGoingToPosition,
     ForceGoingToAnthill,
     ForceGoingToIdle,

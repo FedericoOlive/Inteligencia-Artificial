@@ -15,8 +15,8 @@ public class NodeGenerator : MonoBehaviour
     public Vector3Int startPos = new Vector3Int();
     public Vector3Int endPos = new Vector3Int();
 
-    [SerializeField] private bool showNodes;
-    [SerializeField] private bool showLabel;
+    public bool showNodes;
+    public bool showLabel;
     [SerializeField] private int sizeLabel = 10;
     [SerializeField] private Vector3 offsetLabel = new Vector3(-0.45f, -0.45f, 0);
     [SerializeField] private float alphaColor = 0.5f;

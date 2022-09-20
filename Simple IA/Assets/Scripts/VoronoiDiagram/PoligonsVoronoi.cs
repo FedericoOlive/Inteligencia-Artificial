@@ -6,11 +6,17 @@ using UnityEngine;
 public class PoligonsVoronoi
 {
     public bool drawPoli;
+    [SerializeField] private Transform itemSector;
     [SerializeField] private List<Segment> segments = new List<Segment>();
     [SerializeField] private List<Segment> limits = new List<Segment>();
     [SerializeField] private List<Vector3> intersections = new List<Vector3>();
-    private Color colorGizmos = Color.white;
+    private Color colorGizmos = new Color(0, 0, 0, 0);
     public void SortSegment () => segments.Sort((p1, p2) => p1.Distance.CompareTo(p2.Distance));
+
+    public PoligonsVoronoi (Transform item)
+    {
+        itemSector = item;
+    }
 
     public void AddSegment (Segment refSegment)
     {
@@ -18,7 +24,7 @@ public class PoligonsVoronoi
         segments.Add(segment);
     }
 
-    public void SetIntersections (List<SegmentLimit> limits)
+    public void SetIntersections ()
     {
         colorGizmos.r = Random.Range(0, 1.0f);
         colorGizmos.g = Random.Range(0, 1.0f);
@@ -27,7 +33,6 @@ public class PoligonsVoronoi
 
         intersections.Clear();
 
-        AddSegmentsWithLimits(limits);
         SortSegment();
 
         for (int i = 0; i < segments.Count; i++)
@@ -73,11 +78,11 @@ public class PoligonsVoronoi
         SortPointsPolygon();
     }
 
-    void AddSegmentsWithLimits (List<SegmentLimit> limits)
+    public void AddSegmentsWithLimits (List<SegmentLimit> limits)
     {
         foreach (SegmentLimit limit in limits)
         {
-            Vector3 origin = segments[0].Origin;
+            Vector3 origin = itemSector.transform.position;
             Vector3 final = limit.GetOpositePosition(origin);
 
             Segment segment = new Segment(origin, final);
@@ -176,17 +181,5 @@ public class PoligonsVoronoi
 
         Handles.color = Color.black;
         Handles.DrawPolyLine(points);
-    }
-
-    void DrawIntersections ()
-    {
-        Gizmos.color = Color.red;
-        if (intersections != null)
-        {
-            foreach (Vector3 intersection in intersections)
-            {
-                Handles.DrawWireDisc(intersection, Vector3.up, 0.5f);
-            }
-        }
     }
 }

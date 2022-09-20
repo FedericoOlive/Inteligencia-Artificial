@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,6 +15,17 @@ public class VoronoiDiagram : MonoBehaviour
     [SerializeField] private List<Transform> transformPoints = new List<Transform>();
     [SerializeField] private List<SegmentLimit> segmentLimit = new List<SegmentLimit>();
 
+    public void AddNewItem (Transform item)
+    {
+        transformPoints.Add(item);
+        CreateSegments();
+    }
+
+    public void RemoveItem (Transform item)
+    {
+        transformPoints.Remove(item);
+        CreateSegments();
+    }
 
     private void Update ()
     {
@@ -28,12 +38,22 @@ public class VoronoiDiagram : MonoBehaviour
 
     private void CreateSegments ()
     {
+        if (transformPoints == null)
+            return;
+        if (transformPoints.Count < 1)
+            return;
+
         Segment.amountSegments = 0;
         polis.Clear();
         for (int i = 0; i < transformPoints.Count; i++)
         {
-            PoligonsVoronoi poli = new PoligonsVoronoi();
+            PoligonsVoronoi poli = new PoligonsVoronoi(transformPoints[i]);
             polis.Add(poli);
+        }
+
+        for (int i = 0; i < polis.Count; i++)
+        {
+            polis[i].AddSegmentsWithLimits(segmentLimit);
         }
 
         for (int i = 0; i < transformPoints.Count; i++)
@@ -49,8 +69,13 @@ public class VoronoiDiagram : MonoBehaviour
 
         for (int i = 0; i < polis.Count; i++)
         {
-            polis[i].SetIntersections(segmentLimit);
+            polis[i].SetIntersections();
         }
+    }
+
+    void MergePolisIntersections ()
+    {
+
     }
 
 #if UNITY_EDITOR
