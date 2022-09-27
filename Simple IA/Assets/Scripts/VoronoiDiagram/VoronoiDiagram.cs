@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,12 +8,24 @@ using UnityEditor;
 [ExecuteAlways]
 public class VoronoiDiagram : MonoBehaviour
 {
-    [SerializeField] private List<Transform> transformPoints = new List<Transform>();
-    [SerializeField] private List<Transform> transformLimits = new List<Transform>();
-    [SerializeField] private List<Segment> segments = new List<Segment>();
     public bool createSegments;
-    public int distanceSegment;
-    public float radiusMediatrix = 0.5f;
+    public bool drawPolis;
+
+    [Space(15), SerializeField] private List<PoligonsVoronoi> polis = new List<PoligonsVoronoi>();
+    [SerializeField] private List<Transform> transformPoints = new List<Transform>();
+    [SerializeField] private List<SegmentLimit> segmentLimit = new List<SegmentLimit>();
+
+    public void AddNewItem (Transform item)
+    {
+        transformPoints.Add(item);
+        CreateSegments();
+    }
+
+    public void RemoveItem (Transform item)
+    {
+        transformPoints.Remove(item);
+        CreateSegments();
+    }
 
     private void Update ()
     {
@@ -27,86 +38,62 @@ public class VoronoiDiagram : MonoBehaviour
 
     private void CreateSegments ()
     {
-        segments.Clear();
+        if (transformPoints == null)
+            return;
+        if (transformPoints.Count < 1)
+            return;
+
+        Segment.amountSegments = 0;
+        polis.Clear();
         for (int i = 0; i < transformPoints.Count; i++)
         {
-            for (int j = i + 1; j < transformPoints.Count; j++)
-            {
-                Segment segment;
-                if (j >= transformPoints.Count)
-                    segment = new Segment(transformPoints[i].localPosition, transformPoints[0].localPosition);
-                else
-                    segment = new Segment(transformPoints[i].localPosition, transformPoints[j].localPosition);
+            PoligonsVoronoi poli = new PoligonsVoronoi(transformPoints[i]);
+            polis.Add(poli);
+        }
 
-                segments.Add(segment);
+        for (int i = 0; i < polis.Count; i++)
+        {
+            polis[i].AddSegmentsWithLimits(segmentLimit);
+        }
+
+        for (int i = 0; i < transformPoints.Count; i++)
+        {
+            for (int j = 0; j < transformPoints.Count; j++)
+            {
+                if (i == j)
+                    continue;
+                Segment segment = new Segment(transformPoints[i].position, transformPoints[j].position);
+                polis[i].AddSegment(segment);
             }
         }
 
-        DeleteUnusedSegments();
-    }
-
-    private void DeleteUnusedSegments ()
-    {
-
-    }
-
-    private bool CheckMediatixIsNearOtherPoint (Segment segment, Vector3 point1, Vector3 point2)
-    {
-        float distance = Vector3.Distance(point1, point2);
-
-        foreach (Transform point in transformPoints)
+        for (int i = 0; i < polis.Count; i++)
         {
-            if (point.localPosition == point1) continue;
-            if (point.localPosition == point2) continue;
-
-            float distanceToSegment = Vector3.Distance(segment.Mediatrix, point.localPosition);
-            if (distanceToSegment < distance)
-                return true;
+            polis[i].SetIntersections();
         }
+    }
 
-        return false;
+    void MergePolisIntersections ()
+    {
+
     }
 
 #if UNITY_EDITOR
-
+    
     private void OnDrawGizmos ()
     {
-        DrawLimits();
-        DrawSegments();
-        DrawPointMediatrix();
+        DrawPolis(drawPolis);
     }
 
-    private void DrawLimits ()
+    private void DrawPolis (bool drawPolis)
     {
-        if (transformLimits != null)
-            for (int i = 0; i < transformLimits.Count; i++)
+        if (polis != null)
+        {
+            foreach (PoligonsVoronoi poli in polis)
             {
-                Vector3 origin = transformLimits[i].localPosition;
-                Vector3 final = i < transformLimits.Count - 1 ? transformLimits[i + 1].localPosition : transformLimits[0].localPosition;
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(origin, final);
+                poli.DrawPoli(drawPolis);
             }
-    }
-
-    private void DrawSegments ()
-    {
-        Gizmos.color = Color.blue;
-        if (segments != null)
-            foreach (Segment segment in segments)
-            {
-                Gizmos.DrawRay(segment.Mediatrix, segment.Direction * distanceSegment);
-                Gizmos.DrawRay(segment.Mediatrix, -segment.Direction * distanceSegment);
-            }
-    }
-
-    private void DrawPointMediatrix ()
-    {
-        Gizmos.color = Color.cyan;
-        if (segments != null)
-            foreach (Segment segment in segments)
-            {
-                Gizmos.DrawSphere(segment.Mediatrix, radiusMediatrix);
-            }
+        }
     }
 #endif
 }

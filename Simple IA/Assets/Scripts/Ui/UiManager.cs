@@ -4,6 +4,8 @@ using UnityEngine.UI;
 public class UiManager : MonoBehaviour
 {
     [SerializeField] private Anthill anthill;
+    [SerializeField] private VoronoiDiagram resourceVoronoi;
+    [SerializeField] private NodeGenerator nodeGenerator;
     [Space(15)] 
     [SerializeField] private Button btnSpawn1;
     [SerializeField] private Button btnSpawn10;
@@ -11,6 +13,10 @@ public class UiManager : MonoBehaviour
     [SerializeField] private Button btnOrderAllToMines;
     [SerializeField] private Button btnOrderAllToAntHill;
     [SerializeField] private Button btnSOrderAllToIdle;
+
+    [SerializeField] private Toggle toggleShowVoronoi;
+    [SerializeField] private Toggle toggleShowPathfinding;
+    [SerializeField] private Toggle toggleShowLabel;
 
     void Start ()
     {
@@ -20,6 +26,10 @@ public class UiManager : MonoBehaviour
         btnOrderAllToMines.onClick.AddListener(AllAntsToMines);
         btnOrderAllToAntHill.onClick.AddListener(AllAntsToAnthill);
         btnSOrderAllToIdle.onClick.AddListener(AllAntsToIdle);
+
+        toggleShowVoronoi.onValueChanged.AddListener(ToggleShowVoronoi);
+        toggleShowPathfinding.onValueChanged.AddListener(ToggleShowPathfinding);
+        toggleShowLabel.onValueChanged.AddListener(ToggleShowLabel);
     }
 
     private void Spawn1Ant () => anthill.SpawnAnts(1);
@@ -28,4 +38,8 @@ public class UiManager : MonoBehaviour
     private void AllAntsToMines () => anthill.SpawnAnts(100);
     private void AllAntsToAnthill () => anthill.SpawnAnts(100);
     private void AllAntsToIdle () => anthill.SpawnAnts(100);
+
+    void ToggleShowVoronoi (bool isOn) => resourceVoronoi.drawPolis = isOn;
+    void ToggleShowPathfinding(bool isOn) => nodeGenerator.showNodes = isOn;
+    void ToggleShowLabel(bool isOn) => nodeGenerator.showLabel = isOn;
 }

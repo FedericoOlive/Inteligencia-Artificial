@@ -14,7 +14,6 @@ public class Pathfinding
     public List<Vector3Int> GetPath (Node[] map, Node origin, Node destination)
     {
         List<int> openNodesId = new List<int>();
-        List<int> closedNodesId = new List<int>();
         Vector3Int destinationPosition;
 
         openNodesId.Add(origin.id);

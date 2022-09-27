@@ -1,18 +1,28 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
 public class Segment
 {
-    private Vector3 origin;
-    private Vector3 final;
+    public static int amountSegments = 0;
+    public int id = 0;
+    public bool isLimit;
+    [SerializeField] private Vector3 origin;
+    [SerializeField] private Vector3 final;
 
-    private Vector3 direction;
-    private Vector3 mediatrix;
+    [SerializeField] private Vector3 direction;
+    [SerializeField] private Vector3 mediatrix;
+    [SerializeField] private float distance;
+
+    public List<Vector3> intersection = new List<Vector3>();
 
     public Segment (Vector3 newOrigin, Vector3 newFinal)
     {
+        id = amountSegments;
+        amountSegments++;
         origin = newOrigin;
         final = newFinal;
+        distance = Vector3.Distance(origin, final);
 
         mediatrix = new Vector3((origin.x + final.x) / 2, (origin.y + final.y) / 2, (origin.z + final.z) / 2);
 
@@ -27,4 +37,39 @@ public class Segment
     public Vector3 Mediatrix => mediatrix;
     public Vector3 Origin => origin;
     public Vector3 Final => final;
+    public float Distance => distance;
+
+    public void GetTwoPoints (out Vector3 p1, out Vector3 p2)
+    {
+        p1 = mediatrix;
+        p2 = mediatrix + direction * 10;
+    }
+
+    /// <summary>
+    /// Calcula el punto de intersección de 2 rectas.
+    /// </summary>
+    /// <param name="ap1">Recta 1 Punto 1</param>
+    /// <param name="ap2">Recta 1 Punto 2</param>
+    /// <param name="bp1">Recta 2 Punto 1</param>
+    /// <param name="bp2">Recta 2 Punto 2</param>
+    /// <returns></returns>
+    public static Vector3 Intersection(Vector3 ap1, Vector3 ap2, Vector3 bp1, Vector3 bp2)
+    {
+        // https://es.wikipedia.org/wiki/Intersección_de_dos_rectas o https://en.wikipedia.org/wiki/Line–line_intersection
+        Vector3 intersection = Vector3.zero;
+        if (((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x)) == 0)
+            return intersection;
+
+        intersection.x = ((ap1.x * ap2.z - ap1.z * ap2.x) * (bp1.x - bp2.x) - (ap1.x - ap2.x) * (bp1.x * bp2.z - bp1.z * bp2.x)) / ((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x));
+        intersection.z = ((ap1.x * ap2.z - ap1.z * ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x * bp2.z - bp1.z * bp2.x)) / ((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x));
+
+        return intersection;
+    }
+
+    public void DrawSegment (float distanceSegment)
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawRay(mediatrix, direction * distanceSegment);
+        Gizmos.DrawRay(mediatrix, -direction * distanceSegment);
+    }
 }

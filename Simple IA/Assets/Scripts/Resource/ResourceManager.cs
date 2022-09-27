@@ -10,6 +10,13 @@ public class ResourceManager : MonoBehaviour
     private float currentSpawnTimeResource;
     [SerializeField] private int maxAmountResources = 10;
 
+    private VoronoiDiagram voronoiDiagram;
+
+    private void Awake ()
+    {
+        voronoiDiagram = GetComponent<VoronoiDiagram>();
+    }
+
     void Update ()
     {
         float deltaTime = Time.deltaTime;
@@ -27,15 +34,30 @@ public class ResourceManager : MonoBehaviour
 
     void CreateResource ()
     {
-        Vector3 randomPos = TerrainTextureDetector.GetRandomAvailablePosition(distanceSpawn);
+        Vector3 randomPos = Vector3.zero;
+        bool posOcupped = false;
+        do
+        {
+            posOcupped = false;
+            randomPos = TerrainTextureDetector.GetRandomAvailablePosition(distanceSpawn);
+            foreach (Resource res in resources)
+            {
+                if (res.transform.position == randomPos)
+                    posOcupped = true;
+            }
+
+        } while (posOcupped);
+
         randomPos.y = transform.position.y;
         Resource resource = Instantiate(pfResource, randomPos, Quaternion.identity, transform).GetComponent<Resource>();
         resource.OnEmptyResource += DestroyResource;
         resources.Add(resource);
+        voronoiDiagram.AddNewItem(resource.transform);
     }
 
     private void DestroyResource (Resource resource)
     {
+        voronoiDiagram.RemoveItem(resource.transform);
         resource.OnEmptyResource -= DestroyResource;
         Destroy(resource.gameObject);
         resources.Remove(resource);
