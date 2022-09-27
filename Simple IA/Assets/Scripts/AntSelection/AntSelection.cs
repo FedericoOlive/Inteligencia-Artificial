@@ -19,11 +19,6 @@ public class AntSelection : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            foreach (Ant ant in antSelected)
-            {
-                ant.meshRenderer.material.color = Color.white;
-            }
-
             antSelected.Clear();
             selection.gameObject.SetActive(true);
             clickDown = Input.mousePosition;
@@ -39,8 +34,14 @@ public class AntSelection : MonoBehaviour
     void AddAntToSelection (Ant ant, bool isEnterSelection)
     {
         if (isEnterSelection)
+        {
             antSelected.Add(ant);
+            ant.IsSelected = true;
+        }
         else
+        {
             antSelected.Remove(ant);
+            ant.IsSelected = false;
+        }
     }
 }

@@ -5,9 +5,11 @@ using UnityEngine;
 public class FiniteStateMachine
 {
     private States[,] relations;
-    private Dictionary<States, List<Action>> behaviours;
+    private Dictionary<States, State> behaviours;
+    public Action entryBehaviour;
+    public Action exitBehaviour;
 
-    public FiniteStateMachine (States states, Flags flags)
+    public FiniteStateMachine (States states, Flags flags, Action onEntryBehaviour = null, Action onExitBehaviour = null)
     {
         relations = new States[(int) States.Last, (int) Flags.Last];
         for (int i = 0; i < (int) States.Last; i++)
@@ -18,9 +20,12 @@ public class FiniteStateMachine
             }
         }
 
-        behaviours = new Dictionary<States, List<Action>>();
-    }
+        entryBehaviour = onEntryBehaviour;
+        exitBehaviour = onExitBehaviour;
 
+        behaviours = new Dictionary<States, State>();
+    }
+    
     public void SetRelation (States sourceState, Flags flag, States destinationState)
     {
         relations[(int) sourceState, (int) flag] = destinationState;
@@ -28,36 +33,47 @@ public class FiniteStateMachine
 
     public void SetFlag (ref States currentState, Flags flag)
     {
+        if (behaviours.ContainsKey(currentState))
+            ExitBehaviourState(currentState);
+
         if (relations[(int) currentState, (int) flag] != States.Last)
         {
             currentState = relations[(int) currentState, (int) flag];
-            return;
+            EntryBehaviourState(currentState);
         }
-
-        Debug.Log("No existe connexión entre: " + currentState + " y " + flag);
-    }
-
-    public void SetBehaviour (States state, Action behaviour)
-    {
-        List<Action> newBehaviours = new List<Action>();
-        newBehaviours.Add(behaviour);
-
-        if (behaviours.ContainsKey(state))
-            behaviours[state] = newBehaviours;
-        else
-            behaviours.Add(state, newBehaviours);
-    }
-
-    public void AddBehaviour (States state, Action behaviour)
-    {
-
-        if (behaviours.ContainsKey(state))
-            behaviours[state].Add(behaviour);
         else
         {
-            List<Action> newBehaviours = new List<Action>();
-            newBehaviours.Add(behaviour);
-            behaviours.Add(state, newBehaviours);
+            if (flag == Flags.Last)
+                Debug.Log("Exit FSM.");
+            else
+                Debug.Log("No existe connexión entre: " + currentState + " y " + flag);
+        }
+    }
+
+    private void ExitBehaviourState (States currentState)
+    {
+        if (behaviours[currentState].exitBehaviour != null)
+            behaviours[currentState].exitBehaviour.Invoke();
+    }
+
+    private void EntryBehaviourState (States currentState)
+    {
+        if (behaviours[currentState].entryBehaviour != null)
+            behaviours[currentState].entryBehaviour.Invoke();
+    }
+
+    public void AddBehaviour (States state, Action behaviour, Action onEntryBehaviour = null, Action onExitBehaviour = null)
+    {
+        if (behaviours.ContainsKey(state))
+            behaviours[state].behaviours.Add(behaviour);
+        else
+        {
+            State newState = new State();
+            newState.behaviours.Add(behaviour);
+            newState.entryBehaviour = onEntryBehaviour;
+            newState.exitBehaviour = onExitBehaviour;
+            
+            behaviours.Add(state, newState);
         }
     }
 
@@ -65,7 +81,7 @@ public class FiniteStateMachine
     {
         if (behaviours.ContainsKey(currentState))
         {
-            List<Action> actions = behaviours[currentState];
+            List<Action> actions = behaviours[currentState].behaviours;
             if (actions != null)
             {
                 for (int i = 0; i < actions.Count; i++)
@@ -88,9 +104,12 @@ public enum States
     GoingToResource,
     GoingToAnthill,
     Depositing,
+
+    ForceIndicator,
     ForceGoingToPosition,
     ForceGoingToAnthill,
     ForceGoingToIdle,
+    ForceToHarvasting,
 
     Last
 }
@@ -103,6 +122,7 @@ public enum Flags
     OnReceiveResource,
     OnEmptyInventory,
 
+    ForceIndicator,
     ForceToPosition,
     ForceToIdle,
     ForceToAnthill,
