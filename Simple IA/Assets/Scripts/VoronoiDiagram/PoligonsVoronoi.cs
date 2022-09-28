@@ -6,16 +6,20 @@ using UnityEngine;
 public class PoligonsVoronoi
 {
     public bool drawPoli;
+    public int weight = 0;
     [SerializeField] private Transform itemSector;
     [SerializeField] private List<Segment> segments = new List<Segment>();
     [SerializeField] private List<Segment> limits = new List<Segment>();
     [SerializeField] private List<Vector3> intersections = new List<Vector3>();
+    [SerializeField] private List<int> indexIntersections = new List<int>();
+    private List<Vector3> allIntersections;
     private Color colorGizmos = new Color(0, 0, 0, 0);
     public void SortSegment () => segments.Sort((p1, p2) => p1.Distance.CompareTo(p2.Distance));
-
-    public PoligonsVoronoi (Transform item)
+    
+    public PoligonsVoronoi (Transform item, List<Vector3> allIntersections)
     {
         itemSector = item;
+        this.allIntersections = allIntersections;
     }
 
     public void AddSegment (Segment refSegment)
@@ -32,6 +36,7 @@ public class PoligonsVoronoi
         colorGizmos.a = 0.3f;
 
         intersections.Clear();
+        weight = 0;
 
         SortSegment();
 
@@ -155,6 +160,41 @@ public class PoligonsVoronoi
         secondIntersection = segments[^1].intersection[1];
         if (!intersections.Contains(secondIntersection))
             intersections.Add(secondIntersection);
+
+
+        indexIntersections.Clear();
+        for (int i = 0; i < intersections.Count; i++)
+        {
+            Vector3 intersection = intersections[i];
+            if (!allIntersections.Contains(intersection))
+            {
+                allIntersections.Add(intersection);
+                indexIntersections.Add(allIntersections.Count - 1);
+            }
+            else
+            {
+                for (int j = 0; j < allIntersections.Count; j++)
+                {
+                    if (allIntersections[j] == intersection)
+                    {
+                        indexIntersections.Add(j);
+                        break;
+                    }
+                }
+            }
+        }
+
+        UpdateIntersectionList();
+    }
+
+    void UpdateIntersectionList ()
+    {
+        intersections.Clear();
+
+        for (int i = 0; i < indexIntersections.Count; i++)
+        {
+            intersections.Add(allIntersections[indexIntersections[i]]);
+        }
     }
 
     public void DrawPoli (bool drawPolis)
@@ -210,70 +250,11 @@ public class PoligonsVoronoi
         return (count % 2 == 1); 
     }
 
-    public bool IsPointInSegment(Vector3 point, Vector3 start, Vector3 end)
+    public static bool IsPointInSegment(Vector3 point, Vector3 start, Vector3 end)
     {
         return (point.x <= Mathf.Max(start.x, end.x) &&
                 point.x >= Mathf.Min(start.x, end.x) &&
                 point.z <= Mathf.Max(start.z, end.z) &&
                 point.z >= Mathf.Min(start.z, end.z));
-    }
-
-    public int Orientation(Vector3 p, Vector3 q, Vector3 r)
-    {
-        int val = (int)((q.z - p.z) * (r.x - q.x) - (q.x - p.x) * (r.z - q.z));
-
-        if (val == 0)
-        {
-            return 0; // collinear
-        }
-        return (val > 0) ? 1 : 2; // clock or counterclock wise
-    }
-
-    public bool DoIntersect(Vector3 p1, Vector3 q1, Vector3 p2, Vector3 q2)
-    {
-        // Find the four orientations needed for
-        // general and special cases
-        int o1 = Orientation(p1, q1, p2);
-        int o2 = Orientation(p1, q1, q2);
-        int o3 = Orientation(p2, q2, p1);
-        int o4 = Orientation(p2, q2, q1);
-
-        // General case
-        if (o1 != o2 && o3 != o4)
-        {
-            return true;
-        }
-
-        // Special Cases
-        // p1, q1 and p2 are collinear and
-        // p2 lies on segment p1q1
-        if (o1 == 0 && IsPointInSegment(p1, p2, q1))
-        {
-            return true;
-        }
-
-        // p1, q1 and p2 are collinear and
-        // q2 lies on segment p1q1
-        if (o2 == 0 && IsPointInSegment(p1, q2, q1))
-        {
-            return true;
-        }
-
-        // p2, q2 and p1 are collinear and
-        // p1 lies on segment p2q2
-        if (o3 == 0 && IsPointInSegment(p2, p1, q2))
-        {
-            return true;
-        }
-
-        // p2, q2 and q1 are collinear and
-        // q1 lies on segment p2q2
-        if (o4 == 0 && IsPointInSegment(p2, q1, q2))
-        {
-            return true;
-        }
-
-        // Doesn't fall in any of the above cases
-        return false;
     }
 }

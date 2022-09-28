@@ -11,6 +11,7 @@ public class VoronoiDiagram : MonoBehaviour
     public bool createSegments;
     public bool drawPolis;
 
+    [SerializeField] private List<Vector3> intersections = new List<Vector3>();
     [Space(15), SerializeField] private List<PoligonsVoronoi> polis = new List<PoligonsVoronoi>();
     [SerializeField] private List<Transform> transformPoints = new List<Transform>();
     [SerializeField] private List<SegmentLimit> segmentLimit = new List<SegmentLimit>();
@@ -46,10 +47,11 @@ public class VoronoiDiagram : MonoBehaviour
             return;
 
         Segment.amountSegments = 0;
-        polis.Clear();
+        polis.Clear(); 
+        intersections.Clear();
         for (int i = 0; i < transformPoints.Count; i++)
         {
-            PoligonsVoronoi poli = new PoligonsVoronoi(transformPoints[i]);
+            PoligonsVoronoi poli = new PoligonsVoronoi(transformPoints[i], intersections);
             polis.Add(poli);
         }
 
@@ -73,15 +75,50 @@ public class VoronoiDiagram : MonoBehaviour
         {
             polis[i].SetIntersections();
         }
+
+        SetWeightPoligons();
     }
 
-    void MergePolisIntersections ()
+    private void SetWeightPoligons ()
     {
+        int allWeight = 0;
+        for (int i = 0; i < NodeGenerator.GetMap.Length; i++)
+        {
+            if(IsNodeOutsideLimits(NodeGenerator.GetMap[i]))
+                continue;
 
+            allWeight += NodeGenerator.GetMap[i].weight;
+
+            for (int j = 0; j < polis.Count; j++)
+            {
+                if (polis[j].IsInside(NodeGenerator.GetMap[i].position))
+                {
+                    polis[j].weight += NodeGenerator.GetMap[i].weight;
+                    break;
+                }
+            }
+        }
+
+        for (int i = 0; i < polis.Count; i++)
+            Debug.Log("Weight " + i + ": " + polis[i].weight);
+
+        Debug.Log("Total Weight Polis: " + allWeight);
+    }
+
+    bool IsNodeOutsideLimits (Node node)
+    {
+        Vector3 origin = segmentLimit[0].Origin;
+        Vector3 final = segmentLimit[2].Origin;
+        Vector3 point = node.position;
+
+        return !(point.x > origin.x &&
+                 point.z > origin.z &&
+                 point.x < final.x &&
+                 point.z < final.z);
     }
 
 #if UNITY_EDITOR
-    
+
     private void OnDrawGizmos ()
     {
         DrawPolis(drawPolis);

@@ -8,6 +8,9 @@ public class SegmentLimit
     [SerializeField] private DirectionLimit directionLimit = DirectionLimit.None;
     private Vector3 opositePosition;
 
+    public Vector3 Origin => origin.position;
+    public Vector3 Final => final.position;
+
     public Vector3 GetOpositePosition (Vector3 pos)
     {
         Vector3 newPos = Vector3.zero;
