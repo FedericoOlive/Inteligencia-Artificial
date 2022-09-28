@@ -62,6 +62,12 @@ public class Ant : MonoBehaviour
         fsmAnt.Update(ref currentState);
     }
 
+    public void SetPath (List<Vector3Int> newPath)
+    {
+        path = newPath;
+        pathBack.Clear();
+    }
+
     private void SetFsm ()
     {
         fsmAnt = new FiniteStateMachine(States.Last, Flags.Last);
@@ -100,7 +106,7 @@ public class Ant : MonoBehaviour
         fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToPosition, States.ForceGoingToPosition);
         fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToIdle, States.ForceGoingToIdle);
         fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToAnthill, States.ForceGoingToAnthill);
-        fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToHarvesting, States.ForceToHarvasting);
+        fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToResource, States.ForceToHarvasting);
 
         fsmManual.AddBehaviour(States.ForceGoingToPosition, ForceGoingToPositionBehaviour);
         fsmManual.AddBehaviour(States.ForceGoingToAnthill, ForceGoingToAnthillBehaviour);

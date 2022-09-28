@@ -44,7 +44,7 @@ public class Segment
         p1 = mediatrix;
         p2 = mediatrix + direction * 10;
     }
-
+    
     /// <summary>
     /// Calcula el punto de intersección de 2 rectas.
     /// </summary>
@@ -56,12 +56,18 @@ public class Segment
     public static Vector3 Intersection(Vector3 ap1, Vector3 ap2, Vector3 bp1, Vector3 bp2)
     {
         // https://es.wikipedia.org/wiki/Intersección_de_dos_rectas o https://en.wikipedia.org/wiki/Line–line_intersection
+
+        float denominador = ((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x));
+
         Vector3 intersection = Vector3.zero;
-        if (((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x)) == 0)
+        if (denominador == 0)
             return intersection;
 
-        intersection.x = ((ap1.x * ap2.z - ap1.z * ap2.x) * (bp1.x - bp2.x) - (ap1.x - ap2.x) * (bp1.x * bp2.z - bp1.z * bp2.x)) / ((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x));
-        intersection.z = ((ap1.x * ap2.z - ap1.z * ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x * bp2.z - bp1.z * bp2.x)) / ((ap1.x - ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x - bp2.x));
+        float numeradorX = ((ap1.x * ap2.z - ap1.z * ap2.x) * (bp1.x - bp2.x) - (ap1.x - ap2.x) * (bp1.x * bp2.z - bp1.z * bp2.x));
+        float numeradorZ = ((ap1.x * ap2.z - ap1.z * ap2.x) * (bp1.z - bp2.z) - (ap1.z - ap2.z) * (bp1.x * bp2.z - bp1.z * bp2.x));
+
+        intersection.x = numeradorX / denominador;
+        intersection.z = numeradorZ / denominador;
 
         return intersection;
     }

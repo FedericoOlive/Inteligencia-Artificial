@@ -126,7 +126,7 @@ public enum Flags
     ForceToPosition,
     ForceToIdle,
     ForceToAnthill,
-    ForceToHarvesting,
+    ForceToResource,
 
     Last
 }

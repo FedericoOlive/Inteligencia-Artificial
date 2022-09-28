@@ -694,7 +694,7 @@ MonoBehaviour:
   pfResource: {fileID: 7006447504193339835, guid: 569ac0d626ae01448a5359734d486870, type: 3}
   distanceSpawn: {x: 30, y: 0, z: 16}
   resources: []
-  spawnTimeResource: 1
+  spawnTimeResource: 0.5
   maxAmountResources: 5
 --- !u!114 &195291157
 MonoBehaviour:
@@ -3616,7 +3616,7 @@ GameObject:
   - component: {fileID: 1490837837}
   - component: {fileID: 1490837836}
   - component: {fileID: 1490837835}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3815,7 +3815,7 @@ GameObject:
   - component: {fileID: 1556480206}
   - component: {fileID: 1556480205}
   - component: {fileID: 1556480209}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anthill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3915,6 +3915,7 @@ MonoBehaviour:
   resourceManager: {fileID: 195291156}
   pfAnt: {fileID: 4551391977314605074, guid: d7df140894b67f44b8df39c51879c200, type: 3}
   timeToSpawningAnts: 0.1
+  GETNEARRESOURCE: 0
 --- !u!1 &1606783320
 GameObject:
   m_ObjectHideFlags: 0
@@ -4352,6 +4353,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88857de3c0539b548b8d0915e1c7f78e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  layerResource:
+    serializedVersion: 2
+    m_Bits: 512
+  layerEnemy:
+    serializedVersion: 2
+    m_Bits: 1024
+  layerAnthill:
+    serializedVersion: 2
+    m_Bits: 256
+  layerTerrain:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &1793798922
 GameObject:
   m_ObjectHideFlags: 0

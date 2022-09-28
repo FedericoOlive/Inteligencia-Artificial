@@ -15,6 +15,8 @@ public class VoronoiDiagram : MonoBehaviour
     [SerializeField] private List<Transform> transformPoints = new List<Transform>();
     [SerializeField] private List<SegmentLimit> segmentLimit = new List<SegmentLimit>();
 
+    public List<PoligonsVoronoi> GetPoly => polis;
+
     public void AddNewItem (Transform item)
     {
         transformPoints.Add(item);

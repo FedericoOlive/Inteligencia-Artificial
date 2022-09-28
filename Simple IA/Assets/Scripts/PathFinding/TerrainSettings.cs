@@ -17,6 +17,8 @@ public static class TerrainSettings
                 weight = 5;
                 break;
             case TerrainCellType.Rock:
+                weight = 10;
+                break;
             default:
                 break;
         }

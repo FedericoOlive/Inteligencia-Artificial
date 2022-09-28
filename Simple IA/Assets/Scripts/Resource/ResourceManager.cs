@@ -17,7 +17,7 @@ public class ResourceManager : MonoBehaviour
         voronoiDiagram = GetComponent<VoronoiDiagram>();
     }
 
-    void Update ()
+    private void Update ()
     {
         float deltaTime = Time.deltaTime;
         currentSpawnTimeResource += deltaTime;
@@ -32,7 +32,7 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    void CreateResource ()
+    private void CreateResource ()
     {
         Vector3 randomPos = Vector3.zero;
         bool posOcupped = false;
@@ -77,6 +77,31 @@ public class ResourceManager : MonoBehaviour
             {
                 distance = currentDistance;
                 nearResource = resources[i];
+            }
+        }
+
+        return nearResource;
+    }
+
+    public Resource GetNearResourceVoronoi (Vector3 pos)
+    {
+        pos.y = 0;
+        Resource nearResource = null;
+        int indexPoly = 0;
+        for (int i = 0; i < voronoiDiagram.GetPoly.Count; i++)  // En que Poly está el Anthill
+        {
+            if (voronoiDiagram.GetPoly[i].IsInside(pos))
+            {
+                indexPoly = i;
+                break;
+            }
+        }
+
+        for (int i = 0; i < resources.Count; i++)   // En el poly del Anthill, cual es el recurso dentro
+        {
+            if (voronoiDiagram.GetPoly[indexPoly].IsInside(resources[i].transform.position))
+            {
+                return resources[i];
             }
         }
 

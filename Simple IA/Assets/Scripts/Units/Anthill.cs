@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,6 +26,7 @@ public class Anthill : MonoBehaviour
     {
         GetNewResource();
     }
+    
 
     public void SpawnAnts (int amount) => StartCoroutine(SpawnMultipleAnts(amount));
     
@@ -49,7 +51,7 @@ public class Anthill : MonoBehaviour
 
     public Transform GetNewResource ()
     {
-        Resource resource = resourceManager.GetNearResource(origin.transform.position, visionRadius);//.GetRandomResource();
+        Resource resource = resourceManager.GetNearResourceVoronoi(origin.transform.position);
 
         if (resource != null)
             return resource.transform;

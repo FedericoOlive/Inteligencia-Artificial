@@ -4,12 +4,19 @@ using Random = UnityEngine.Random;
 
 public class Resource : MonoBehaviour
 {
+    public static int instantiations = 0;
+    static int SetId () => instantiations++;
     public int id;
 
     [SerializeField] private ResourceCharge resourceCharge=new ResourceCharge();
     public event Action<Resource> OnEmptyResource;
     public float GetAmount () => resourceCharge.resourceAmount;
     public ResourceType GetResourceType () => resourceCharge.resourceType;
+
+    private void Awake ()
+    {
+        id = SetId();
+    }
 
     private void Start ()
     {

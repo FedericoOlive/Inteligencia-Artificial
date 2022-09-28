@@ -157,7 +157,6 @@ public class PoligonsVoronoi
             intersections.Add(secondIntersection);
     }
 
-
     public void DrawPoli (bool drawPolis)
     {
         if (drawPolis)
@@ -181,5 +180,100 @@ public class PoligonsVoronoi
 
         Handles.color = Color.black;
         Handles.DrawPolyLine(points);
+    }
+
+
+    // https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/?ref=gcse
+    public bool IsInside (Vector3 point)
+    {
+        int lenght = intersections.Count;
+
+        if (lenght < 3)
+        {
+            return false;
+        }
+        
+        Vector3 extreme = new Vector3(100, 0, point.z);
+        
+        int count = 0;
+        for (int i = 0; i < lenght; i++)
+        {
+            int next = (i + 1) % lenght;
+            
+            Vector3 intersection = Segment.Intersection(intersections[i], intersections[next], point, extreme);
+            if (intersection != Vector3.zero)
+                if (IsPointInSegment(intersection, intersections[i], intersections[next]))
+                    if (IsPointInSegment(intersection, point, extreme))
+                        count++;
+        } 
+        
+        return (count % 2 == 1); 
+    }
+
+    public bool IsPointInSegment(Vector3 point, Vector3 start, Vector3 end)
+    {
+        return (point.x <= Mathf.Max(start.x, end.x) &&
+                point.x >= Mathf.Min(start.x, end.x) &&
+                point.z <= Mathf.Max(start.z, end.z) &&
+                point.z >= Mathf.Min(start.z, end.z));
+    }
+
+    public int Orientation(Vector3 p, Vector3 q, Vector3 r)
+    {
+        int val = (int)((q.z - p.z) * (r.x - q.x) - (q.x - p.x) * (r.z - q.z));
+
+        if (val == 0)
+        {
+            return 0; // collinear
+        }
+        return (val > 0) ? 1 : 2; // clock or counterclock wise
+    }
+
+    public bool DoIntersect(Vector3 p1, Vector3 q1, Vector3 p2, Vector3 q2)
+    {
+        // Find the four orientations needed for
+        // general and special cases
+        int o1 = Orientation(p1, q1, p2);
+        int o2 = Orientation(p1, q1, q2);
+        int o3 = Orientation(p2, q2, p1);
+        int o4 = Orientation(p2, q2, q1);
+
+        // General case
+        if (o1 != o2 && o3 != o4)
+        {
+            return true;
+        }
+
+        // Special Cases
+        // p1, q1 and p2 are collinear and
+        // p2 lies on segment p1q1
+        if (o1 == 0 && IsPointInSegment(p1, p2, q1))
+        {
+            return true;
+        }
+
+        // p1, q1 and p2 are collinear and
+        // q2 lies on segment p1q1
+        if (o2 == 0 && IsPointInSegment(p1, q2, q1))
+        {
+            return true;
+        }
+
+        // p2, q2 and p1 are collinear and
+        // p1 lies on segment p2q2
+        if (o3 == 0 && IsPointInSegment(p2, p1, q2))
+        {
+            return true;
+        }
+
+        // p2, q2 and q1 are collinear and
+        // q1 lies on segment p2q2
+        if (o4 == 0 && IsPointInSegment(p2, q1, q2))
+        {
+            return true;
+        }
+
+        // Doesn't fall in any of the above cases
+        return false;
     }
 }
