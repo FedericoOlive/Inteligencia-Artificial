@@ -33,12 +33,12 @@ public class Ant : MonoBehaviour
     private float currentActionTime = 0.0f;
 
     private ResourceCharge resourceCharge = new ResourceCharge();
-    private FiniteStateMachine fsmAnt;
-    private FiniteStateMachine fsmManual;
+    private List<FiniteStateMachine> fsmList = new List<FiniteStateMachine>();
+    private FiniteStateMachine currentFsm;
 
     [SerializeField] private List<Vector3Int> path = new List<Vector3Int>();
     [SerializeField] private List<Vector3Int> pathBack = new List<Vector3Int>();
-
+    public Flags externalFlag = Flags.Last;
     private float offsetFailDistance = 0.03f;
 
     private void Awake ()
@@ -68,7 +68,7 @@ public class Ant : MonoBehaviour
 
     public void CustomUpdate ()
     {
-        fsmAnt.Update(ref currentState);
+        currentFsm.Update(ref currentState);
     }
 
     public void SetPath (List<Vector3Int> newPath)
@@ -79,8 +79,12 @@ public class Ant : MonoBehaviour
 
     private void SetFsm ()
     {
-        fsmAnt = new FiniteStateMachine(States.Last, Flags.Last);
-        fsmManual = new FiniteStateMachine(States.Last, Flags.Last);
+        for (int i = 0; i < 2; i++)
+        {
+            currentFsm = new FiniteStateMachine(States.Last, Flags.Last);
+            fsmList.Add(currentFsm);
+        }
+        currentFsm = fsmList[0];
 
         currentState = States.WaitingInstructions;
         SetFsmAnt();
@@ -89,40 +93,45 @@ public class Ant : MonoBehaviour
 
     void SetFsmAnt ()
     {
-        fsmAnt.SetRelation(States.GoingToResource, Flags.OnArriveResource, States.Harvesting);
-        fsmAnt.SetRelation(States.Harvesting, Flags.OnFullInventory, States.GoingToAnthill);
-        fsmAnt.SetRelation(States.GoingToAnthill, Flags.OnArriveWithResource, States.Depositing);
-        fsmAnt.SetRelation(States.Depositing, Flags.OnEmptyInventory, States.WaitingInstructions);
-        fsmAnt.SetRelation(States.WaitingInstructions, Flags.OnReceiveResource, States.GoingToResource);
-
-        fsmAnt.AddBehaviour(States.Harvesting, HarvestingBehaviour);
-        fsmAnt.AddBehaviour(States.GoingToResource, GoingToResourceBehaviour);
-        fsmAnt.AddBehaviour(States.GoingToAnthill, GoingToAnthillBehaviour);
-        fsmAnt.AddBehaviour(States.Depositing, DepositingBehaviour);
-        fsmAnt.AddBehaviour(States.WaitingInstructions, WaitingInstructions);
+        fsmList[0].SetRelation(States.GoingToResource, Flags.OnArriveResource, States.Harvesting);
+        fsmList[0].SetRelation(States.Harvesting, Flags.OnFullInventory, States.GoingToAnthill);
+        fsmList[0].SetRelation(States.GoingToAnthill, Flags.OnArriveWithResource, States.Depositing);
+        fsmList[0].SetRelation(States.Depositing, Flags.OnEmptyInventory, States.WaitingInstructions);
+        fsmList[0].SetRelation(States.WaitingInstructions, Flags.OnReceiveResource, States.GoingToResource);
 
         // Exit FSM Cases:
-        fsmAnt.SetRelation(States.Idle, Flags.ForceIndicator, States.ForceIndicator);
-        fsmAnt.SetRelation(States.GoingToResource, Flags.ForceIndicator, States.ForceIndicator);
-        fsmAnt.SetRelation(States.Harvesting, Flags.ForceIndicator, States.ForceIndicator);
-        fsmAnt.SetRelation(States.GoingToAnthill, Flags.ForceIndicator, States.ForceIndicator);
-        fsmAnt.SetRelation(States.Depositing, Flags.ForceIndicator, States.ForceIndicator);
-        fsmAnt.SetRelation(States.WaitingInstructions, Flags.ForceIndicator, States.ForceIndicator);
+        fsmList[0].SetRelation(States.Idle, Flags.ForceIndicator, States.ForceIndicator);
+        fsmList[0].SetRelation(States.GoingToResource, Flags.ForceIndicator, States.ForceIndicator);
+        fsmList[0].SetRelation(States.Harvesting, Flags.ForceIndicator, States.ForceIndicator);
+        fsmList[0].SetRelation(States.GoingToAnthill, Flags.ForceIndicator, States.ForceIndicator);
+        fsmList[0].SetRelation(States.Depositing, Flags.ForceIndicator, States.ForceIndicator);
+        fsmList[0].SetRelation(States.WaitingInstructions, Flags.ForceIndicator, States.ForceIndicator);
+
+
+        fsmList[0].AddBehaviour(States.Harvesting, HarvestingBehaviour);
+        fsmList[0].AddBehaviour(States.GoingToResource, GoingToResourceBehaviour);
+        fsmList[0].AddBehaviour(States.GoingToAnthill, GoingToAnthillBehaviour);
+        fsmList[0].AddBehaviour(States.Depositing, DepositingBehaviour);
+        fsmList[0].AddBehaviour(States.WaitingInstructions, WaitingInstructions);
+        fsmList[0].AddBehaviour(States.ForceIndicator, ForceIndicator);
     }
 
     void SetFsmManual()
     {
-        fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToPosition, States.ForceGoingToPosition);
-        fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToIdle, States.ForceGoingToIdle);
-        fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToAnthill, States.ForceGoingToAnthill);
-        fsmManual.SetRelation(States.ForceIndicator, Flags.ForceToResource, States.ForceToHarvasting);
+        fsmList[1].SetRelation(States.ForceIndicator, Flags.ForceToPosition, States.ForceGoingToPosition);
+        fsmList[1].SetRelation(States.ForceIndicator, Flags.ForceToIdle, States.ForceGoingToIdle);
+        fsmList[1].SetRelation(States.ForceIndicator, Flags.ForceToAnthill, States.ForceGoingToAnthill);
+        fsmList[1].SetRelation(States.ForceIndicator, Flags.ForceToResource, States.ForceToHarvasting);
+       
+        fsmList[1].AddBehaviour(States.ForceGoingToPosition, ForceGoingToPositionBehaviour);
+        fsmList[1].AddBehaviour(States.ForceGoingToAnthill, ForceGoingToAnthillBehaviour);
+        fsmList[1].AddBehaviour(States.ForceGoingToIdle, ForceGoingToIdleBehaviour);
+    }
 
-        fsmManual.AddBehaviour(States.ForceGoingToPosition, ForceGoingToPositionBehaviour);
-        fsmManual.AddBehaviour(States.ForceGoingToAnthill, ForceGoingToAnthillBehaviour);
-        fsmManual.AddBehaviour(States.ForceGoingToIdle, ForceGoingToIdleBehaviour);
-
-        // Exit FSM Cases:
-
+    void ForceIndicator ()
+    {
+        SetFSM(1);
+        SetFlag(externalFlag);
     }
 
 
@@ -158,14 +167,14 @@ public class Ant : MonoBehaviour
 
         meshRenderer.material.color = Color.white;
 
-        fsmAnt.SetFlag(ref currentState, Flags.OnReceiveResource);
+        currentFsm.SetFlag(ref currentState, Flags.OnReceiveResource);
     }
 
     private void GoingToAnthillBehaviour ()
     {
         if (pathBack.Count < 1)
         {
-            fsmAnt.SetFlag(ref currentState, Flags.OnArriveWithResource);
+            currentFsm.SetFlag(ref currentState, Flags.OnArriveWithResource);
             path.Reverse();
             return;
         }
@@ -204,7 +213,7 @@ public class Ant : MonoBehaviour
     {
         if (path.Count < 1)
         {
-            fsmAnt.SetFlag(ref currentState, Flags.OnArriveResource);
+            currentFsm.SetFlag(ref currentState, Flags.OnArriveResource);
             pathBack.Reverse();
             return;
         }
@@ -248,7 +257,7 @@ public class Ant : MonoBehaviour
         else
         {
             currentActionTime = 0.0f;
-            fsmAnt.SetFlag(ref currentState, Flags.OnFullInventory);
+            currentFsm.SetFlag(ref currentState, Flags.OnFullInventory);
 
             if (resource)
                 resource.TakeResource(ref resourceCharge, stats.maxChargeResource);
@@ -264,15 +273,21 @@ public class Ant : MonoBehaviour
         else
         {
             currentActionTime = 0.0f;
-            fsmAnt.SetFlag(ref currentState, Flags.OnEmptyInventory);
+            currentFsm.SetFlag(ref currentState, Flags.OnEmptyInventory);
         }
     }
 
     public void SetFlag (Flags flag)
     {
-        fsmAnt.SetFlag(ref currentState, flag);
+        currentFsm.SetFlag(ref currentState, flag);
     }
 
+    public void SetFSM (int nextFsm)
+    {
+        currentFsm.exitBehaviour?.Invoke();
+        currentFsm = fsmList[nextFsm];
+        currentFsm.entryBehaviour?.Invoke();
+    }
 
 #if UNITY_EDITOR
 

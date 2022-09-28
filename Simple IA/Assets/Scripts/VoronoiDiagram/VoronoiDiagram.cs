@@ -99,10 +99,10 @@ public class VoronoiDiagram : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < polis.Count; i++)
-            Debug.Log("Weight " + i + ": " + polis[i].weight);
-
-        Debug.Log("Total Weight Polis: " + allWeight);
+       // for (int i = 0; i < polis.Count; i++)
+       //     Debug.Log("Weight " + i + ": " + polis[i].weight);
+       //
+       // Debug.Log("Total Weight Polis: " + allWeight);
     }
 
     bool IsNodeOutsideLimits (Node node)

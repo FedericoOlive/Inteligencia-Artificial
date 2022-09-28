@@ -50,6 +50,8 @@ public class FiniteStateMachine
         }
     }
 
+
+
     private void ExitBehaviourState (States currentState)
     {
         if (behaviours[currentState].exitBehaviour != null)
