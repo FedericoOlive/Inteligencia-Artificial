@@ -1,4 +1,5 @@
-using System;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,9 +12,10 @@ public class Anthill : MonoBehaviour
 {
     [SerializeField] private ResourceManager resourceManager;
     [SerializeField] private GameObject pfAnt;
+    private ConcurrentBag<Ant> ants = new ConcurrentBag<Ant>();
+    private ParallelOptions parallelOptions = new ParallelOptions();
 
     private Anthill origin;
-    private List<Ant> ants = new List<Ant>();
     private float visionRadius = 25.0f;
     [SerializeField] private float timeToSpawningAnts = 0.1f;
 
@@ -26,7 +28,14 @@ public class Anthill : MonoBehaviour
     {
         GetNewResource();
     }
-    
+
+    private void Update ()
+    {
+        Parallel.ForEach(ants, parallelOptions, ant =>
+        {
+            ant.CustomUpdate();
+        });
+    }
 
     public void SpawnAnts (int amount) => StartCoroutine(SpawnMultipleAnts(amount));
     
@@ -60,10 +69,10 @@ public class Anthill : MonoBehaviour
 
     public void SetOrderToAnt (Flags flag)
     {
-        for (int i = 0; i < ants.Count; i++)
+        Parallel.ForEach(ants, parallelOptions, ant =>
         {
-            ants[i].SetFlag(flag);
-        }
+            ant.SetFlag(flag);
+        });
     }
 
 #if UNITY_EDITOR

@@ -713,40 +713,40 @@ MonoBehaviour:
   intersections: []
   polis:
   - drawPoli: 0
+    weight: 0
     itemSector: {fileID: 0}
     segments: []
     limits: []
     intersections: []
     indexIntersections: 
-    weight: 0
   - drawPoli: 0
+    weight: 0
     itemSector: {fileID: 0}
     segments: []
     limits: []
     intersections: []
     indexIntersections: 
-    weight: 0
   - drawPoli: 0
+    weight: 0
     itemSector: {fileID: 0}
     segments: []
     limits: []
     intersections: []
     indexIntersections: 
-    weight: 0
   - drawPoli: 0
+    weight: 0
     itemSector: {fileID: 0}
     segments: []
     limits: []
     intersections: []
     indexIntersections: 
-    weight: 0
   - drawPoli: 0
+    weight: 0
     itemSector: {fileID: 0}
     segments: []
     limits: []
     intersections: []
     indexIntersections: 
-    weight: 0
   transformPoints: []
   segmentLimit:
   - origin: {fileID: 478813141}

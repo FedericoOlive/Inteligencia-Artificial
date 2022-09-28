@@ -12,7 +12,7 @@ public class Resource : MonoBehaviour
     public event Action<Resource> OnEmptyResource;
     public float GetAmount () => resourceCharge.resourceAmount;
     public ResourceType GetResourceType () => resourceCharge.resourceType;
-
+    public Vector3 pos;
     private void Awake ()
     {
         id = SetId();
@@ -20,6 +20,7 @@ public class Resource : MonoBehaviour
 
     private void Start ()
     {
+        pos = transform.position;
         resourceCharge.resourceType = (ResourceType) Random.Range(0, (int) ResourceType.Last);
         resourceCharge.resourceAmount = 3;
     }

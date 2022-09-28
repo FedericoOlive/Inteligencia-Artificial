@@ -14,6 +14,8 @@ public class Ant : MonoBehaviour
     [SerializeField] private Anthill anthill;
     [SerializeField] private Resource resource;
     [SerializeField] private States currentState;
+    private Vector3 pos;
+    private float deltaTime = 0;
 
     private bool isSelected = false;
     public bool IsSelected
@@ -43,6 +45,7 @@ public class Ant : MonoBehaviour
     {
         meshRenderer = GetComponent<MeshRenderer>();
         outline = GetComponent<Outline>();
+        pos = transform.position;
     }
 
     public void Init (Anthill anthill, Transform resource)
@@ -58,6 +61,12 @@ public class Ant : MonoBehaviour
     }
 
     private void Update ()
+    {
+        transform.position = pos;
+        deltaTime = Time.deltaTime;
+    }
+
+    public void CustomUpdate ()
     {
         fsmAnt.Update(ref currentState);
     }
@@ -141,7 +150,7 @@ public class Ant : MonoBehaviour
             if (newResource)
             {
                 resource = newResource.GetComponent<Resource>();
-                path = NodeGenerator.GetPath(transform.position, resource.transform.position);
+                path = NodeGenerator.GetPath(pos, resource.pos);
             }
 
             return;
@@ -167,17 +176,17 @@ public class Ant : MonoBehaviour
             pathBack.Remove(pathBack[0]);
         }
         
-        Vector3 dir = (pathBack[0] - transform.position);
+        Vector3 dir = (pathBack[0] - pos);
         dir.Normalize();
 
-        if (NodeUtils.GetDistanceXZ(pathBack[0], transform.position) > offsetFailDistance)
+        if (NodeUtils.GetDistanceXZ(pathBack[0], pos) > offsetFailDistance)
         {
-            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(pathBack[0])) * Time.deltaTime;
-            transform.position += new Vector3(movement.x, 0, movement.z);
+            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(pathBack[0])) * deltaTime;
+            pos += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
-            transform.position = pathBack[0];
+            pos = pathBack[0];
             path.Add(pathBack[0]);
             pathBack.Remove(pathBack[0]);
 
@@ -185,8 +194,8 @@ public class Ant : MonoBehaviour
             {
                 dir = (pathBack[0] - path[^1]);
                 dir.Normalize();
-                Vector3 movement = dir * stats.speed * Time.deltaTime;
-                transform.position += new Vector3(movement.x, 0, movement.z);
+                Vector3 movement = dir * stats.speed * deltaTime;
+                pos += new Vector3(movement.x, 0, movement.z);
             }
         }
     }
@@ -206,17 +215,17 @@ public class Ant : MonoBehaviour
             path.Remove(path[0]);
         }
         
-        Vector3 dir = (path[0] - transform.position);
+        Vector3 dir = (path[0] - pos);
         dir.Normalize();
 
-        if (NodeUtils.GetDistanceXZ(path[0], transform.position) > offsetFailDistance)
+        if (NodeUtils.GetDistanceXZ(path[0], pos) > offsetFailDistance)
         {
-            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(path[0])) * Time.deltaTime;
-            transform.position += new Vector3(movement.x, 0, movement.z);
+            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(path[0])) * deltaTime;
+            pos += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
-            transform.position = path[0];
+            pos = path[0];
             pathBack.Add(path[0]);
             path.Remove(path[0]);
 
@@ -224,8 +233,8 @@ public class Ant : MonoBehaviour
             {
                 dir = (path[0] - pathBack[^1]);
                 dir.Normalize();
-                Vector3 movement = dir * stats.speed * Time.deltaTime;
-                transform.position += new Vector3(movement.x, 0, movement.z);
+                Vector3 movement = dir * stats.speed * deltaTime;
+                pos += new Vector3(movement.x, 0, movement.z);
             }
         }
     }
@@ -234,7 +243,7 @@ public class Ant : MonoBehaviour
     {
         if (currentActionTime < stats.pickTime)
         {
-            currentActionTime += Time.deltaTime;
+            currentActionTime += deltaTime;
         }
         else
         {
@@ -250,7 +259,7 @@ public class Ant : MonoBehaviour
     {
         if (currentActionTime < stats.dropTime)
         {
-            currentActionTime += Time.deltaTime;
+            currentActionTime += deltaTime;
         }
         else
         {
@@ -292,7 +301,7 @@ public class Ant : MonoBehaviour
     private void OnDrawGizmosSelected ()
     {
         //Handles.color = Color.red;
-        //Handles.DrawWireDisc(transform.position, Vector3.up, stats.visionRadius);
+        //Handles.DrawWireDisc(pos, Vector3.up, stats.visionRadius);
     }
 #endif
 }
