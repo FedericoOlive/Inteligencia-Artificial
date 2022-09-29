@@ -16,7 +16,7 @@ public class Ant : MonoBehaviour
     [SerializeField] private States currentState;
     private Vector3 pos;
     public Vector3 destination;
-
+    private Color colorAnt = Color.white;
     private float deltaTime = 0;
 
     private bool isSelected = false;
@@ -52,7 +52,7 @@ public class Ant : MonoBehaviour
     public void Init (Anthill anthill, Transform resource)
     {
         SetFsm();
-        meshRenderer.material.color = Color.white;
+        meshRenderer.material.color = colorAnt;
         this.anthill = anthill;
     }
 
@@ -65,6 +65,7 @@ public class Ant : MonoBehaviour
     {
         transform.position = pos;
         deltaTime = Time.deltaTime;
+        meshRenderer.material.color = colorAnt;
         Debug.Log("State: " + currentState);
     }
 
@@ -202,18 +203,22 @@ public class Ant : MonoBehaviour
 
     private void SetColorRed ()
     {
-        meshRenderer.material.color = Color.red;
+        colorAnt = Color.red;
     }
 
     private void SetColorNormal ()
     {
-        meshRenderer.material.color = Color.white;
+        colorAnt = Color.white;
     }
 
     private void GetPathAnthill ()
     {
         path = NodeGenerator.GetPath(pos, anthill.pos);
+        if (path.Count < 1)
+            path = NodeGenerator.GetPath(pos, anthill.pos);
+        int i = 0;
     }
+
     private void GetPathResource()
     {
         path = NodeGenerator.GetPath(pos, resource.pos);
@@ -221,20 +226,20 @@ public class Ant : MonoBehaviour
 
     private void GetPathTarget ()
     {
-        Debug.Log("Pos: "+pos+"     Destination: " +destination);
+        Debug.Log("Pos: " + pos + "     Destination: " + destination);
         path = NodeGenerator.GetPath(pos, destination);
     }
 
     private void WaitingInstructions ()
     {
-        Transform newResource = anthill.GetNewResource();
+        Resource newResource = anthill.GetNewResource();
         if (!newResource)
         {
             return;
         }
 
-        resource = newResource.GetComponent<Resource>();
-        meshRenderer.material.color = Color.white;
+        resource = newResource;
+        colorAnt = Color.white;
 
         currentFsm.SetFlag(ref currentState, Flags.OnReceiveResource);
     }
@@ -290,7 +295,7 @@ public class Ant : MonoBehaviour
             pathBack.Add(path[0]);
             path.Remove(path[0]);
         }
-        
+
         Vector3 dir = (path[0] - pos);
         dir.Normalize();
 

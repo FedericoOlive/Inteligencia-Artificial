@@ -84,7 +84,7 @@ public class VoronoiDiagram : MonoBehaviour
         int allWeight = 0;
         for (int i = 0; i < NodeGenerator.GetMap.Length; i++)
         {
-            if(IsNodeOutsideLimits(NodeGenerator.GetMap[i]))
+            if (IsNodeOutsideLimits(NodeGenerator.GetMap[i]))
                 continue;
 
             allWeight += NodeGenerator.GetMap[i].weight;
@@ -99,10 +99,10 @@ public class VoronoiDiagram : MonoBehaviour
             }
         }
 
-       // for (int i = 0; i < polis.Count; i++)
-       //     Debug.Log("Weight " + i + ": " + polis[i].weight);
-       //
-       // Debug.Log("Total Weight Polis: " + allWeight);
+        // for (int i = 0; i < polis.Count; i++)
+        //     Debug.Log("Weight " + i + ": " + polis[i].weight);
+        //
+        // Debug.Log("Total Weight Polis: " + allWeight);
     }
 
     bool IsNodeOutsideLimits (Node node)

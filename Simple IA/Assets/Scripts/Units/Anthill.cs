@@ -56,15 +56,15 @@ public class Anthill : MonoBehaviour
         GameObject newAnt = Instantiate(pfAnt, pos, Quaternion.identity, origin.transform);
         Ant ant = newAnt.GetComponent<Ant>();
         ants.Add(ant);
-        ant.Init(origin, GetNewResource());
+        ant.Init(origin, GetNewResource().transform);
     }
 
-    public Transform GetNewResource ()
+    public Resource GetNewResource ()
     {
-        Resource resource = resourceManager.GetNearResourceVoronoi(origin.transform.position);
+        Resource resource = resourceManager.GetNearResourceVoronoi(pos);
 
         if (resource != null)
-            return resource.transform;
+            return resource;
         return null;
     }
 

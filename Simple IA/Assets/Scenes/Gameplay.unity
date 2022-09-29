@@ -289,7 +289,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: All To Mines
+  m_text: All To Work
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -694,7 +694,7 @@ MonoBehaviour:
   pfResource: {fileID: 7006447504193339835, guid: 569ac0d626ae01448a5359734d486870, type: 3}
   distanceSpawn: {x: 30, y: 0, z: 16}
   resources: []
-  spawnTimeResource: 0.5
+  spawnTimeResource: 3
   maxAmountResources: 1
 --- !u!114 &195291157
 MonoBehaviour:
@@ -3925,6 +3925,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceManager: {fileID: 195291156}
   pfAnt: {fileID: 4551391977314605074, guid: d7df140894b67f44b8df39c51879c200, type: 3}
+  pos: {x: 0, y: 0, z: 0}
   timeToSpawningAnts: 0.1
 --- !u!1 &1606783320
 GameObject:

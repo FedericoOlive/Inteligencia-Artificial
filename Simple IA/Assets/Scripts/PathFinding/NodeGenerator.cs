@@ -11,7 +11,6 @@ public class NodeGenerator : MonoBehaviour
     public Vector3Int mapSize;
     private static Node[] map;
     private static Pathfinding pathfinding;
-    public static int AuxDelete = 11;
     public Vector3Int startPos = new Vector3Int();
     public Vector3Int endPos = new Vector3Int();
 

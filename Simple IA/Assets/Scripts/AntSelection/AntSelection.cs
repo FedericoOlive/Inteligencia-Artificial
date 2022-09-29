@@ -19,6 +19,11 @@ public class AntSelection : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            for (int i = 0; i < antSelected.Count; i++)
+            {
+                AddAntToSelection(antSelected[i], false);
+            }
+
             antSelected.Clear();
             selection.gameObject.SetActive(true);
             clickDown = Input.mousePosition;

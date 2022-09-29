@@ -99,7 +99,7 @@ public class ResourceManager : MonoBehaviour
 
         for (int i = 0; i < resources.Count; i++)   // En el poly del Anthill, cual es el recurso dentro
         {
-            if (voronoiDiagram.GetPoly[indexPoly].IsInside(resources[i].transform.position))
+            if (voronoiDiagram.GetPoly[indexPoly].IsInside(resources[i].pos))
             {
                 return resources[i];
             }
