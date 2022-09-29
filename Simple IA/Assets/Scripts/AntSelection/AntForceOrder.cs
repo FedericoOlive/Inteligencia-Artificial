@@ -42,9 +42,9 @@ public class AntForceOrder : MonoBehaviour
             {
                 Vector3 origin = ant.transform.position;
                 Vector3 final = hitsResource[0].transform.position;
-
-                ant.SetPath(NodeGenerator.GetPath(origin, final));
-                ant.SetFlag(Flags.ForceToResource);
+                
+                ant.destination = final;
+                ant.SetFlag(Flags.ForceToPoint);
                 Debug.Log("Send to Resource: " + hitsResource[0].transform.gameObject.name);
             }
         }
@@ -62,7 +62,7 @@ public class AntForceOrder : MonoBehaviour
                 Vector3 origin = ant.transform.position;
                 Vector3 final = hitsAnthill[0].transform.position;
 
-                ant.SetPath(NodeGenerator.GetPath(origin, final));
+                ant.destination = final;
                 ant.SetFlag(Flags.ForceToAnthill);
 
                 Debug.Log("Send to Anthill: " + hitsAnthill[0].transform.gameObject.name);
@@ -73,10 +73,11 @@ public class AntForceOrder : MonoBehaviour
             foreach (Ant ant in antSelection.antSelected)
             {
                 Vector3 origin = ant.transform.position;
-                Vector3 final = hitsTerrain[0].transform.position;
+                Vector3 final = hitsTerrain[0].point;
+                final = new Vector3(Mathf.RoundToInt(final.x), 0, Mathf.RoundToInt(final.z));
 
-                ant.SetPath(NodeGenerator.GetPath(origin, final));
-                ant.SetFlag(Flags.ForceToPosition);
+                ant.destination = final;
+                ant.SetFlag(Flags.ForceToPoint);
 
                 Debug.Log("Send to Point: " + hitsTerrain[0].transform.gameObject.name);
             }

@@ -14,7 +14,7 @@ public class Anthill : MonoBehaviour
     [SerializeField] private GameObject pfAnt;
     private ConcurrentBag<Ant> ants = new ConcurrentBag<Ant>();
     private ParallelOptions parallelOptions = new ParallelOptions();
-
+    public Vector3 pos;
     private Anthill origin;
     private float visionRadius = 25.0f;
     [SerializeField] private float timeToSpawningAnts = 0.1f;
@@ -22,6 +22,7 @@ public class Anthill : MonoBehaviour
     private void Awake ()
     {
         origin = GetComponent<Anthill>();
+        pos = transform.position;
     }
 
     private void Start ()
@@ -33,7 +34,7 @@ public class Anthill : MonoBehaviour
     {
         Parallel.ForEach(ants, parallelOptions, ant =>
         {
-            ant.CustomUpdate();
+            ant.FsmUpdate();
         });
     }
 

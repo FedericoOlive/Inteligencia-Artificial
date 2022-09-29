@@ -15,6 +15,8 @@ public class Ant : MonoBehaviour
     [SerializeField] private Resource resource;
     [SerializeField] private States currentState;
     private Vector3 pos;
+    public Vector3 destination;
+
     private float deltaTime = 0;
 
     private bool isSelected = false;
@@ -33,7 +35,6 @@ public class Ant : MonoBehaviour
     private float currentActionTime = 0.0f;
 
     private ResourceCharge resourceCharge = new ResourceCharge();
-    private List<FiniteStateMachine> fsmList = new List<FiniteStateMachine>();
     private FiniteStateMachine currentFsm;
 
     [SerializeField] private List<Vector3Int> path = new List<Vector3Int>();
@@ -64,9 +65,10 @@ public class Ant : MonoBehaviour
     {
         transform.position = pos;
         deltaTime = Time.deltaTime;
+        Debug.Log("State: " + currentState);
     }
 
-    public void CustomUpdate ()
+    public void FsmUpdate ()
     {
         currentFsm.Update(ref currentState);
     }
@@ -79,92 +81,159 @@ public class Ant : MonoBehaviour
 
     private void SetFsm ()
     {
-        for (int i = 0; i < 2; i++)
-        {
-            currentFsm = new FiniteStateMachine(States.Last, Flags.Last);
-            fsmList.Add(currentFsm);
-        }
-        currentFsm = fsmList[0];
+        currentFsm = new FiniteStateMachine(States.Last, Flags.Last);
 
         currentState = States.WaitingInstructions;
         SetFsmAnt();
-        SetFsmManual();
     }
 
     void SetFsmAnt ()
     {
-        fsmList[0].SetRelation(States.GoingToResource, Flags.OnArriveResource, States.Harvesting);
-        fsmList[0].SetRelation(States.Harvesting, Flags.OnFullInventory, States.GoingToAnthill);
-        fsmList[0].SetRelation(States.GoingToAnthill, Flags.OnArriveWithResource, States.Depositing);
-        fsmList[0].SetRelation(States.Depositing, Flags.OnEmptyInventory, States.WaitingInstructions);
-        fsmList[0].SetRelation(States.WaitingInstructions, Flags.OnReceiveResource, States.GoingToResource);
+        currentFsm.AddBehaviour(States.Harvesting, HarvestingBehaviour);
+        currentFsm.AddBehaviour(States.GoingToResource, GoingToResourceBehaviour, GetPathResource, CleanPath);
+        currentFsm.AddBehaviour(States.GoingToAnthill, GoingToAnthillBehaviour, GetPathAnthill, CleanPath);
+        currentFsm.AddBehaviour(States.Depositing, DepositingBehaviour, CleanPath);
+        currentFsm.AddBehaviour(States.WaitingInstructions, WaitingInstructions, SetColorRed, SetColorNormal);
 
-        // Exit FSM Cases:
-        fsmList[0].SetRelation(States.Idle, Flags.ForceIndicator, States.ForceIndicator);
-        fsmList[0].SetRelation(States.GoingToResource, Flags.ForceIndicator, States.ForceIndicator);
-        fsmList[0].SetRelation(States.Harvesting, Flags.ForceIndicator, States.ForceIndicator);
-        fsmList[0].SetRelation(States.GoingToAnthill, Flags.ForceIndicator, States.ForceIndicator);
-        fsmList[0].SetRelation(States.Depositing, Flags.ForceIndicator, States.ForceIndicator);
-        fsmList[0].SetRelation(States.WaitingInstructions, Flags.ForceIndicator, States.ForceIndicator);
+        currentFsm.AddBehaviour(States.ForceGoingToAnthill, GoingToAnthillBehaviour, GetPathAnthill, CleanPath);
+        currentFsm.AddBehaviour(States.ForceGoingToPosition, ForceGoingToPositionBehaviour, GetPathTarget, CleanPath);
+        currentFsm.AddBehaviour(States.Idle, IdleBehaviour, IdleEntry, IdleExit);
 
 
-        fsmList[0].AddBehaviour(States.Harvesting, HarvestingBehaviour);
-        fsmList[0].AddBehaviour(States.GoingToResource, GoingToResourceBehaviour);
-        fsmList[0].AddBehaviour(States.GoingToAnthill, GoingToAnthillBehaviour);
-        fsmList[0].AddBehaviour(States.Depositing, DepositingBehaviour);
-        fsmList[0].AddBehaviour(States.WaitingInstructions, WaitingInstructions);
-        fsmList[0].AddBehaviour(States.ForceIndicator, ForceIndicator);
-    }
+        currentFsm.SetRelation(States.GoingToResource, Flags.OnArriveResource, States.Harvesting);
+        currentFsm.SetRelation(States.Harvesting, Flags.OnFullInventory, States.GoingToAnthill);
+        currentFsm.SetRelation(States.GoingToAnthill, Flags.OnArriveAnthill, States.Depositing);
+        currentFsm.SetRelation(States.Depositing, Flags.OnEmptyInventory, States.WaitingInstructions);
+        currentFsm.SetRelation(States.WaitingInstructions, Flags.OnReceiveResource, States.GoingToResource);
 
-    void SetFsmManual()
-    {
-        fsmList[1].SetRelation(States.ForceIndicator, Flags.ForceToPosition, States.ForceGoingToPosition);
-        fsmList[1].SetRelation(States.ForceIndicator, Flags.ForceToIdle, States.ForceGoingToIdle);
-        fsmList[1].SetRelation(States.ForceIndicator, Flags.ForceToAnthill, States.ForceGoingToAnthill);
-        fsmList[1].SetRelation(States.ForceIndicator, Flags.ForceToResource, States.ForceToHarvasting);
-       
-        fsmList[1].AddBehaviour(States.ForceGoingToPosition, ForceGoingToPositionBehaviour);
-        fsmList[1].AddBehaviour(States.ForceGoingToAnthill, ForceGoingToAnthillBehaviour);
-        fsmList[1].AddBehaviour(States.ForceGoingToIdle, ForceGoingToIdleBehaviour);
-    }
+        currentFsm.SetRelation(States.Idle, Flags.Idle, States.Idle);
+        currentFsm.SetRelation(States.GoingToResource, Flags.Idle, States.Idle);
+        currentFsm.SetRelation(States.Harvesting, Flags.Idle, States.Idle);
+        currentFsm.SetRelation(States.GoingToAnthill, Flags.Idle, States.Idle);
+        currentFsm.SetRelation(States.Depositing, Flags.Idle, States.Idle);
+        currentFsm.SetRelation(States.WaitingInstructions, Flags.Idle, States.Idle);
+        currentFsm.SetRelation(States.ForceGoingToAnthill, Flags.Idle, States.Idle);
+        currentFsm.SetRelation(States.ForceGoingToPosition, Flags.Idle, States.Idle);
+        currentFsm.SetRelation(States.ForceGoingToAnthill, Flags.OnArriveAnthill, States.Idle);
 
-    void ForceIndicator ()
-    {
-        SetFSM(1);
-        SetFlag(externalFlag);
+        currentFsm.SetRelation(States.ForceGoingToAnthill, Flags.ForceToPoint, States.ForceGoingToPosition);
+        currentFsm.SetRelation(States.Idle, Flags.ForceToPoint, States.ForceGoingToPosition);
+        currentFsm.SetRelation(States.GoingToResource, Flags.ForceToPoint, States.ForceGoingToPosition);
+        currentFsm.SetRelation(States.Harvesting, Flags.ForceToPoint, States.ForceGoingToPosition);
+        currentFsm.SetRelation(States.GoingToAnthill, Flags.ForceToPoint, States.ForceGoingToPosition);
+        currentFsm.SetRelation(States.Depositing, Flags.ForceToPoint, States.ForceGoingToPosition);
+        currentFsm.SetRelation(States.WaitingInstructions, Flags.ForceToPoint, States.ForceGoingToPosition);
+        //currentFsm.SetRelation(States.ForceGoingToPosition, Flags.OnArriveAnthill, States.ForceGoingToPosition);
+
+        currentFsm.SetRelation(States.Idle, Flags.ForceToAnthill, States.ForceGoingToAnthill);
+        currentFsm.SetRelation(States.GoingToResource, Flags.ForceToAnthill, States.ForceGoingToAnthill);
+        currentFsm.SetRelation(States.Harvesting, Flags.ForceToAnthill, States.ForceGoingToAnthill);
+        currentFsm.SetRelation(States.GoingToAnthill, Flags.ForceToAnthill, States.ForceGoingToAnthill);
+        currentFsm.SetRelation(States.Depositing, Flags.ForceToAnthill, States.ForceGoingToAnthill);
+        currentFsm.SetRelation(States.WaitingInstructions, Flags.ForceToAnthill, States.ForceGoingToAnthill);
+        currentFsm.SetRelation(States.ForceGoingToPosition, Flags.ForceToAnthill, States.ForceGoingToAnthill);
+
+        currentFsm.SetRelation(States.ForceGoingToPosition, Flags.OnBackToWork, States.WaitingInstructions);
+        currentFsm.SetRelation(States.ForceGoingToAnthill, Flags.OnBackToWork, States.WaitingInstructions);
+        currentFsm.SetRelation(States.Idle, Flags.OnBackToWork, States.WaitingInstructions);
     }
 
 
     private void ForceGoingToPositionBehaviour()
     {
+        if (path.Count < 1)
+        {
+            currentFsm.SetFlag(ref currentState, Flags.Idle);
+            return;
+        }
 
+        if (pathBack.Count < 1)
+        {
+            pathBack.Add(path[0]);
+            path.Remove(path[0]);
+        }
+
+        Vector3 dir = (path[0] - pos);
+        dir.Normalize();
+
+        if (NodeUtils.GetDistanceXZ(path[0], pos) > offsetFailDistance)
+        {
+            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(path[0])) * deltaTime;
+            pos += new Vector3(movement.x, 0, movement.z);
+        }
+        else
+        {
+            pos = path[0];
+            pathBack.Add(path[0]);
+            path.Remove(path[0]);
+
+            if (path.Count > 0)
+            {
+                dir = (path[0] - pathBack[^1]);
+                dir.Normalize();
+                Vector3 movement = dir * stats.speed * deltaTime;
+                pos += new Vector3(movement.x, 0, movement.z);
+            }
+        }
+    }
+    
+    private void IdleBehaviour()
+    {
+        
     }
 
-    private void ForceGoingToAnthillBehaviour()
+    private void IdleEntry ()
     {
-
+        CleanPath();
+        SetColorRed();
     }
 
-    private void ForceGoingToIdleBehaviour()
+    private void IdleExit ()
     {
+        CleanPath();
+        SetColorNormal();
+    }
 
+    private void CleanPath ()
+    {
+        pathBack.Clear();
+        path.Clear();
+    }
+
+    private void SetColorRed ()
+    {
+        meshRenderer.material.color = Color.red;
+    }
+
+    private void SetColorNormal ()
+    {
+        meshRenderer.material.color = Color.white;
+    }
+
+    private void GetPathAnthill ()
+    {
+        path = NodeGenerator.GetPath(pos, anthill.pos);
+    }
+    private void GetPathResource()
+    {
+        path = NodeGenerator.GetPath(pos, resource.pos);
+    }
+
+    private void GetPathTarget ()
+    {
+        Debug.Log("Pos: "+pos+"     Destination: " +destination);
+        path = NodeGenerator.GetPath(pos, destination);
     }
 
     private void WaitingInstructions ()
     {
-        meshRenderer.material.color = Color.red;
-        if (!resource)
+        Transform newResource = anthill.GetNewResource();
+        if (!newResource)
         {
-            Transform newResource = anthill.GetNewResource();
-            if (newResource)
-            {
-                resource = newResource.GetComponent<Resource>();
-                path = NodeGenerator.GetPath(pos, resource.pos);
-            }
-
             return;
         }
 
+        resource = newResource.GetComponent<Resource>();
         meshRenderer.material.color = Color.white;
 
         currentFsm.SetFlag(ref currentState, Flags.OnReceiveResource);
@@ -172,36 +241,35 @@ public class Ant : MonoBehaviour
 
     private void GoingToAnthillBehaviour ()
     {
-        if (pathBack.Count < 1)
+        if (path.Count < 1)
         {
-            currentFsm.SetFlag(ref currentState, Flags.OnArriveWithResource);
-            path.Reverse();
+            currentFsm.SetFlag(ref currentState, Flags.OnArriveAnthill);
             return;
         }
 
-        if (path.Count < 1)
+        if (pathBack.Count < 1)
         {
-            path.Add(pathBack[0]);
-            pathBack.Remove(pathBack[0]);
+            pathBack.Add(path[0]);
+            path.Remove(path[0]);
         }
-        
-        Vector3 dir = (pathBack[0] - pos);
+
+        Vector3 dir = (path[0] - pos);
         dir.Normalize();
 
-        if (NodeUtils.GetDistanceXZ(pathBack[0], pos) > offsetFailDistance)
+        if (NodeUtils.GetDistanceXZ(path[0], pos) > offsetFailDistance)
         {
-            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(pathBack[0])) * deltaTime;
+            Vector3 movement = dir * (stats.speed * TerrainSettings.GetSpeedInTerrain(path[0])) * deltaTime;
             pos += new Vector3(movement.x, 0, movement.z);
         }
         else
         {
-            pos = pathBack[0];
-            path.Add(pathBack[0]);
-            pathBack.Remove(pathBack[0]);
+            pos = path[0];
+            pathBack.Add(path[0]);
+            path.Remove(path[0]);
 
-            if (pathBack.Count > 0)
+            if (path.Count > 0)
             {
-                dir = (pathBack[0] - path[^1]);
+                dir = (path[0] - pathBack[^1]);
                 dir.Normalize();
                 Vector3 movement = dir * stats.speed * deltaTime;
                 pos += new Vector3(movement.x, 0, movement.z);
@@ -214,7 +282,6 @@ public class Ant : MonoBehaviour
         if (path.Count < 1)
         {
             currentFsm.SetFlag(ref currentState, Flags.OnArriveResource);
-            pathBack.Reverse();
             return;
         }
 
@@ -280,13 +347,6 @@ public class Ant : MonoBehaviour
     public void SetFlag (Flags flag)
     {
         currentFsm.SetFlag(ref currentState, flag);
-    }
-
-    public void SetFSM (int nextFsm)
-    {
-        currentFsm.exitBehaviour?.Invoke();
-        currentFsm = fsmList[nextFsm];
-        currentFsm.entryBehaviour?.Invoke();
     }
 
 #if UNITY_EDITOR

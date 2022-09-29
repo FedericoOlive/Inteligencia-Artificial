@@ -35,9 +35,9 @@ public class UiManager : MonoBehaviour
     private void Spawn1Ant () => anthill.SpawnAnts(1);
     private void Spawn10Ant () => anthill.SpawnAnts(10);
     private void Spawn100Ant () => anthill.SpawnAnts(100);
-    private void AllAntsToMines () => anthill.SpawnAnts(100);
-    private void AllAntsToAnthill () => anthill.SpawnAnts(100);
-    private void AllAntsToIdle () => anthill.SpawnAnts(100);
+    private void AllAntsToMines () => anthill.SetOrderToAnt(Flags.OnBackToWork);
+    private void AllAntsToAnthill () => anthill.SetOrderToAnt(Flags.ForceToAnthill);
+    private void AllAntsToIdle () => anthill.SetOrderToAnt(Flags.Idle);
 
     void ToggleShowVoronoi (bool isOn) => resourceVoronoi.drawPolis = isOn;
     void ToggleShowPathfinding(bool isOn) => nodeGenerator.showNodes = isOn;

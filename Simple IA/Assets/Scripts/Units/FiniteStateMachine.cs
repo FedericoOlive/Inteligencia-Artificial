@@ -100,35 +100,30 @@ public class FiniteStateMachine
 
 public enum States
 {
-    Idle,
     WaitingInstructions,
     Harvesting,
     GoingToResource,
     GoingToAnthill,
     Depositing,
 
-    ForceIndicator,
-    ForceGoingToPosition,
+    Idle,
     ForceGoingToAnthill,
-    ForceGoingToIdle,
-    ForceToHarvasting,
+    ForceGoingToPosition,
 
     Last
 }
 
 public enum Flags
 {
+    OnBackToWork,
     OnFullInventory,
     OnArriveResource,
-    OnArriveWithResource,
+    OnArriveAnthill,
     OnReceiveResource,
     OnEmptyInventory,
 
-    ForceIndicator,
-    ForceToPosition,
-    ForceToIdle,
+    Idle,
     ForceToAnthill,
-    ForceToResource,
-
+    ForceToPoint,
     Last
 }
