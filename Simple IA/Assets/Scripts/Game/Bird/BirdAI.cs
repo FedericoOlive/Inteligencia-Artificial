@@ -7,7 +7,7 @@ public class BirdAI : BirdBase
         Vector3 birdPos = birdBehaviour.transform.position;
         Vector3 obstaclePos = obstacleBase.transform.position;
 
-        float[] inputs = new float[12];
+        float[] inputs = new float[10];
         inputs[1] = birdPos.y;
         inputs[2] = (float) obstacleBase.obstacleType + 1;
         inputs[3] = obstaclePos.y;
@@ -33,7 +33,7 @@ public class BirdAI : BirdBase
             }
             else
             {
-                genome.fitness *= 3/5.0f;
+                genome.fitness *= 3 / 5.0f;
             }
         }
 
