@@ -50,11 +50,26 @@ public class BirdBase : MonoBehaviour
 
             birdBehaviour.UpdateBird(dt);
 
-            if (this.transform.position.y > 5f || this.transform.position.y < -5f || ObstacleManager.Instance.IsColliding(this.transform.position))
+            if (this.transform.position.y > 5f || this.transform.position.y < -5f || IsColliding(this.transform.position))
             {
                 KillBird();
             }
         }
+    }
+
+    public bool IsColliding(Vector3 pos)
+    {
+        Collider2D coll = Physics2D.OverlapBox(pos, new Vector2(0.3f, 0.3f), 0);
+
+        if (coll != null)
+        {
+            ObstacleBase obstacleBase = coll.GetComponentInParent<ObstacleBase>();
+            if (obstacleBase)
+                return !obstacleBase.birdsDisables.Contains(this);
+            return true;
+        }
+
+        return false;
     }
 
     public void KillBird ()

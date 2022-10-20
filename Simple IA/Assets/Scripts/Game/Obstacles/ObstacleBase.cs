@@ -35,6 +35,11 @@ public abstract class ObstacleBase : MonoBehaviour
 
         return false;
     }
+
+    public bool IsDestroyable (BirdBase birdBase)
+    {
+        return !birdsDisables.Contains(birdBase);
+    }
 }
 
 public enum ObstacleType
