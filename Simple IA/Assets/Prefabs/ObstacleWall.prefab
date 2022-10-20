@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8601936342269771220}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7503251877049065455}
   - component: {fileID: 8246298422916933473}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ObstacleWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -79,6 +79,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstacleType: 0
+  maxPos: 0
+  minPos: 0
+  velocity: 0
   minDistance: 1
   maxDistance: 1.5
   up: {fileID: 8601936342269771220}
@@ -94,7 +97,7 @@ GameObject:
   - component: {fileID: 7503251877494951934}
   - component: {fileID: 7503251877494951935}
   - component: {fileID: 8096820352622489946}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpriteUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -205,7 +208,7 @@ GameObject:
   - component: {fileID: 7503251877638313343}
   - component: {fileID: 7503251877638313336}
   - component: {fileID: 911318180419387595}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpriteDown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -314,7 +317,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 431385480859257766}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Down
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class ObstacleBase : MonoBehaviour
@@ -7,6 +8,8 @@ public abstract class ObstacleBase : MonoBehaviour
     public float maxPos;
     public float minPos;
     public float velocity;
+    public bool destroyable;
+    public List<BirdBase> birdsDisables = new List<BirdBase>();
 
     public void CheckToDestroy ()
     {
@@ -17,6 +20,20 @@ public abstract class ObstacleBase : MonoBehaviour
 
             Destroy(this.gameObject);
         }
+    }
+
+    public bool Disable (BirdBase birdBase)
+    {
+        if (destroyable)
+        {
+            if (!birdsDisables.Contains(birdBase))
+            {
+                birdsDisables.Add(birdBase);
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

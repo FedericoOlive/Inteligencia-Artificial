@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7483037321243403120}
   - component: {fileID: 7524608783123098848}
   - component: {fileID: 8935238254097401654}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Saw
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2389938436219974578}
   - component: {fileID: 1709424403534032414}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ObstacleSaw
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,3 +147,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstacleType: 2
+  maxPos: 0
+  minPos: 0
+  velocity: 0

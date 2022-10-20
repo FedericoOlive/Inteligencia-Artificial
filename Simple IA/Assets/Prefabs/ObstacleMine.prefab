@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2312114764091610661}
   - component: {fileID: 4798899971682867781}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ObstacleMine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,6 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstacleType: 1
+  maxPos: 0
+  minPos: 0
+  velocity: 0
 --- !u!1 &3354903221577766334
 GameObject:
   m_ObjectHideFlags: 0
@@ -57,7 +60,7 @@ GameObject:
   - component: {fileID: 8293208631476965722}
   - component: {fileID: 5309597313678253838}
   - component: {fileID: 6456582514512268922}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Mine
   m_TagString: Untagged
   m_Icon: {fileID: 0}

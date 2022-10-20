@@ -8,6 +8,13 @@ public class ObstacleSaw : ObstacleBase
         maxPos = 4.5f;
         velocity = 10.0f;
         obstacleType = ObstacleType.Saw;
+
+        Vector3 pos = transform.position;
+        pos.y = Random.Range(minPos, maxPos);
+        transform.position = pos;
+
+        if (Random.Range(0, 1) == 0) 
+            velocity *= -1;
     }
 
     private void Update ()
