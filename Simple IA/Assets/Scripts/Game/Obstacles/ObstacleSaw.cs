@@ -1,18 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ObstacleSaw : MonoBehaviour
+public class ObstacleSaw : ObstacleBase
 {
-    // Start is called before the first frame update
-    void Start()
+    private void Start ()
     {
-        
+        minPos = -4.5f;
+        maxPos = 4.5f;
+        velocity = 10.0f;
+        obstacleType = ObstacleType.Saw;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update ()
     {
-        
+        Vector3 pos = transform.position;
+        pos.y += velocity * Time.deltaTime;
+
+        if (pos.y > maxPos)
+        {
+            pos.y = maxPos;
+            velocity *= -1;
+        }
+        else if (pos.y < minPos)
+        {
+            pos.y = minPos;
+            velocity *= -1;
+        }
+
+        transform.position = pos;
     }
 }

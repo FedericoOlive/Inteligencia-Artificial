@@ -1,22 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BirdAI : BirdBase
 {
-    protected override void OnThink(float dt, BirdBehaviour birdBehaviour, ObstacleBase obstacleBase)
+    protected override void OnThink (float dt, BirdBehaviour birdBehaviour, ObstacleBase obstacleBase)
     {
         float[] inputs = new float[6];
-        inputs[0] = (obstacleBase.transform.position - birdBehaviour.transform.position).x / 10.0f;
-        inputs[1] = (obstacleBase.transform.position - birdBehaviour.transform.position).y / 10.0f;
+        inputs[0] = (int) obstacleBase.obstacleType / (float) ObstacleType.Last;
+        inputs[1] = (obstacleBase.transform.position - birdBehaviour.transform.position).x / 10.0f;
         inputs[2] = (obstacleBase.transform.position - birdBehaviour.transform.position).y / 10.0f;
-        inputs[3] = (obstacleBase.transform.position - birdBehaviour.transform.position).y / 10.0f;
-        inputs[4] = (obstacleBase.transform.position - birdBehaviour.transform.position).y / 10.0f;
-        inputs[5] = (obstacleBase.transform.position - birdBehaviour.transform.position).y / 10.0f;
-
-
-
-
+        inputs[3] = obstacleBase.velocity;
+        inputs[4] = obstacleBase.maxPos;
+        inputs[5] = obstacleBase.minPos;
 
         float[] outputs;
         outputs = brain.Synapsis(inputs);
@@ -32,11 +26,11 @@ public class BirdAI : BirdBase
         }
 
         genome.fitness += (100.0f - Vector3.Distance(obstacleBase.transform.position, birdBehaviour.transform.position));
-
     }
 
     protected override void OnDead()
     {
+
     }
 
     protected override void OnReset()

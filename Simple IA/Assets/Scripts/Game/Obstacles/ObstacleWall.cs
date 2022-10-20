@@ -9,9 +9,17 @@ public class ObstacleWall : ObstacleBase
 
     private void Start()
     {
+        minPos = -3.0f;
+        maxPos = 3.0f;
+        velocity = 0.0f;
         obstacleType = ObstacleType.Wall;
+
+        Vector3 pos = transform.position;
+        pos.y = Random.Range(minPos, maxPos);
+        transform.position = pos;
+
         float distance = Random.Range(minDistance, maxDistance);
-        Vector3 pos = new Vector3(0, distance, 0);
+        pos = new Vector3(0, distance, 0);
         up.localPosition = pos;
         down.localPosition = -pos;
     }

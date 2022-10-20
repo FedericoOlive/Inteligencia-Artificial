@@ -3,11 +3,14 @@ using UnityEngine;
 public abstract class ObstacleBase : MonoBehaviour
 {
     public event System.Action<ObstacleBase> OnDestroy;
-    [SerializeField] protected ObstacleType obstacleType;
-    
-    public void CheckToDestroy()
+    public ObstacleType obstacleType;
+    public float maxPos;
+    public float minPos;
+    public float velocity;
+
+    public void CheckToDestroy ()
     {
-        if (this.transform.position.x - Camera.main.transform.position.x < -7.5f)
+        if (transform.position.x - Camera.main.transform.position.x < -10.0f)
         {
             if (OnDestroy != null)
                 OnDestroy.Invoke(this);
@@ -21,5 +24,6 @@ public enum ObstacleType
 {
     Wall,
     Mine,
-    Saw
+    Saw,
+    Last
 }

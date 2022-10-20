@@ -6,10 +6,9 @@ public class ObstacleManager : MonoBehaviour
     const float DISTANCE_BETWEEN_OBSTACLES = 6f;
     const float MINDISTANCE_BETWEEN_OBSTACLES = 6f;
     const float MAXDISTANCE_BETWEEN_OBSTACLES = 8f;
-    const float HEIGHT_RANDOM = 3f;
     const int MIN_COUNT = 3;
 
-    public GameObject prefab;
+    public GameObject[] prefabsObstacles;
     Vector3 pos = new Vector3(DISTANCE_BETWEEN_OBSTACLES, 0, 0);
 
     List<ObstacleBase> obstacles = new List<ObstacleBase>();
@@ -77,11 +76,13 @@ public class ObstacleManager : MonoBehaviour
             InstantiateObstacle();
     }
 
-    void InstantiateObstacle()
+    void InstantiateObstacle ()
     {
         pos.x += Random.Range(MINDISTANCE_BETWEEN_OBSTACLES, MAXDISTANCE_BETWEEN_OBSTACLES);
-        pos.y = Random.Range(-HEIGHT_RANDOM, HEIGHT_RANDOM);
-        GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+
+        int indexObstacle = Random.Range(0, prefabsObstacles.Length);
+        GameObject go = Instantiate(prefabsObstacles[indexObstacle], pos, Quaternion.identity);
+
         go.transform.SetParent(this.transform, false);
         ObstacleBase obstacleBase = go.GetComponent<ObstacleBase>();
         obstacleBase.OnDestroy += OnObstacleDestroy;

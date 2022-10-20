@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ObstacleMine : MonoBehaviour
+public class ObstacleMine : ObstacleBase
 {
-    // Start is called before the first frame update
-    void Start()
+    private void Start ()
     {
-        
-    }
+        minPos = -4.5f;
+        maxPos = 4.5f;
+        obstacleType = ObstacleType.Mine;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Vector3 pos = transform.position;
+        pos.y = Random.Range(minPos, maxPos);
+        transform.position = pos;
     }
 }
