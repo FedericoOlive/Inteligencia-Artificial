@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class BirdBase : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class BirdBase : MonoBehaviour
     protected Genome genome;
     protected NeuralNetwork brain;
     protected BirdBehaviour birdBehaviour;
+
+    private ObstacleBase lastObstacleBase;
 
     private void Awake()
     {
@@ -46,15 +49,44 @@ public class BirdBase : MonoBehaviour
             if (obstacleBase == null)
                 return;
 
+            if (lastObstacleBase != obstacleBase)
+            {
+                if (lastObstacleBase != null)
+                    AddFitnessByNearCenterOfObstacle();
+                lastObstacleBase = obstacleBase;
+            }
+
             OnThink(dt, birdBehaviour, obstacleBase);
 
             birdBehaviour.UpdateBird(dt);
 
-            if (this.transform.position.y > 5f || this.transform.position.y < -5f || IsColliding(this.transform.position))
+            if (transform.position.y > 10f || transform.position.y < 0f || IsColliding(transform.position))
             {
                 KillBird();
             }
         }
+    }
+
+    private void AddFitnessByNearCenterOfObstacle ()
+    {
+        float heightBird = transform.position.y;
+        float distanceMiddleSafeZoneA = Mathf.Abs(lastObstacleBase.GetSafeZone().midSafeZoneA - heightBird);
+        float distanceMiddleSafeZoneB = Mathf.Abs(lastObstacleBase.GetSafeZone().midSafeZoneB - heightBird);
+        float nearDistance = 0;
+
+        if (distanceMiddleSafeZoneA > distanceMiddleSafeZoneB)
+        {
+            nearDistance = 1 - Mathf.Log10(distanceMiddleSafeZoneB);
+        }
+        else
+        {
+            nearDistance = 1 - Mathf.Log10(distanceMiddleSafeZoneA);
+        }
+
+        if (nearDistance < 0)
+            nearDistance = 1;
+
+        genome.fitness += 5000 * (1 - nearDistance);
     }
 
     public bool IsColliding(Vector3 pos)

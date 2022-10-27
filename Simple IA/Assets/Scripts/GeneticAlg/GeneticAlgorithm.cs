@@ -1,10 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class Genome
 {
     public float[] genome;
     public float fitness = 0;
+
+    public Genome (Genome genome)
+    {
+        this.genome = genome.genome;
+        this.fitness = genome.fitness;
+    }
 
     public Genome(float[] genes)
     {

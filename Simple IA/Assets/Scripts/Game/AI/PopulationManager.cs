@@ -20,9 +20,9 @@ public class PopulationManager : MonoBehaviour
 
     GeneticAlgorithm genAlg;
 
-    List<BirdBase> populationGOs = new List<BirdBase>();
-    List<Genome> population = new List<Genome>();
-    List<NeuralNetwork> brains = new List<NeuralNetwork>();
+    public List<BirdBase> populationGOs = new List<BirdBase>();
+    public List<Genome> population = new List<Genome>();
+    public List<NeuralNetwork> brains = new List<NeuralNetwork>();
 
     bool isRunning = false;
 
@@ -201,6 +201,25 @@ public class PopulationManager : MonoBehaviour
         }
     }
 
+    public void GenerateInitialPopulation(List<Genome> genomes)
+    {
+        generation = 0;
+        //DestroyBirds();
+
+        for (int i = 0; i < genomes.Count; i++)
+        {
+            NeuralNetwork brain = CreateBrain();
+
+            Genome genome = new Genome(genomes[i]);
+
+            brain.SetWeights(genome.genome);
+            brains.Add(brain);
+
+            population.Add(genome);
+            populationGOs.Add(CreateBird(genome, brain));
+        }
+    }
+
     // Creates a new NeuralNetwork
     NeuralNetwork CreateBrain()
     {
@@ -289,8 +308,9 @@ public class PopulationManager : MonoBehaviour
     #region Helpers
     BirdBase CreateBird(Genome genome, NeuralNetwork brain)
     {
-        Vector3 position = Vector3.zero;
-        GameObject go = Instantiate<GameObject>(BirdPrefab, position, Quaternion.identity);
+        Vector3 pos = Vector3.zero;
+        pos.y = 5;
+        GameObject go = Instantiate<GameObject>(BirdPrefab, pos, Quaternion.identity);
         BirdBase b = go.GetComponent<BirdBase>();
         b.SetBrain(genome, brain);
         return b;

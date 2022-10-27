@@ -4,9 +4,9 @@ public class ObstacleSaw : ObstacleBase
 {
     private void Start ()
     {
-        minPos = -4.5f;
-        maxPos = 4.5f;
-        velocity = 10.0f;
+        minPos = 0.5f;
+        maxPos = 9.5f;
+        velocity = 5.0f;
         obstacleType = ObstacleType.Saw;
 
         Vector3 pos = transform.position;
@@ -17,8 +17,13 @@ public class ObstacleSaw : ObstacleBase
             velocity *= -1;
     }
 
-    private void Update ()
+    private void FixedUpdate ()
     {
+        safeZone.a1 = 10;
+        safeZone.a2 = up.position.y;
+        safeZone.b1 = down.position.y;
+        safeZone.b2 = 0;
+
         Vector3 pos = transform.position;
         pos.y += velocity * Time.deltaTime;
 
@@ -34,5 +39,6 @@ public class ObstacleSaw : ObstacleBase
         }
 
         transform.position = pos;
+        SetSafeZone();
     }
 }

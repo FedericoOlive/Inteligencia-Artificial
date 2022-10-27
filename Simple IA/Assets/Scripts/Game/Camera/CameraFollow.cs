@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public GameObject agent;
-
     private static CameraFollow instance = null;
 
     public static CameraFollow Instance
@@ -26,25 +24,21 @@ public class CameraFollow : MonoBehaviour
 
     public void Reset()
     {
-        this.transform.position = new Vector3(0, 0, this.transform.position.z);
+        this.transform.position = new Vector3(0, 5, transform.position.z);
     }
 
-    public void UpdateCamera()
+    public void UpdateCamera ()
     {
         Vector3 follow = Vector3.zero;
 
         if (PopulationManager.Instance != null)
         {
             if (PopulationManager.Instance.GetBestAgent() != null)
-                follow = PopulationManager.Instance.GetBestAgent().transform.position;
-            else
-                return;
+            {
+                Vector3 pos = transform.position;
+                pos.x += 3 * Time.deltaTime;
+                transform.position = pos;
+            }
         }
-        else
-            follow = agent.transform.position;
-
-        Vector3 pos = this.transform.position;
-        pos.x = follow.x;
-        this.transform.position = pos;
     }
 }

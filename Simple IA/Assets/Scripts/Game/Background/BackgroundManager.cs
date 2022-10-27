@@ -28,7 +28,7 @@ public class BackgroundManager : MonoBehaviour
 
     public void Reset()
     {
-        this.transform.position = new Vector3(0, 0, 10);
+        this.transform.position = new Vector3(0, 5, 10);
         lastCameraPos = 0;
         accumPos = 0;
 

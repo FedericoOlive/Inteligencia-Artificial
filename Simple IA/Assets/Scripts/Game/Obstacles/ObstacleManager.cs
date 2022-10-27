@@ -48,7 +48,7 @@ public class ObstacleManager : MonoBehaviour
     {
         for (int i = 0; i < obstacles.Count; i++)
         {
-            if (pos.x < obstacles[i].transform.position.x + 2f)
+            if (pos.x < obstacles[i].transform.position.x + 1f)
                 return obstacles[i];
         }
 
