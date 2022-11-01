@@ -3,13 +3,18 @@ using System.Collections.Generic;
 
 public class PopulationManager : MonoBehaviour
 {
+    public static event System.Action OnEpoch;
+    public Collider zoneTanks;
+    public Collider zoneMines;
+
     public GameObject TankPrefab;
     public GameObject MinePrefab;
 
-    public int PopulationCount = 40;
+    public int villageCount = 2;
+    public int PopulationCount = 10;
     public int MinesCount = 50;
 
-    public Vector3 SceneHalfExtents = new Vector3 (20.0f, 0.0f, 20.0f);
+    public Vector3 SceneHalfExtents = new Vector3(20.0f, 0.0f, 20.0f);
 
     public float GenerationDuration = 20.0f;
     public int IterationCount = 1;
@@ -28,39 +33,18 @@ public class PopulationManager : MonoBehaviour
 
     GeneticAlgorithm genAlg;
 
-    List<Tank> populationGOs = new List<Tank>();
-    List<Genome> population = new List<Genome>();
-    List<NeuralNetwork> brains = new List<NeuralNetwork>();
-    List<GameObject> mines = new List<GameObject>();
-    List<GameObject> goodMines = new List<GameObject>();
-    List<GameObject> badMines = new List<GameObject>();
-     
+    public List<Village> village = new List<Village>();
+
+    List<Mine> mines = new List<Mine>();
+
     float accumTime = 0;
     bool isRunning = false;
-
-    public int generation {
-        get; private set;
-    }
-
-    public float bestFitness 
-    {
-        get; private set;
-    }
-
-    public float avgFitness 
-    {
-        get; private set;
-    }
-
-    public float worstFitness 
-    {
-        get; private set;
-    }
-
-    private float getBestFitness()
+    
+    private float getBestFitness (int index)
     {
         float fitness = 0;
-        foreach(Genome g in population)
+
+        foreach (Genome g in village[index].population)
         {
             if (fitness < g.fitness)
                 fitness = g.fitness;
@@ -69,21 +53,21 @@ public class PopulationManager : MonoBehaviour
         return fitness;
     }
 
-    private float getAvgFitness()
+    private float getAvgFitness (int index)
     {
         float fitness = 0;
-        foreach(Genome g in population)
+        foreach (Genome g in village[index].population)
         {
             fitness += g.fitness;
         }
 
-        return fitness / population.Count;
+        return fitness / village[index].population.Count;
     }
 
-    private float getWorstFitness()
+    private float getWorstFitness (int index)
     {
         float fitness = float.MaxValue;
-        foreach(Genome g in population)
+        foreach (Genome g in village[index].population)
         {
             if (fitness > g.fitness)
                 fitness = g.fitness;
@@ -93,24 +77,24 @@ public class PopulationManager : MonoBehaviour
     }
 
     static PopulationManager instance = null;
-    
+
     public static PopulationManager Instance
     {
         get
         {
             if (instance == null)
                 instance = FindObjectOfType<PopulationManager>();
-    
+
             return instance;
         }
     }
-    
-    void Awake()
+
+    void Awake ()
     {
         instance = this;
     }
 
-    public void StartSimulation()
+    public void StartSimulation ()
     {
         // Create and confiugre the Genetic Algorithm
         genAlg = new GeneticAlgorithm(EliteCount, MutationChance, MutationRate);
@@ -121,16 +105,19 @@ public class PopulationManager : MonoBehaviour
         isRunning = true;
     }
 
-    public void PauseSimulation()
+    public void PauseSimulation ()
     {
         isRunning = !isRunning;
     }
 
-    public void StopSimulation()
+    public void StopSimulation ()
     {
         isRunning = false;
 
-        generation = 0;
+        for (int i = 0; i < village.Count; i++)
+        {
+            village[i].generation = 0;
+        }
 
         // Destroy previous tanks (if there are any)
         DestroyTanks();
@@ -140,31 +127,38 @@ public class PopulationManager : MonoBehaviour
     }
 
     // Generate the random initial population
-    void GenerateInitialPopulation()
+    void GenerateInitialPopulation ()
     {
-        generation = 0;
-
         // Destroy previous tanks (if there are any)
         DestroyTanks();
-        
-        for (int i = 0; i < PopulationCount; i++)
+
+        for (int i = 0; i < villageCount; i++)
         {
-            NeuralNetwork brain = CreateBrain();
-            
-            Genome genome = new Genome(brain.GetTotalWeightsCount());
+            village.Add(new Village());
+            village[i].generation = 0;
+            village[i].SetTeam(i);
 
-            brain.SetWeights(genome.genome);
-            brains.Add(brain);
+            for (int j = 0; j < PopulationCount; j++)
+            {
+                NeuralNetwork brain = CreateBrain();
 
-            population.Add(genome);
-            populationGOs.Add(CreateTank(genome, brain));
+                Genome genome = new Genome(brain.GetTotalWeightsCount());
+
+                brain.SetWeights(genome.genome);
+                village[i].brains.Add(brain);
+
+                village[i].population.Add(genome);
+                village[i].populationGOs.Add(CreateTank(genome, brain));
+            }
+
+            village[i].SetTanks();
         }
 
         accumTime = 0.0f;
     }
 
     // Creates a new NeuralNetwork
-    NeuralNetwork CreateBrain()
+    NeuralNetwork CreateBrain ()
     {
         NeuralNetwork brain = new NeuralNetwork();
 
@@ -184,83 +178,118 @@ public class PopulationManager : MonoBehaviour
     }
 
     // Evolve!!!
-    void Epoch()
+    void Epoch ()
     {
-        // Increment generation counter
-        generation++;
+        OnEpoch?.Invoke();
+        int indexBestVillage = 0;
+        float maxFitness = 0;
 
-        // Calculate best, average and worst fitness
-        bestFitness = getBestFitness();
-        avgFitness = getAvgFitness();
-        worstFitness = getWorstFitness();
-
-        // Evolve each genome and create a new array of genomes
-        Genome[] newGenomes = genAlg.Epoch(population.ToArray());
-
-        // Clear current population
-        population.Clear();
-
-        // Add new population
-        population.AddRange(newGenomes);
-
-        // Set the new genomes as each NeuralNetwork weights
-        for (int i = 0; i < PopulationCount; i++)
+        for (int i = 0; i < village.Count; i++)
         {
-            NeuralNetwork brain = brains[i];
+            float currentFitness = getBestFitness(i);
+            if (currentFitness > maxFitness)
+            {
+                indexBestVillage = i;
+                maxFitness = currentFitness;
+            }
+        }
 
-            brain.SetWeights(newGenomes[i].genome);
+        for (int i = 0; i < village.Count; i++)
+        {
+            if (i == indexBestVillage)
+            {
+                for (int j = 0; j < PopulationCount; j++)
+                {
+                    village[i].populationGOs[j].transform.position = GetRandomPosInBounds(zoneTanks.bounds);
+                    village[i].populationGOs[j].transform.rotation = GetRandomRot();
+                    village[i].bestFitness = getBestFitness(i);
+                    village[i].avgFitness = getAvgFitness(i);
+                    village[i].worstFitness = getWorstFitness(i);
+                    village[i].ResetFitness();
+                }
 
-            populationGOs[i].SetBrain(newGenomes[i], brain);
-            populationGOs[i].transform.position = GetRandomPos();
-            populationGOs[i].transform.rotation = GetRandomRot();
+                continue;
+            }
+
+            // Increment generation counter
+            village[i].generation++;
+
+            // Calculate best, average and worst fitness
+            village[i].bestFitness = getBestFitness(i);
+            village[i].avgFitness = getAvgFitness(i);
+            village[i].worstFitness = getWorstFitness(i);
+
+            // Evolve each genome and create a new array of genomes
+            Genome[] newGenomes = genAlg.Epoch(village[i].population.ToArray());
+
+            // Clear current population
+            village[i].population.Clear();
+
+            // Add new population
+            village[i].population.AddRange(newGenomes);
+
+            // Set the new genomes as each NeuralNetwork weights
+            for (int j = 0; j < PopulationCount; j++)
+            {
+                NeuralNetwork brain = village[i].brains[j];
+
+                brain.SetWeights(newGenomes[j].genome);
+
+                village[i].populationGOs[j].SetBrain(newGenomes[j], brain);
+                village[i].populationGOs[j].transform.position = GetRandomPosInBounds(zoneTanks.bounds);
+                village[i].populationGOs[j].transform.rotation = GetRandomRot();
+            }
         }
     }
 
     // Update is called once per frame
-    void FixedUpdate () 
-	{
+    void FixedUpdate ()
+    {
         if (!isRunning)
             return;
-        
+
         float dt = Time.fixedDeltaTime;
 
-        for (int i = 0; i < Mathf.Clamp((float)(IterationCount / 100.0f) * 50, 1, 50); i++)
+        for (int i = 0; i < Mathf.Clamp((float) (IterationCount / 100.0f) * 50, 1, 50); i++)
         {
-            foreach (Tank t in populationGOs)
+            for (int j = 0; j < village.Count; j++)
             {
-                // Get the nearest mine
-                GameObject mine = GetNearestMine(t.transform.position);
+                foreach (Tank t in village[j].populationGOs)
+                {
+                    // Get the nearest mine
+                    GameObject mine = GetNearestMine(t.transform.position);
 
-                // Set the nearest mine to current tank
-                t.SetNearestMine(mine);
+                    // Set the nearest mine to current tank
+                    t.SetNearestMine(mine);
 
-                mine = GetNearestGoodMine(t.transform.position);
+                    mine = GetNearestTeamMine(t.transform.position, village[j].team, true);
 
-                // Set the nearest mine to current tank
-                t.SetGoodNearestMine(mine);
+                    // Set the nearest mine to current tank
+                    t.SetGoodNearestMine(mine);
 
-                mine = GetNearestBadMine(t.transform.position);
+                    mine = GetNearestTeamMine(t.transform.position, village[j].team, false);
 
-                // Set the nearest mine to current tank
-                t.SetBadNearestMine(mine);
+                    // Set the nearest mine to current tank
+                    t.SetBadNearestMine(mine);
 
-                // Think!! 
-                t.Think(dt);
+                    // Think!! 
+                    t.Think(dt);
 
-                // Just adjust tank position when reaching world extents
-                Vector3 pos = t.transform.position;
-                if (pos.x > SceneHalfExtents.x)
-                    pos.x -= SceneHalfExtents.x * 2;
-                else if (pos.x < -SceneHalfExtents.x)
-                    pos.x += SceneHalfExtents.x * 2;
+                    // Just adjust tank position when reaching world extents
+                    Vector3 pos = t.transform.position;
+                    if (pos.x > SceneHalfExtents.x)
+                        pos.x -= SceneHalfExtents.x * 2;
+                    else if (pos.x < -SceneHalfExtents.x)
+                        pos.x += SceneHalfExtents.x * 2;
 
-                if (pos.z > SceneHalfExtents.z)
-                    pos.z -= SceneHalfExtents.z * 2;
-                else if (pos.z < -SceneHalfExtents.z)
-                    pos.z += SceneHalfExtents.z * 2;
+                    if (pos.z > SceneHalfExtents.z)
+                        pos.z -= SceneHalfExtents.z * 2;
+                    else if (pos.z < -SceneHalfExtents.z)
+                        pos.z += SceneHalfExtents.z * 2;
 
-                // Set tank position
-                t.transform.position = pos;
+                    // Set tank position
+                    t.transform.position = pos;
+                }
             }
 
             // Check the time to evolve
@@ -272,155 +301,154 @@ public class PopulationManager : MonoBehaviour
                 break;
             }
         }
-	}
+    }
 
-#region Helpers
-    Tank CreateTank(Genome genome, NeuralNetwork brain)
+    #region Helpers
+
+    Tank CreateTank (Genome genome, NeuralNetwork brain)
     {
-        Vector3 position = GetRandomPos();
+        Vector3 position = GetRandomPosInBounds(zoneTanks.bounds);
         GameObject go = Instantiate<GameObject>(TankPrefab, position, GetRandomRot());
         Tank t = go.GetComponent<Tank>();
         t.SetBrain(genome, brain);
         return t;
     }
 
-    void DestroyMines()
+    void DestroyMines ()
     {
-        foreach (GameObject go in mines)
-            Destroy(go);
+        foreach (Mine mine in mines)
+            Destroy(mine.gameObject);
 
         mines.Clear();
-        goodMines.Clear();
-        badMines.Clear();
     }
 
-    void DestroyTanks()
+    void DestroyTanks ()
     {
-        foreach (Tank go in populationGOs)
-            Destroy(go.gameObject);
+        for (int i = 0; i < village.Count; i++)
+        {
+            foreach (Tank go in village[i].populationGOs)
+                Destroy(go.gameObject);
 
-        populationGOs.Clear();
-        population.Clear();
-        brains.Clear();
+            village[i].populationGOs.Clear();
+            village[i].population.Clear();
+            village[i].brains.Clear();
+        }
     }
 
-    void CreateMines()
+    void CreateMines ()
     {
         // Destroy previous created mines
         DestroyMines();
 
         for (int i = 0; i < MinesCount; i++)
         {
-            Vector3 position = GetRandomPos();
-            GameObject go = Instantiate<GameObject>(MinePrefab, position, Quaternion.identity);
+            Vector3 position = GetRandomPosInBounds(zoneMines.bounds);
+            GameObject go = Instantiate(MinePrefab, position, Quaternion.identity);
 
-            bool good = Random.Range(-1.0f, 1.0f) >= 0;
+            Mine mine = go.GetComponent<Mine>();
+            Team teamMine = (Team) (i % villageCount);
+            go.name = "Mine " + teamMine.ToString();
+            mine.SetTeam(teamMine);
 
-            SetMineGood(good, go);
-
-            mines.Add(go);
+            mines.Add(mine);
         }
     }
 
-    void SetMineGood(bool good, GameObject go)
+    public void RelocateMine (GameObject mine)
     {
-        if (good)
-        {
-            go.GetComponent<Renderer>().material.color = Color.green;
-            goodMines.Add(go);
-        }
-        else
-        {
-            go.GetComponent<Renderer>().material.color = Color.red;
-            badMines.Add(go);
-        }
-
+        mine.transform.position = GetRandomPosInBounds(zoneMines.bounds);
     }
 
-    public void RelocateMine(GameObject mine)
+    public Vector3 GetRandomPosInBounds (Bounds bounds)
     {
-        if (goodMines.Contains(mine))
-            goodMines.Remove(mine);
-        else
-            badMines.Remove(mine);
+        float minX = bounds.center.x - bounds.extents.x;
+        float minZ = bounds.center.z - bounds.extents.z;
+        float maxX = bounds.center.x + bounds.extents.x;
+        float maxZ = bounds.center.z + bounds.extents.z;
+        Vector3 pos = Vector3.zero;
+        pos.x = Random.Range(minX, maxX);
+        pos.y = 0;
+        pos.z = Random.Range(minZ, maxZ);
 
-        bool good = Random.Range(-1.0f, 1.0f) >= 0;
-
-        SetMineGood(good, mine);
-
-        mine.transform.position = GetRandomPos();
+        return pos;
     }
 
-    Vector3 GetRandomPos()
+    Quaternion GetRandomRot ()
     {
-        return new Vector3(Random.value * SceneHalfExtents.x * 2.0f - SceneHalfExtents.x, 0.0f, Random.value * SceneHalfExtents.z * 2.0f - SceneHalfExtents.z); 
+        return Quaternion.identity;
+        //return Quaternion.AngleAxis(Random.value * 360.0f, Vector3.up);
     }
 
-    Quaternion GetRandomRot()
+    GameObject GetNearestMine (Vector3 pos)
     {
-        return Quaternion.AngleAxis(Random.value * 360.0f, Vector3.up);
-    }
-
-    GameObject GetNearestMine(Vector3 pos)
-    {
-        GameObject nearest = mines[0];
+        GameObject nearest = mines[0].gameObject;
         float distance = (pos - nearest.transform.position).sqrMagnitude;
 
-        foreach (GameObject go in mines)
+        foreach (Mine mine in mines)
         {
-            float newDist = (go.transform.position - pos).sqrMagnitude;
+            float newDist = (mine.transform.position - pos).sqrMagnitude;
             if (newDist < distance)
             {
-                nearest = go;
+                nearest = mine.gameObject;
                 distance = newDist;
             }
         }
 
         return nearest;
-    }   
+    }
 
-    GameObject GetNearestGoodMine(Vector3 pos)
+    GameObject GetNearestTeamMine (Vector3 pos, Team team, bool isEqualTeam)
     {
-        GameObject nearest = mines[0];
-        float distance = (pos - nearest.transform.position).sqrMagnitude;
+        int indexNearMine = 0;
+        float distanceNearMine = float.MaxValue;
 
-        foreach (GameObject go in goodMines)
+        for (int i = 0; i < mines.Count; i++)
         {
-            float newDist = (go.transform.position - pos).sqrMagnitude;
-            if (newDist < distance)
+            if (isEqualTeam)
             {
-                nearest = go;
-                distance = newDist;
+                if (mines[i].team != team)
+                    continue;
+            }
+            else
+            {
+                if (mines[i].team == team)
+                    continue;
+            }
+
+            float currentDistanceNearMine = (pos - mines[i].transform.position).sqrMagnitude;
+            if (currentDistanceNearMine < distanceNearMine)
+            {
+                indexNearMine = i;
+                distanceNearMine = currentDistanceNearMine;
             }
         }
 
-        return nearest;
-    }   
-
-    GameObject GetNearestBadMine(Vector3 pos)
+        return mines[indexNearMine].gameObject;
+    }
+    
+    private void OnDrawGizmos ()
     {
-        GameObject nearest = mines[0];
-        float distance = (pos - nearest.transform.position).sqrMagnitude;
-
-        foreach (GameObject go in badMines)
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(Vector3.zero, SceneHalfExtents * 2);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(zoneTanks.bounds.center, zoneTanks.bounds.size);
+        Gizmos.color = Color.gray;
+        Gizmos.DrawWireCube(zoneMines.bounds.center, zoneMines.bounds.size);
+        for (int i = 0; i < village.Count; i++)
         {
-            float newDist = (go.transform.position - pos).sqrMagnitude;
-            if (newDist < distance)
-            {
-                nearest = go;
-                distance = newDist;
-            }
+            village[i].OnDrawGizmos();
         }
+    }
 
-        return nearest;
-    }   
-
-#endregion
+    #endregion
 
 }
 
 public enum Team
 {
     Blue,
-    Red
+    Red,
+    Yellow,
+    Green,
+    Magenta
 }

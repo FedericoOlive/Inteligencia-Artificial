@@ -1,18 +1,20 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
+using UnityEngine;
 
 public class TankBase : MonoBehaviour
 {
+    public Team team;
     public float Speed = 10.0f;
     public float RotSpeed = 20.0f;
 
     protected Genome genome;
 	protected NeuralNetwork brain;
-    protected GameObject nearMine;
+    public GameObject nearMine;
     protected GameObject goodMine;
     protected GameObject badMine;
     protected float[] inputs;
-
+    public MeshRenderer[] meshRenderer;
+    
     public void SetBrain(Genome genome, NeuralNetwork brain)
     {
         this.genome = genome;

@@ -5,22 +5,16 @@ using UnityEngine.UI;
 
 public class SimulationScreen : MonoBehaviour
 {
-    public Text generationsCountTxt;
-    public Text bestFitnessTxt;
-    public Text avgFitnessTxt;
-    public Text worstFitnessTxt;
+    private List<UiPanelDataVillager> panelDataVillager = new List<UiPanelDataVillager>();
+
     public Text timerTxt;
     public Slider timerSlider;
     public Button pauseBtn;
     public Button stopBtn;
     public GameObject startConfigurationScreen;
 
-    string generationsCountText;
-    string bestFitnessText;
-    string avgFitnessText;
-    string worstFitnessText;
+    
     string timerText;
-    int lastGeneration = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -30,34 +24,8 @@ public class SimulationScreen : MonoBehaviour
 
         timerTxt.text = string.Format(timerText, PopulationManager.Instance.IterationCount);
 
-        if (string.IsNullOrEmpty(generationsCountText))
-            generationsCountText = generationsCountTxt.text;   
-        if (string.IsNullOrEmpty(bestFitnessText))
-            bestFitnessText = bestFitnessTxt.text;   
-        if (string.IsNullOrEmpty(avgFitnessText))
-            avgFitnessText = avgFitnessTxt.text;   
-        if (string.IsNullOrEmpty(worstFitnessText))
-            worstFitnessText = worstFitnessTxt.text;   
-
         pauseBtn.onClick.AddListener(OnPauseButtonClick);
         stopBtn.onClick.AddListener(OnStopButtonClick);
-    }
-
-    void OnEnable()
-    {
-        if (string.IsNullOrEmpty(generationsCountText))
-            generationsCountText = generationsCountTxt.text;   
-        if (string.IsNullOrEmpty(bestFitnessText))
-            bestFitnessText = bestFitnessTxt.text;   
-        if (string.IsNullOrEmpty(avgFitnessText))
-            avgFitnessText = avgFitnessTxt.text;   
-        if (string.IsNullOrEmpty(worstFitnessText))
-            worstFitnessText = worstFitnessTxt.text;   
-
-        generationsCountTxt.text = string.Format(generationsCountText, 0);
-        bestFitnessTxt.text = string.Format(bestFitnessText, 0);
-        avgFitnessTxt.text = string.Format(avgFitnessText, 0);
-        worstFitnessTxt.text = string.Format(worstFitnessText, 0);
     }
 
     void OnTimerChange(float value)
@@ -76,18 +44,9 @@ public class SimulationScreen : MonoBehaviour
         PopulationManager.Instance.StopSimulation();
         this.gameObject.SetActive(false);
         startConfigurationScreen.SetActive(true);
-        lastGeneration = 0;
-    }
-
-    void LateUpdate()
-    {
-        if (lastGeneration != PopulationManager.Instance.generation)
+        for (int i = 0; i < panelDataVillager.Count; i++)
         {
-            lastGeneration = PopulationManager.Instance.generation;
-            generationsCountTxt.text = string.Format(generationsCountText, PopulationManager.Instance.generation);
-            bestFitnessTxt.text = string.Format(bestFitnessText, PopulationManager.Instance.bestFitness);
-            avgFitnessTxt.text = string.Format(avgFitnessText, PopulationManager.Instance.avgFitness);
-            worstFitnessTxt.text = string.Format(worstFitnessText, PopulationManager.Instance.worstFitness);
+            panelDataVillager[i]. lastGeneration = 0;
         }
     }
 }

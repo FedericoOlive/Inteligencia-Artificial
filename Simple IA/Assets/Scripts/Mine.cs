@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class Mine : MonoBehaviour
 {
-    private Team team;
+    public MeshRenderer meshRenderer;
+    public Team team;
+    private Color colorTeam;
 
-
-    public void SetMine (Team newTeam)
+    public void SetTeam (Team newTeam)
     {
-
+        team = newTeam;
+        meshRenderer.material.color = Village.GetColorCiv(team);
     }
-
-    
 }

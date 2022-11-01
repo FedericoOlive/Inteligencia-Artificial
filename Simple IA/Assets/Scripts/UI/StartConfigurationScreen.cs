@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class StartConfigurationScreen : MonoBehaviour
 {
-    public InstancingManager instancingManager;
     [Space(15)]
     public Text populationCountTxt;
     public Slider populationCountSlider;
