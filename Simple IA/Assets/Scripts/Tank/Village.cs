@@ -13,19 +13,45 @@ public class Village
 
     public int generation;
 
+    public float populationFitness;
     public float bestFitness;
     public float avgFitness;
     public float worstFitness;
 
+    public void UpdateFitness ()
+    {
+        populationFitness = 0;
+        bestFitness = float.MinValue;
+        avgFitness = 0;
+        worstFitness = float.MaxValue;
 
+        for (int i = 0; i < population.Count; i++)
+        {
+            float currentFitness = population[i].fitness;
 
+            if (currentFitness > bestFitness)
+                bestFitness = currentFitness;
+
+            if (currentFitness < worstFitness)
+                worstFitness = currentFitness;
+
+            populationFitness += currentFitness;
+        }
+
+        avgFitness = populationFitness / population.Count;
+    }
 
     public void ResetFitness ()
     {
         for (int i = 0; i < population.Count; i++)
         {
-            population[i].fitness = 0;
+            population[i].fitness = 1;
         }
+
+        populationFitness = 0;
+        bestFitness = 0;
+        avgFitness = 0;
+        worstFitness = 0;
     }
 
     public void SetTeam (int i)

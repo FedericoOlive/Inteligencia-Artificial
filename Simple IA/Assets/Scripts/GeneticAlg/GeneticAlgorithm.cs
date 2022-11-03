@@ -10,7 +10,7 @@ public class Genome
 	public Genome(float[] genes)
 	{
 		this.genome = genes;
-		fitness = 0;
+		fitness = 1;
 	}
 
 	public Genome(int genesCount)
@@ -20,12 +20,12 @@ public class Genome
         for (int j = 0; j < genesCount; j++)
             genome[j] = Random.Range(-1.0f, 1.0f);
 
-        fitness = 0;
+        fitness = 1;
 	}
 
     public Genome()
     {
-        fitness = 0;
+        fitness = 1;
     }
 
 }
@@ -164,7 +164,7 @@ public class GeneticAlgorithm
 
 		for (int i = 0; i < population.Count; i++)
 		{
-			fitness += Mathf.Max(population[i].fitness, 0);
+			fitness += Mathf.Max(population[i].fitness, 1);
 			if (fitness >= rnd)
 				return population[i];
 		}

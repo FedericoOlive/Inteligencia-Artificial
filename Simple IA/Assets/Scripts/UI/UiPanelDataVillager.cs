@@ -16,12 +16,7 @@ public class UiPanelDataVillager : MonoBehaviour
     private string bestFitnessText;
     private string avgFitnessText;
     private string worstFitnessText;
-
-    private void Awake ()
-    {
-        PopulationManager.OnEpoch += UpdatePanel;
-    }
-
+    
     private void Start ()
     {
         if (string.IsNullOrEmpty(generationsCountText))
@@ -59,32 +54,12 @@ public class UiPanelDataVillager : MonoBehaviour
         worstFitnessTxt.text = string.Format(worstFitnessText, 0);
     }
 
-    void UpdatePanel ()
+    void Update()
     {
-        UpdateFirst();
-        if (lastGeneration != PopulationManager.Instance.village[indexVillage].generation)
-        {
-            lastGeneration = PopulationManager.Instance.village[indexVillage].generation;
-            generationsCountTxt.text = string.Format(generationsCountText, PopulationManager.Instance.village[indexVillage].generation);
-            bestFitnessTxt.text = string.Format(bestFitnessText, PopulationManager.Instance.village[indexVillage].bestFitness);
-            avgFitnessTxt.text = string.Format(avgFitnessText, PopulationManager.Instance.village[indexVillage].avgFitness);
-            worstFitnessTxt.text = string.Format(worstFitnessText, PopulationManager.Instance.village[indexVillage].worstFitness);
-        }
+        lastGeneration = PopulationManager.Instance.village[indexVillage].generation;
+        generationsCountTxt.text = string.Format(generationsCountText, PopulationManager.Instance.village[indexVillage].generation);
+        bestFitnessTxt.text = string.Format(bestFitnessText, PopulationManager.Instance.village[indexVillage].bestFitness);
+        avgFitnessTxt.text = string.Format(avgFitnessText, PopulationManager.Instance.village[indexVillage].avgFitness);
+        worstFitnessTxt.text = string.Format(worstFitnessText, PopulationManager.Instance.village[indexVillage].worstFitness);
     }
-
-    private bool wasUpdate;
-    void UpdateFirst ()
-    {
-        if (!wasUpdate)
-        {
-            lastGeneration = PopulationManager.Instance.village[indexVillage].generation;
-            generationsCountTxt.text = string.Format(generationsCountText, PopulationManager.Instance.village[indexVillage].generation);
-            bestFitnessTxt.text = string.Format(bestFitnessText, PopulationManager.Instance.village[indexVillage].bestFitness);
-            avgFitnessTxt.text = string.Format(avgFitnessText, PopulationManager.Instance.village[indexVillage].avgFitness);
-            worstFitnessTxt.text = string.Format(worstFitnessText, PopulationManager.Instance.village[indexVillage].worstFitness);
-        }
-
-        wasUpdate = true;
-    }
-
 }

@@ -9,9 +9,9 @@ public class TankBase : MonoBehaviour
 
     protected Genome genome;
 	protected NeuralNetwork brain;
-    public GameObject nearMine;
-    protected GameObject goodMine;
-    protected GameObject badMine;
+    public Mine nearMine;
+    protected Mine goodMine;
+    protected Mine badMine;
     protected float[] inputs;
     public MeshRenderer[] meshRenderer;
     
@@ -23,34 +23,29 @@ public class TankBase : MonoBehaviour
         OnReset();
     }
 
-    public void SetNearestMine(GameObject mine)
+    public void SetNearestMine(Mine mine)
     {
         nearMine = mine;
     }
 
-    public void SetGoodNearestMine(GameObject mine)
+    public void SetGoodNearestMine(Mine mine)
     {
         goodMine = mine;
     }
 
-    public void SetBadNearestMine(GameObject mine)
+    public void SetBadNearestMine(Mine mine)
     {
         badMine = mine;
     }
-
-    protected bool IsGoodMine(GameObject mine)
-    {
-        return goodMine == mine;
-    }
-
-    protected Vector3 GetDirToMine(GameObject mine)
+    
+    protected Vector3 GetDirToMine(Mine mine)
     {
         return (mine.transform.position - this.transform.position).normalized;
     }
     
     protected bool IsCloseToMine(GameObject mine)
     {
-        return (this.transform.position - nearMine.transform.position).sqrMagnitude <= 2.0f;
+        return (transform.position - mine.transform.position).sqrMagnitude <= 2.0f;
     }
 
     protected void SetForces(float leftForce, float rightForce, float dt)
@@ -66,10 +61,10 @@ public class TankBase : MonoBehaviour
 	{
         OnThink(dt);
 
-        if(IsCloseToMine(nearMine))
+        if(IsCloseToMine(nearMine.gameObject))
         {
             OnTakeMine(nearMine);
-            PopulationManager.Instance.RelocateMine(nearMine);
+            PopulationManager.Instance.RelocateMine(nearMine.gameObject);
         }
 	}
 
@@ -78,7 +73,7 @@ public class TankBase : MonoBehaviour
 
     }
 
-    protected virtual void OnTakeMine(GameObject mine)
+    protected virtual void OnTakeMine(Mine mine)
     {
     }
 

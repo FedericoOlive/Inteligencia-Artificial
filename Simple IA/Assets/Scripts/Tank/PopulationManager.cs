@@ -40,42 +40,6 @@ public class PopulationManager : MonoBehaviour
     float accumTime = 0;
     bool isRunning = false;
     
-    private float getBestFitness (int index)
-    {
-        float fitness = 0;
-
-        foreach (Genome g in village[index].population)
-        {
-            if (fitness < g.fitness)
-                fitness = g.fitness;
-        }
-
-        return fitness;
-    }
-
-    private float getAvgFitness (int index)
-    {
-        float fitness = 0;
-        foreach (Genome g in village[index].population)
-        {
-            fitness += g.fitness;
-        }
-
-        return fitness / village[index].population.Count;
-    }
-
-    private float getWorstFitness (int index)
-    {
-        float fitness = float.MaxValue;
-        foreach (Genome g in village[index].population)
-        {
-            if (fitness > g.fitness)
-                fitness = g.fitness;
-        }
-
-        return fitness;
-    }
-
     static PopulationManager instance = null;
 
     public static PopulationManager Instance
@@ -186,7 +150,7 @@ public class PopulationManager : MonoBehaviour
 
         for (int i = 0; i < village.Count; i++)
         {
-            float currentFitness = getBestFitness(i);
+            float currentFitness = village[i].bestFitness;
             if (currentFitness > maxFitness)
             {
                 indexBestVillage = i;
@@ -202,9 +166,6 @@ public class PopulationManager : MonoBehaviour
                 {
                     village[i].populationGOs[j].transform.position = GetRandomPosInBounds(zoneTanks.bounds);
                     village[i].populationGOs[j].transform.rotation = GetRandomRot();
-                    village[i].bestFitness = getBestFitness(i);
-                    village[i].avgFitness = getAvgFitness(i);
-                    village[i].worstFitness = getWorstFitness(i);
                     village[i].ResetFitness();
                 }
 
@@ -213,12 +174,7 @@ public class PopulationManager : MonoBehaviour
 
             // Increment generation counter
             village[i].generation++;
-
-            // Calculate best, average and worst fitness
-            village[i].bestFitness = getBestFitness(i);
-            village[i].avgFitness = getAvgFitness(i);
-            village[i].worstFitness = getWorstFitness(i);
-
+            
             // Evolve each genome and create a new array of genomes
             Genome[] newGenomes = genAlg.Epoch(village[i].population.ToArray());
 
@@ -248,35 +204,38 @@ public class PopulationManager : MonoBehaviour
         if (!isRunning)
             return;
 
+        for (int i = 0; i < village.Count; i++)
+            village[i].UpdateFitness();
+
         float dt = Time.fixedDeltaTime;
 
         for (int i = 0; i < Mathf.Clamp((float) (IterationCount / 100.0f) * 50, 1, 50); i++)
         {
             for (int j = 0; j < village.Count; j++)
             {
-                foreach (Tank t in village[j].populationGOs)
+                foreach (Tank tank in village[j].populationGOs)
                 {
                     // Get the nearest mine
-                    GameObject mine = GetNearestMine(t.transform.position);
+                    Mine mine = GetNearestMine(tank.transform.position);
 
                     // Set the nearest mine to current tank
-                    t.SetNearestMine(mine);
+                    tank.SetNearestMine(mine);
 
-                    mine = GetNearestTeamMine(t.transform.position, village[j].team, true);
-
-                    // Set the nearest mine to current tank
-                    t.SetGoodNearestMine(mine);
-
-                    mine = GetNearestTeamMine(t.transform.position, village[j].team, false);
+                    mine = GetNearestTeamMine(tank.transform.position, village[j].team, true);
 
                     // Set the nearest mine to current tank
-                    t.SetBadNearestMine(mine);
+                    tank.SetGoodNearestMine(mine);
+
+                    mine = GetNearestTeamMine(tank.transform.position, village[j].team, false);
+
+                    // Set the nearest mine to current tank
+                    tank.SetBadNearestMine(mine);
 
                     // Think!! 
-                    t.Think(dt);
+                    tank.Think(dt);
 
                     // Just adjust tank position when reaching world extents
-                    Vector3 pos = t.transform.position;
+                    Vector3 pos = tank.transform.position;
                     if (pos.x > SceneHalfExtents.x)
                         pos.x -= SceneHalfExtents.x * 2;
                     else if (pos.x < -SceneHalfExtents.x)
@@ -288,7 +247,7 @@ public class PopulationManager : MonoBehaviour
                         pos.z += SceneHalfExtents.z * 2;
 
                     // Set tank position
-                    t.transform.position = pos;
+                    tank.transform.position = pos;
                 }
             }
 
@@ -379,9 +338,9 @@ public class PopulationManager : MonoBehaviour
         //return Quaternion.AngleAxis(Random.value * 360.0f, Vector3.up);
     }
 
-    GameObject GetNearestMine (Vector3 pos)
+    Mine GetNearestMine (Vector3 pos)
     {
-        GameObject nearest = mines[0].gameObject;
+        Mine nearest = mines[0];
         float distance = (pos - nearest.transform.position).sqrMagnitude;
 
         foreach (Mine mine in mines)
@@ -389,7 +348,7 @@ public class PopulationManager : MonoBehaviour
             float newDist = (mine.transform.position - pos).sqrMagnitude;
             if (newDist < distance)
             {
-                nearest = mine.gameObject;
+                nearest = mine;
                 distance = newDist;
             }
         }
@@ -397,7 +356,7 @@ public class PopulationManager : MonoBehaviour
         return nearest;
     }
 
-    GameObject GetNearestTeamMine (Vector3 pos, Team team, bool isEqualTeam)
+    Mine GetNearestTeamMine (Vector3 pos, Team team, bool isEqualTeam)
     {
         int indexNearMine = 0;
         float distanceNearMine = float.MaxValue;
@@ -423,7 +382,7 @@ public class PopulationManager : MonoBehaviour
             }
         }
 
-        return mines[indexNearMine].gameObject;
+        return mines[indexNearMine];
     }
     
     private void OnDrawGizmos ()
