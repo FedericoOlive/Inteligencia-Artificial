@@ -19,7 +19,7 @@ public class Tank : TankBase
         inputs[1] = dir.z;
         inputs[2] = dirToTeamMine.x;
         inputs[3] = dirToTeamMine.z;
-        inputs[4] = dirToEnemyMine.z;
+        inputs[4] = dirToEnemyMine.x;
         inputs[5] = dirToEnemyMine.z;
 
         float[] output = brain.Synapsis(inputs);

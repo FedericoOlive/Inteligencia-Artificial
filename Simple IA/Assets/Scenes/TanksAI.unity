@@ -1236,7 +1236,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -1479,7 +1479,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2177378219867976781, guid: 2bc60862222585c488997a49abe493bc, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3522055290976781741, guid: 2bc60862222585c488997a49abe493bc, type: 3}
       propertyPath: indexVillage
@@ -2771,6 +2771,10 @@ PrefabInstance:
     - target: {fileID: 2177378219867976781, guid: 2bc60862222585c488997a49abe493bc, type: 3}
       propertyPath: m_Name
       value: Panel Data (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2177378219867976781, guid: 2bc60862222585c488997a49abe493bc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3522055290976781741, guid: 2bc60862222585c488997a49abe493bc, type: 3}
       propertyPath: indexVillage
@@ -4118,7 +4122,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2177378219867976781, guid: 2bc60862222585c488997a49abe493bc, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3522055290976781741, guid: 2bc60862222585c488997a49abe493bc, type: 3}
       propertyPath: indexVillage
@@ -6847,7 +6851,7 @@ MonoBehaviour:
   zoneMines: {fileID: 899863481}
   TankPrefab: {fileID: 1915012411374756, guid: c7621d24efff4b04ca19cf2ef19a1af9, type: 3}
   MinePrefab: {fileID: 1712181699425504, guid: 74d6116ddc0b6ab4686323b873e69fb8, type: 3}
-  villageCount: 2
+  villageCount: 4
   PopulationCount: 40
   MinesCount: 40
   SceneHalfExtents: {x: 45, y: 0, z: 45}
