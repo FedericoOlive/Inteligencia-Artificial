@@ -1,15 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class StartConfigurationScreen : MonoBehaviour
 {
+    [SerializeField] private PopulationManager populationManager;
     [Space(15)]
     public Text populationCountTxt;
     public Slider populationCountSlider;
-    public Text minesCountTxt;
-    public Slider minesCountSlider;
+    public Text FoodsCountTxt;
+    public Slider FoodsCountSlider;
     public Text generationDurationTxt;
     public Slider generationDurationSlider;
     public Text eliteCountTxt;
@@ -30,7 +29,7 @@ public class StartConfigurationScreen : MonoBehaviour
     public GameObject simulationScreen;
     
     string populationText;
-    string minesText;
+    string FoodsText;
     string generationDurationText;
     string elitesText;
     string mutationChanceText;
@@ -43,7 +42,7 @@ public class StartConfigurationScreen : MonoBehaviour
     void Start()
     {   
         populationCountSlider.onValueChanged.AddListener(OnPopulationCountChange);
-        minesCountSlider.onValueChanged.AddListener(OnMinesCountChange);
+        FoodsCountSlider.onValueChanged.AddListener(OnFoodsCountChange);
         generationDurationSlider.onValueChanged.AddListener(OnGenerationDurationChange);
         eliteCountSlider.onValueChanged.AddListener(OnEliteCountChange);
         mutationChanceSlider.onValueChanged.AddListener(OnMutationChanceChange);
@@ -54,7 +53,7 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeSlider.onValueChanged.AddListener(OnSigmoidSlopeChange);
 
         populationText = populationCountTxt.text;
-        minesText = minesCountTxt.text;
+        FoodsText = FoodsCountTxt.text;
         generationDurationText = generationDurationTxt.text;
         elitesText = eliteCountTxt.text;
         mutationChanceText = mutationChanceTxt.text;
@@ -64,95 +63,95 @@ public class StartConfigurationScreen : MonoBehaviour
         biasText = biasTxt.text;
         sigmoidSlopeText = sigmoidSlopeTxt.text;
 
-        populationCountSlider.value = PopulationManager.Instance.PopulationCount;
-        minesCountSlider.value = PopulationManager.Instance.MinesCount;
-        generationDurationSlider.value = PopulationManager.Instance.GenerationDuration;
-        eliteCountSlider.value = PopulationManager.Instance.EliteCount;
-        mutationChanceSlider.value = PopulationManager.Instance.MutationChance * 100.0f;
-        mutationRateSlider.value = PopulationManager.Instance.MutationRate * 100.0f;
-        hiddenLayersCountSlider.value = PopulationManager.Instance.HiddenLayers;
-        neuronsPerHLSlider.value = PopulationManager.Instance.NeuronsCountPerHL;
-        biasSlider.value = -PopulationManager.Instance.Bias;
-        sigmoidSlopeSlider.value = PopulationManager.Instance.P;
+        populationCountSlider.value = populationManager.PopulationCount;
+        FoodsCountSlider.value = populationManager.FoodsCount;
+        generationDurationSlider.value = populationManager.GenerationDuration;
+        eliteCountSlider.value = populationManager.EliteCount;
+        mutationChanceSlider.value = populationManager.MutationChance * 100.0f;
+        mutationRateSlider.value = populationManager.MutationRate * 100.0f;
+        hiddenLayersCountSlider.value = populationManager.HiddenLayers;
+        neuronsPerHLSlider.value = populationManager.NeuronsCountPerHL;
+        biasSlider.value = -populationManager.Bias;
+        sigmoidSlopeSlider.value = populationManager.P;
 
         startButton.onClick.AddListener(OnStartButtonClick);        
     }
 
     void OnPopulationCountChange(float value)
     {
-        PopulationManager.Instance.PopulationCount = (int)value;
+        populationManager.PopulationCount = (int)value;
         
-        populationCountTxt.text = string.Format(populationText, PopulationManager.Instance.PopulationCount);
+        populationCountTxt.text = string.Format(populationText, populationManager.PopulationCount);
     }
 
-    void OnMinesCountChange(float value)
+    void OnFoodsCountChange(float value)
     {
-        PopulationManager.Instance.MinesCount = (int)value;        
+        populationManager.FoodsCount = (int)value;        
 
-        minesCountTxt.text = string.Format(minesText, PopulationManager.Instance.MinesCount);
+        FoodsCountTxt.text = string.Format(FoodsText, populationManager.FoodsCount);
     }
 
     void OnGenerationDurationChange(float value)
     {
-        PopulationManager.Instance.GenerationDuration = (int)value;
+        populationManager.GenerationDuration = (int)value;
         
-        generationDurationTxt.text = string.Format(generationDurationText, PopulationManager.Instance.GenerationDuration);
+        generationDurationTxt.text = string.Format(generationDurationText, populationManager.GenerationDuration);
     }
 
     void OnEliteCountChange(float value)
     {
-        PopulationManager.Instance.EliteCount = (int)value;
+        populationManager.EliteCount = (int)value;
 
-        eliteCountTxt.text = string.Format(elitesText, PopulationManager.Instance.EliteCount);
+        eliteCountTxt.text = string.Format(elitesText, populationManager.EliteCount);
     }
 
     void OnMutationChanceChange(float value)
     {
-        PopulationManager.Instance.MutationChance = value / 100.0f;
+        populationManager.MutationChance = value / 100.0f;
 
-        mutationChanceTxt.text = string.Format(mutationChanceText, (int)(PopulationManager.Instance.MutationChance * 100));
+        mutationChanceTxt.text = string.Format(mutationChanceText, (int)(populationManager.MutationChance * 100));
     }
 
     void OnMutationRateChange(float value)
     {
-        PopulationManager.Instance.MutationRate = value / 100.0f;
+        populationManager.MutationRate = value / 100.0f;
 
-        mutationRateTxt.text = string.Format(mutationRateText, (int)(PopulationManager.Instance.MutationRate * 100));
+        mutationRateTxt.text = string.Format(mutationRateText, (int)(populationManager.MutationRate * 100));
     }
 
     void OnHiddenLayersCountChange(float value)
     {
-        PopulationManager.Instance.HiddenLayers = (int)value;
+        populationManager.HiddenLayers = (int)value;
         
 
-        hiddenLayersCountTxt.text = string.Format(hiddenLayersCountText, PopulationManager.Instance.HiddenLayers);
+        hiddenLayersCountTxt.text = string.Format(hiddenLayersCountText, populationManager.HiddenLayers);
     }
 
     void OnNeuronsPerHLChange(float value)
     {
-        PopulationManager.Instance.NeuronsCountPerHL = (int)value;
+        populationManager.NeuronsCountPerHL = (int)value;
 
-        neuronsPerHLCountTxt.text = string.Format(neuronsPerHLCountText, PopulationManager.Instance.NeuronsCountPerHL);
+        neuronsPerHLCountTxt.text = string.Format(neuronsPerHLCountText, populationManager.NeuronsCountPerHL);
     }
 
     void OnBiasChange(float value)
     {
-        PopulationManager.Instance.Bias = -value;
+        populationManager.Bias = -value;
 
-        biasTxt.text = string.Format(biasText, PopulationManager.Instance.Bias.ToString("0.00"));
+        biasTxt.text = string.Format(biasText, populationManager.Bias.ToString("0.00"));
     }
 
     void OnSigmoidSlopeChange(float value)
     {
-        PopulationManager.Instance.P = value;
+        populationManager.P = value;
 
-        sigmoidSlopeTxt.text = string.Format(sigmoidSlopeText, PopulationManager.Instance.P.ToString("0.00"));
+        sigmoidSlopeTxt.text = string.Format(sigmoidSlopeText, populationManager.P.ToString("0.00"));
     }
 
 
     void OnStartButtonClick()
     {
-        PopulationManager.Instance.StartSimulation();
+        populationManager.StartSimulation();
         this.gameObject.SetActive(false);
         simulationScreen.SetActive(true);
     }

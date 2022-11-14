@@ -6,7 +6,7 @@ using UnityEngine;
 public class ZonesDrawDebug : MonoBehaviour
 {
     public Transform zoneTanks;
-    public Transform zoneMines;
+    public Transform zoneFoods;
 
     private void OnDrawGizmos ()
     {

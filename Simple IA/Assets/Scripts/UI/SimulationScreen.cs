@@ -12,8 +12,8 @@ public class SimulationScreen : MonoBehaviour
     public Button pauseBtn;
     public Button stopBtn;
     public GameObject startConfigurationScreen;
+    [SerializeField] private PopulationManager populationManager;
 
-    
     string timerText;
 
     // Start is called before the first frame update
@@ -22,7 +22,7 @@ public class SimulationScreen : MonoBehaviour
         timerSlider.onValueChanged.AddListener(OnTimerChange);
         timerText = timerTxt.text;
 
-        timerTxt.text = string.Format(timerText, PopulationManager.Instance.IterationCount);
+        timerTxt.text = string.Format(timerText, populationManager.IterationCount);
 
         pauseBtn.onClick.AddListener(OnPauseButtonClick);
         stopBtn.onClick.AddListener(OnStopButtonClick);
@@ -30,18 +30,18 @@ public class SimulationScreen : MonoBehaviour
 
     void OnTimerChange(float value)
     {
-        PopulationManager.Instance.IterationCount = (int)value;
-        timerTxt.text = string.Format(timerText, PopulationManager.Instance.IterationCount);
+        populationManager.IterationCount = (int)value;
+        timerTxt.text = string.Format(timerText, populationManager.IterationCount);
     }
 
     void OnPauseButtonClick()
     {
-        PopulationManager.Instance.PauseSimulation();
+        populationManager.PauseSimulation();
     }
 
     void OnStopButtonClick()
     {
-        PopulationManager.Instance.StopSimulation();
+        populationManager.StopSimulation();
         this.gameObject.SetActive(false);
         startConfigurationScreen.SetActive(true);
         for (int i = 0; i < panelDataVillager.Count; i++)

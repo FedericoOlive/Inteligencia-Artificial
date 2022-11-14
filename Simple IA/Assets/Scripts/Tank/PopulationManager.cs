@@ -5,17 +5,15 @@ public class PopulationManager : MonoBehaviour
 {
     public static event System.Action OnEpoch;
     public Collider zoneTanks;
-    public Collider zoneMines;
+    public Collider zoneFoods;
 
     public GameObject TankPrefab;
-    public GameObject MinePrefab;
+    public GameObject FoodPrefab;
 
     public int villageCount = 2;
     public int PopulationCount = 10;
-    public int MinesCount = 50;
-
-    public Vector3 SceneHalfExtents = new Vector3(20.0f, 0.0f, 20.0f);
-
+    public int FoodsCount = 50;
+    
     public float GenerationDuration = 20.0f;
     public int IterationCount = 1;
 
@@ -35,36 +33,18 @@ public class PopulationManager : MonoBehaviour
 
     public List<Village> village = new List<Village>();
 
-    List<Mine> mines = new List<Mine>();
+    List<Food> Foods = new List<Food>();
 
     float accumTime = 0;
     bool isRunning = false;
     
-    static PopulationManager instance = null;
-
-    public static PopulationManager Instance
-    {
-        get
-        {
-            if (instance == null)
-                instance = FindObjectOfType<PopulationManager>();
-
-            return instance;
-        }
-    }
-
-    void Awake ()
-    {
-        instance = this;
-    }
-
     public void StartSimulation ()
     {
         // Create and confiugre the Genetic Algorithm
         genAlg = new GeneticAlgorithm(EliteCount, MutationChance, MutationRate);
 
         GenerateInitialPopulation();
-        CreateMines();
+        CreateFoods();
 
         isRunning = true;
     }
@@ -86,8 +66,8 @@ public class PopulationManager : MonoBehaviour
         // Destroy previous tanks (if there are any)
         DestroyTanks();
 
-        // Destroy all mines
-        DestroyMines();
+        // Destroy all Foods
+        DestroyFoods();
     }
 
     // Generate the random initial population
@@ -197,8 +177,7 @@ public class PopulationManager : MonoBehaviour
             }
         }
     }
-
-    // Update is called once per frame
+    
     void FixedUpdate ()
     {
         if (!isRunning)
@@ -213,41 +192,11 @@ public class PopulationManager : MonoBehaviour
         {
             for (int j = 0; j < village.Count; j++)
             {
-                foreach (Tank tank in village[j].populationGOs)
+                foreach (Villager tank in village[j].populationGOs)
                 {
-                    // Get the nearest mine
-                    Mine mine = GetNearestMine(tank.transform.position);
-
-                    // Set the nearest mine to current tank
-                    tank.SetNearestMine(mine);
-
-                    mine = GetNearestTeamMine(tank.transform.position, village[j].team, true);
-
-                    // Set the nearest mine to current tank
-                    tank.SetGoodNearestMine(mine);
-
-                    mine = GetNearestTeamMine(tank.transform.position, village[j].team, false);
-
-                    // Set the nearest mine to current tank
-                    tank.SetBadNearestMine(mine);
-
-                    // Think!! 
+                    Food food = GetNearestFood(tank.transform.position);
+                    tank.SetNearestFood(food);
                     tank.Think(dt);
-
-                    // Just adjust tank position when reaching world extents
-                    Vector3 pos = tank.transform.position;
-                    if (pos.x > SceneHalfExtents.x)
-                        pos.x -= SceneHalfExtents.x * 2;
-                    else if (pos.x < -SceneHalfExtents.x)
-                        pos.x += SceneHalfExtents.x * 2;
-
-                    if (pos.z > SceneHalfExtents.z)
-                        pos.z -= SceneHalfExtents.z * 2;
-                    else if (pos.z < -SceneHalfExtents.z)
-                        pos.z += SceneHalfExtents.z * 2;
-
-                    // Set tank position
-                    tank.transform.position = pos;
                 }
             }
 
@@ -264,28 +213,28 @@ public class PopulationManager : MonoBehaviour
 
     #region Helpers
 
-    Tank CreateTank (Genome genome, NeuralNetwork brain)
+    Villager CreateTank (Genome genome, NeuralNetwork brain)
     {
         Vector3 position = GetRandomPosInBounds(zoneTanks.bounds);
         GameObject go = Instantiate<GameObject>(TankPrefab, position, GetRandomRot());
-        Tank t = go.GetComponent<Tank>();
+        Villager t = go.GetComponent<Villager>();
         t.SetBrain(genome, brain);
         return t;
     }
 
-    void DestroyMines ()
+    void DestroyFoods ()
     {
-        foreach (Mine mine in mines)
-            Destroy(mine.gameObject);
+        foreach (Food food in Foods)
+            Destroy(food.gameObject);
 
-        mines.Clear();
+        Foods.Clear();
     }
 
     void DestroyTanks ()
     {
         for (int i = 0; i < village.Count; i++)
         {
-            foreach (Tank go in village[i].populationGOs)
+            foreach (Villager go in village[i].populationGOs)
                 Destroy(go.gameObject);
 
             village[i].populationGOs.Clear();
@@ -294,28 +243,28 @@ public class PopulationManager : MonoBehaviour
         }
     }
 
-    void CreateMines ()
+    void CreateFoods ()
     {
-        // Destroy previous created mines
-        DestroyMines();
+        // Destroy previous created Foods
+        DestroyFoods();
 
-        for (int i = 0; i < MinesCount; i++)
+        for (int i = 0; i < FoodsCount; i++)
         {
-            Vector3 position = GetRandomPosInBounds(zoneMines.bounds);
-            GameObject go = Instantiate(MinePrefab, position, Quaternion.identity);
+            Vector3 position = GetRandomPosInBounds(zoneFoods.bounds);
+            GameObject go = Instantiate(FoodPrefab, position, Quaternion.identity);
 
-            Mine mine = go.GetComponent<Mine>();
-            Team teamMine = (Team) (i % villageCount);
-            go.name = "Mine " + teamMine.ToString();
-            mine.SetTeam(teamMine);
+            Food food = go.GetComponent<Food>();
+            Team teamFood = (Team) (i % villageCount);
+            go.name = "Food " + teamFood.ToString();
+            food.SetTeam(teamFood);
 
-            mines.Add(mine);
+            Foods.Add(food);
         }
     }
 
-    public void RelocateMine (GameObject mine)
+    public void RelocateFood (GameObject food)
     {
-        mine.transform.position = GetRandomPosInBounds(zoneMines.bounds);
+        food.transform.position = GetRandomPosInBounds(zoneFoods.bounds);
     }
 
     public Vector3 GetRandomPosInBounds (Bounds bounds)
@@ -338,17 +287,17 @@ public class PopulationManager : MonoBehaviour
         //return Quaternion.AngleAxis(Random.value * 360.0f, Vector3.up);
     }
 
-    Mine GetNearestMine (Vector3 pos)
+    Food GetNearestFood (Vector3 pos)
     {
-        Mine nearest = mines[0];
+        Food nearest = Foods[0];
         float distance = (pos - nearest.transform.position).sqrMagnitude;
 
-        foreach (Mine mine in mines)
+        foreach (Food food in Foods)
         {
-            float newDist = (mine.transform.position - pos).sqrMagnitude;
+            float newDist = (food.transform.position - pos).sqrMagnitude;
             if (newDist < distance)
             {
-                nearest = mine;
+                nearest = food;
                 distance = newDist;
             }
         }
@@ -356,43 +305,43 @@ public class PopulationManager : MonoBehaviour
         return nearest;
     }
 
-    Mine GetNearestTeamMine (Vector3 pos, Team team, bool isEqualTeam)
+    Food GetNearestTeamFood (Vector3 pos, Team team, bool isEqualTeam)
     {
-        int indexNearMine = 0;
-        float distanceNearMine = float.MaxValue;
+        int indexNearFood = 0;
+        float distanceNearFood = float.MaxValue;
 
-        for (int i = 0; i < mines.Count; i++)
+        for (int i = 0; i < Foods.Count; i++)
         {
             if (isEqualTeam)
             {
-                if (mines[i].team != team)
+                if (Foods[i].team != team)
                     continue;
             }
             else
             {
-                if (mines[i].team == team)
+                if (Foods[i].team == team)
                     continue;
             }
 
-            float currentDistanceNearMine = (pos - mines[i].transform.position).sqrMagnitude;
-            if (currentDistanceNearMine < distanceNearMine)
+            float currentDistanceNearFood = (pos - Foods[i].transform.position).sqrMagnitude;
+            if (currentDistanceNearFood < distanceNearFood)
             {
-                indexNearMine = i;
-                distanceNearMine = currentDistanceNearMine;
+                indexNearFood = i;
+                distanceNearFood = currentDistanceNearFood;
             }
         }
 
-        return mines[indexNearMine];
+        return Foods[indexNearFood];
     }
-    
+
     private void OnDrawGizmos ()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(Vector3.zero, SceneHalfExtents * 2);
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(zoneTanks.bounds.center, zoneTanks.bounds.size);
+        if (zoneTanks)
+            Gizmos.DrawWireCube(zoneTanks.bounds.center, zoneTanks.bounds.size);
         Gizmos.color = Color.gray;
-        Gizmos.DrawWireCube(zoneMines.bounds.center, zoneMines.bounds.size);
+        if (zoneFoods)
+            Gizmos.DrawWireCube(zoneFoods.bounds.center, zoneFoods.bounds.size);
         for (int i = 0; i < village.Count; i++)
         {
             village[i].OnDrawGizmos();

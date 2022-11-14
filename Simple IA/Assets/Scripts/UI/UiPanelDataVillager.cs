@@ -16,7 +16,8 @@ public class UiPanelDataVillager : MonoBehaviour
     private string bestFitnessText;
     private string avgFitnessText;
     private string worstFitnessText;
-    
+    [SerializeField] private PopulationManager populationManager;
+
     private void Start ()
     {
         if (string.IsNullOrEmpty(generationsCountText))
@@ -31,7 +32,7 @@ public class UiPanelDataVillager : MonoBehaviour
 
     void OnEnable ()
     {
-        if (PopulationManager.Instance.village.Count <= indexVillage)
+        if (populationManager.village.Count <= indexVillage)
         {
             gameObject.SetActive(false);
             return;
@@ -56,10 +57,10 @@ public class UiPanelDataVillager : MonoBehaviour
 
     void Update()
     {
-        lastGeneration = PopulationManager.Instance.village[indexVillage].generation;
-        generationsCountTxt.text = string.Format(generationsCountText, PopulationManager.Instance.village[indexVillage].generation);
-        bestFitnessTxt.text = string.Format(bestFitnessText, PopulationManager.Instance.village[indexVillage].bestFitness);
-        avgFitnessTxt.text = string.Format(avgFitnessText, PopulationManager.Instance.village[indexVillage].avgFitness);
-        worstFitnessTxt.text = string.Format(worstFitnessText, PopulationManager.Instance.village[indexVillage].worstFitness);
+        lastGeneration = populationManager.village[indexVillage].generation;
+        generationsCountTxt.text = string.Format(generationsCountText, populationManager.village[indexVillage].generation);
+        bestFitnessTxt.text = string.Format(bestFitnessText, populationManager.village[indexVillage].bestFitness);
+        avgFitnessTxt.text = string.Format(avgFitnessText, populationManager.village[indexVillage].avgFitness);
+        worstFitnessTxt.text = string.Format(worstFitnessText, populationManager.village[indexVillage].worstFitness);
     }
 }

@@ -7,7 +7,7 @@ public class Village
     public Team team;
     private Color colorCiv = Color.white;
 
-    public List<Tank> populationGOs = new List<Tank>();
+    public List<Villager> populationGOs = new List<Villager>();
     public List<Genome> population = new List<Genome>();
     public List<NeuralNetwork> brains = new List<NeuralNetwork>();
 
@@ -97,8 +97,8 @@ public class Village
         Gizmos.color = colorCiv;
         for (int i = 0; i < populationGOs.Count; i++)
         {
-            if (populationGOs[i].nearMine)
-                Gizmos.DrawLine(populationGOs[i].transform.position, populationGOs[i].nearMine.transform.position);
+            if (populationGOs[i].nearFood)
+                Gizmos.DrawLine(populationGOs[i].transform.position, populationGOs[i].nearFood.transform.position);
         }
 
         Gizmos.color = Color.white;
