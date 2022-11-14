@@ -9,25 +9,19 @@ public class FoodManager : MonoBehaviour
     [SerializeField] private List<Food> foods = new List<Food>();
     [SerializeField] private bool locateFood;
     [SerializeField] private Collider coll;
-    
+
     private void Update ()
     {
         if (locateFood)
         {
             locateFood = false;
-            InitFood();
+            Init();
         }
     }
 
-    private void InitFood ()
+    public void Init ()
     {
-        if (!Application.isPlaying)
-            for (int i = 0; i < foods.Count; i++)
-                DestroyImmediate(foods[i].gameObject);
-        else
-            for (int i = 0; i < foods.Count; i++)
-                Destroy(foods[i].gameObject);
-        foods.Clear();
+        DeInit();
 
         Vector3 pos = Vector3.zero;
 
@@ -38,6 +32,24 @@ public class FoodManager : MonoBehaviour
             Food food = foodGo.GetComponent<Food>();
             foods.Add(food);
         }
+    }
+
+    public void DeInit ()
+    {
+        if (!Application.isPlaying)
+        {
+            for (int i = 0; i < foods.Count; i++)
+                if (foods[i])
+                    DestroyImmediate(foods[i].gameObject);
+        }
+        else
+        {
+            for (int i = 0; i < foods.Count; i++)
+                if (foods[i])
+                    Destroy(foods[i].gameObject);
+        }
+
+        foods.Clear();
     }
 
     private void RelocateFood ()

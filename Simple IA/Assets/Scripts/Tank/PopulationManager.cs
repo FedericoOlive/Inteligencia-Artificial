@@ -5,10 +5,8 @@ public class PopulationManager : MonoBehaviour
 {
     public static event System.Action OnEpoch;
     public Collider zoneTanks;
-    public Collider zoneFoods;
 
     public GameObject TankPrefab;
-    public GameObject FoodPrefab;
 
     public int villageCount = 2;
     public int PopulationCount = 10;
@@ -27,8 +25,7 @@ public class PopulationManager : MonoBehaviour
     public int NeuronsCountPerHL = 7;
     public float Bias = 1f;
     public float P = 0.5f;
-
-
+    
     GeneticAlgorithm genAlg;
 
     public List<Village> village = new List<Village>();
@@ -37,14 +34,23 @@ public class PopulationManager : MonoBehaviour
 
     float accumTime = 0;
     bool isRunning = false;
-    
+
+    public void Init ()
+    {
+
+    }
+
+    public void DeInit ()
+    {
+
+    }
+
     public void StartSimulation ()
     {
         // Create and confiugre the Genetic Algorithm
         genAlg = new GeneticAlgorithm(EliteCount, MutationChance, MutationRate);
 
         GenerateInitialPopulation();
-        CreateFoods();
 
         isRunning = true;
     }
@@ -243,30 +249,6 @@ public class PopulationManager : MonoBehaviour
         }
     }
 
-    void CreateFoods ()
-    {
-        // Destroy previous created Foods
-        DestroyFoods();
-
-        for (int i = 0; i < FoodsCount; i++)
-        {
-            Vector3 position = GetRandomPosInBounds(zoneFoods.bounds);
-            GameObject go = Instantiate(FoodPrefab, position, Quaternion.identity);
-
-            Food food = go.GetComponent<Food>();
-            Team teamFood = (Team) (i % villageCount);
-            go.name = "Food " + teamFood.ToString();
-            food.SetTeam(teamFood);
-
-            Foods.Add(food);
-        }
-    }
-
-    public void RelocateFood (GameObject food)
-    {
-        food.transform.position = GetRandomPosInBounds(zoneFoods.bounds);
-    }
-
     public Vector3 GetRandomPosInBounds (Bounds bounds)
     {
         float minX = bounds.center.x - bounds.extents.x;
@@ -336,12 +318,6 @@ public class PopulationManager : MonoBehaviour
 
     private void OnDrawGizmos ()
     {
-        Gizmos.color = Color.green;
-        if (zoneTanks)
-            Gizmos.DrawWireCube(zoneTanks.bounds.center, zoneTanks.bounds.size);
-        Gizmos.color = Color.gray;
-        if (zoneFoods)
-            Gizmos.DrawWireCube(zoneFoods.bounds.center, zoneFoods.bounds.size);
         for (int i = 0; i < village.Count; i++)
         {
             village[i].OnDrawGizmos();
@@ -354,9 +330,8 @@ public class PopulationManager : MonoBehaviour
 
 public enum Team
 {
-    Blue,
     Red,
-    Yellow,
+    Magenta,
+    Blue,
     Green,
-    Magenta
 }

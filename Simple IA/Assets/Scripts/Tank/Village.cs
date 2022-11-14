@@ -65,16 +65,14 @@ public class Village
     {
         switch (team)
         {
-            case Team.Blue:
-                return Color.blue;
             case Team.Red:
                 return Color.red;
-            case Team.Yellow:
-                return Color.yellow;
-            case Team.Green:
-                return Color.green;
             case Team.Magenta:
                 return Color.magenta;
+            case Team.Blue:
+                return Color.blue;
+            case Team.Green:
+                return Color.green;
         }
 
         return Color.black;
