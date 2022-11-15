@@ -33,9 +33,7 @@ public class VillagerBase : MonoBehaviour
     {
         return (transform.position - food.transform.position).sqrMagnitude <= 2.0f;
     }
-
-
-
+    
     protected void SetDirection (Direction dir)
     {
         Vector3 nextPos = transform.position;

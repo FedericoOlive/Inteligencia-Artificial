@@ -1,87 +1,85 @@
 using System.Collections.Generic;
 
-namespace Intelligence
+public enum NodeState
 {
-    public enum NodeState
+    Running,
+    Success,
+    Failure
+}
+
+public abstract class Node
+{
+    public NodeState state;
+    public Node parent;
+    public List<Node> childrens = new List<Node>();
+
+    private Dictionary<string, object> data = new Dictionary<string, object>();
+
+    public Node()
     {
-        Running,
-        Success,
-        Failure
+        parent = null;
     }
 
-    public abstract class Node
+    public Node(List<Node> childrens)
     {
-        public NodeState state;
-        public Node parent;
-        public List<Node> childrens = new List<Node>();
-
-        private Dictionary<string, object> data = new Dictionary<string, object>();
-
-        public Node ()
+        foreach (Node children in childrens)
         {
-            parent = null;
+            Attach(children);
         }
+    }
 
-        public Node (List<Node> childrens)
+    public void Attach(Node node)
+    {
+        node.parent = this;
+        childrens.Add(node);
+    }
+
+    public virtual NodeState Evaluate() => NodeState.Failure;
+
+    public void SetData(string key, object value)
+    {
+        if (data.ContainsKey(key))
+            data[key] = value;
+        else
+            data.Add(key, value);
+    }
+
+    public object GetData<T>(string key)
+    {
+        if (data.TryGetValue(key, out var value))
+            return value;
+
+        Node parentNode = parent;
+        while (parentNode != null)
         {
-            foreach (Node children in childrens)
-            {
-                Attach(children);
-            }
-        }
-
-        public void Attach (Node node)
-        {
-            node.parent = this;
-        }
-
-        public virtual NodeState Evaluate () => NodeState.Failure;
-
-        public void SetData (string key, object value)
-        {
-            if (data.ContainsKey(key))
-                data[key] = value;
-            else
-                data.Add(key, value);
-        }
-
-        public object GetData<T> (string key)
-        {
-            if (data.TryGetValue(key, out var value))
+            value = parentNode.GetData<T>(key);
+            if (value != null)
                 return value;
 
-            Node parentNode = parent;
-            while (parentNode != null)
-            {
-                value = parentNode.GetData<T>(key);
-                if (value != null)
-                    return value;
-
-                parentNode = parent;
-            }
-
-            return default;
+            parentNode = parent;
         }
 
-        public bool RemoveData (string key)
+        return default;
+    }
+
+    public bool RemoveData(string key)
+    {
+        if (data.ContainsKey(key))
         {
-            if (data.ContainsKey(key))
-            {
-                data.Remove(key);
-                return true;
-            }
-
-            Node parentNode = parent;
-            while (parentNode != null)
-            {
-                bool cleaned = parentNode.RemoveData(key);
-                if (cleaned)
-                    return true;
-
-                parentNode = parent;
-            }
-
-            return false;
+            data.Remove(key);
+            return true;
         }
+
+        Node parentNode = parent;
+        while (parentNode != null)
+        {
+            bool cleaned = parentNode.RemoveData(key);
+            if (cleaned)
+                return true;
+
+            parentNode = parent;
+        }
+
+        return false;
     }
 }
