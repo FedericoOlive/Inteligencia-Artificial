@@ -122,6 +122,11 @@ public class TerrainGenerator : MonoBehaviour
         return false;
     }
 
+    public static List<Transform> GetSpawnPoints (int spawnPointType)
+    {
+        return GetSpawnPoints((SpawnPointType) spawnPointType);
+    }
+
     public static List<Transform> GetSpawnPoints (SpawnPointType spawnPointType)
     {
         switch (spawnPointType)

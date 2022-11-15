@@ -94,6 +94,22 @@ public class FoodManager : MonoBehaviour
         return randomPos;
     }
 
+    public Food GetNearFood (Vector3 pos)
+    {
+        float minDistance = float.MaxValue;
+        int index = 0;
+
+        for (int i = 0; i < foods.Count; i++)
+        {
+            if (Vector3.Distance(foods[i].transform.position, pos) < minDistance)
+            {
+                index = i;
+            }
+        }
+
+        return foods[index];
+    }
+
 #if UNITY_EDITOR
     private void OnDrawGizmos ()
     {

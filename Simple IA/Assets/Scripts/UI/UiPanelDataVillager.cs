@@ -31,11 +31,11 @@ public class UiPanelDataVillager : MonoBehaviour
 
     void OnEnable ()
     {
-        if (populationManager.village.Count <= indexVillage)
-        {
-            gameObject.SetActive(false);
-            return;
-        }
+        //if (populationManager.village.Count <= indexVillage)
+        //{
+        //    gameObject.SetActive(false);
+        //    return;
+        //}
 
         generationsCountTxt.color = Village.GetColorCiv((Team) indexVillage);
 
@@ -56,10 +56,10 @@ public class UiPanelDataVillager : MonoBehaviour
 
     void Update()
     {
-        lastGeneration = populationManager.village[indexVillage].generation;
-        generationsCountTxt.text = string.Format(generationsCountText, populationManager.village[indexVillage].generation);
-        bestFitnessTxt.text = string.Format(bestFitnessText, populationManager.village[indexVillage].bestFitness);
-        avgFitnessTxt.text = string.Format(avgFitnessText, populationManager.village[indexVillage].avgFitness);
-        worstFitnessTxt.text = string.Format(worstFitnessText, populationManager.village[indexVillage].worstFitness);
+        //lastGeneration = populationManager.village[indexVillage].generation;
+        //generationsCountTxt.text = string.Format(generationsCountText, populationManager.village[indexVillage].generation);
+        //bestFitnessTxt.text = string.Format(bestFitnessText, populationManager.village[indexVillage].bestFitness);
+        //avgFitnessTxt.text = string.Format(avgFitnessText, populationManager.village[indexVillage].avgFitness);
+        //worstFitnessTxt.text = string.Format(worstFitnessText, populationManager.village[indexVillage].worstFitness);
     }
 }

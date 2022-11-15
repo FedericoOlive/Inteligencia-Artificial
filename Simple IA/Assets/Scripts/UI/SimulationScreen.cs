@@ -22,7 +22,7 @@ public class SimulationScreen : MonoBehaviour
         timerSlider.onValueChanged.AddListener(OnTimerChange);
         timerText = timerTxt.text;
 
-        timerTxt.text = string.Format(timerText, populationManager.IterationCount);
+        timerTxt.text = string.Format(timerText, populationManager.iterationCount);
 
         pauseBtn.onClick.AddListener(OnPauseButtonClick);
         stopBtn.onClick.AddListener(OnStopButtonClick);
@@ -30,8 +30,8 @@ public class SimulationScreen : MonoBehaviour
 
     void OnTimerChange(float value)
     {
-        populationManager.IterationCount = (int)value;
-        timerTxt.text = string.Format(timerText, populationManager.IterationCount);
+        populationManager.iterationCount = (int)value;
+        timerTxt.text = string.Format(timerText, populationManager.iterationCount);
     }
 
     void OnPauseButtonClick()
@@ -41,7 +41,7 @@ public class SimulationScreen : MonoBehaviour
 
     void OnStopButtonClick()
     {
-        populationManager.StopSimulation();
+        //populationManager.StopSimulation();
         this.gameObject.SetActive(false);
         startConfigurationScreen.SetActive(true);
         for (int i = 0; i < panelDataVillager.Count; i++)

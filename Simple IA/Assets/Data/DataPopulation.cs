@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "Data Population", menuName = "Data/Population")]
 
 public class DataPopulation : ScriptableObject
 {
@@ -18,5 +17,5 @@ public class DataPopulation : ScriptableObject
     public int outputsCount = 2;
     public int neuronsCountPerHL = 7;
     public float bias = 1f;
-    public float P = 0.5f;
+    public float p = 0.5f;
 }

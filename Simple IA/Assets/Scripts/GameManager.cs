@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteAlways]
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourSingleton<GameManager>
 {
     [SerializeField] private bool initWorld;
     [SerializeField] private bool clearWorld;
@@ -42,5 +42,10 @@ public class GameManager : MonoBehaviour
         foodManager.DeInit();
 
         populationManager.DeInit();
+    }
+
+    public Food GetNearFood (Vector3 pos)
+    {
+        return foodManager.GetNearFood(pos);
     }
 }
