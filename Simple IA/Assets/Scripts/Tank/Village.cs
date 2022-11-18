@@ -4,7 +4,6 @@ using UnityEngine;
 [System.Serializable]
 public class Village
 {
-    public Team team;
     private Color colorCiv = Color.white;
 
     public List<Villager> populationGOs = new List<Villager>();
@@ -54,10 +53,8 @@ public class Village
         worstFitness = 0;
     }
 
-    public void SetTeam (int i)
+    public void SetColorCivTeam (Team team)
     {
-        team = (Team) i;
-
         colorCiv = GetColorCiv(team);
     }
 
@@ -78,11 +75,10 @@ public class Village
         return Color.black;
     }
 
-    public void SetTanks ()
+    public void SetVillager ()
     {
         for (int i = 0; i < populationGOs.Count; i++)
         {
-            populationGOs[i].team = team;
             for (int j = 0; j < populationGOs[i].meshRenderer.Length; j++)
             {
                 populationGOs[i].meshRenderer[j].material.color = colorCiv;
@@ -95,8 +91,8 @@ public class Village
         Gizmos.color = colorCiv;
         for (int i = 0; i < populationGOs.Count; i++)
         {
-            if (populationGOs[i].nearFood)
-                Gizmos.DrawLine(populationGOs[i].transform.position, populationGOs[i].nearFood.transform.position);
+            if (populationGOs[i].targetFood)
+                Gizmos.DrawLine(populationGOs[i].transform.position, populationGOs[i].targetFood.transform.position);
         }
 
         Gizmos.color = Color.white;

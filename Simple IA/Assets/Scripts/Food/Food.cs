@@ -1,14 +1,13 @@
+using System;
 using UnityEngine;
 
 public class Food : MonoBehaviour
 {
     public MeshRenderer meshRenderer;
-    public Team team;
-    private Color colorTeam;
+    public event Action<Food> OnEated;
 
-    public void SetTeam (Team newTeam)
+    public void EatFood ()
     {
-        team = newTeam;
-        meshRenderer.material.color = Village.GetColorCiv(team);
+        OnEated?.Invoke(this);
     }
 }

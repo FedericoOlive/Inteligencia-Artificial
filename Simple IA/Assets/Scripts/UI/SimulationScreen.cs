@@ -19,19 +19,10 @@ public class SimulationScreen : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        timerSlider.onValueChanged.AddListener(OnTimerChange);
         timerText = timerTxt.text;
-
-        timerTxt.text = string.Format(timerText, populationManager.iterationCount);
 
         pauseBtn.onClick.AddListener(OnPauseButtonClick);
         stopBtn.onClick.AddListener(OnStopButtonClick);
-    }
-
-    void OnTimerChange(float value)
-    {
-        populationManager.iterationCount = (int)value;
-        timerTxt.text = string.Format(timerText, populationManager.iterationCount);
     }
 
     void OnPauseButtonClick()

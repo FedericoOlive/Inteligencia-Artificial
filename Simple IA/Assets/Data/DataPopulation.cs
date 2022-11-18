@@ -6,8 +6,6 @@ public class DataPopulation : ScriptableObject
 {
     public int populationCount = 10;
 
-    public int iterationCount = 1;
-
     public int eliteCount = 4;
     public float mutationChance = 0.10f;
     public float mutationRate = 0.01f;

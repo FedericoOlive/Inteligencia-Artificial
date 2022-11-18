@@ -1,15 +1,27 @@
 ﻿using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class VillagerBase : MonoBehaviour
 {
+    public event Action OnKilled;
+    public Vector3 lastPosition = Vector3.one * -100;
     public Team team;
-
+    public int life;
     protected Genome genome;
     protected NeuralNetwork brain;
-    public Food nearFood;
+    public Food targetFood;
     protected float[] inputs;
     public MeshRenderer[] meshRenderer;
+    public bool fightForFood;
+    public StateAttack stateAttack;
+    public int generationsAlive = 3;
+    public int foodsEatsInGeneration;
+
+    private void Awake ()
+    {
+        life = Random.Range(50, 150);
+    }
 
     public void SetBrain (Genome genome, NeuralNetwork brain)
     {
@@ -21,21 +33,18 @@ public class VillagerBase : MonoBehaviour
 
     public void SetNearestFood (Food food)
     {
-        nearFood = food;
-    }
-
-    protected Vector3 GetDirToFood (Food food)
-    {
-        return (food.transform.position - this.transform.position).normalized;
+        targetFood = food;
     }
 
     protected bool IsCloseToFood (GameObject food)
     {
-        return (transform.position - food.transform.position).sqrMagnitude <= 2.0f;
+        return (transform.position == food.transform.position);
     }
-    
+
     protected void SetDirection (Direction dir)
     {
+        if (lastPosition != transform.position)
+            lastPosition = transform.position;
         Vector3 nextPos = transform.position;
 
         switch (dir)
@@ -55,33 +64,29 @@ public class VillagerBase : MonoBehaviour
         }
 
         if (TerrainGenerator.IsPositionInsideBounds(nextPos))
+        {
+            if (nextPos.x > TerrainGenerator.maxPos.x)
+                nextPos.x = TerrainGenerator.minPos.x;
+            if (nextPos.x < TerrainGenerator.minPos.x)
+                nextPos.x = TerrainGenerator.maxPos.x;
+
             transform.position = nextPos;
+        }
     }
 
     public void Think (float dt)
     {
         OnThink(dt);
-
-        if (IsCloseToFood(nearFood.gameObject))
-        {
-            OnTakeFood(nearFood);
-            //PopulationManager.Instance.RelocateFood(nearFood.gameObject);
-        }
     }
 
-    protected virtual void OnThink (float dt)
+    public void Kill ()
     {
-
+        OnKilled?.Invoke();
     }
 
-    protected virtual void OnTakeFood (Food food)
-    {
-    }
-
-    protected virtual void OnReset ()
-    {
-
-    }
+    protected virtual void OnThink (float dt) { }
+    public virtual void TakeFood (Food food) { }
+    protected virtual void OnReset () { }
 }
 
 public enum Direction
@@ -91,4 +96,11 @@ public enum Direction
     Down,
     Left,
     Right
+}
+
+public enum StateAttack
+{
+    None,
+    EatOrRun,
+    FightAndEat
 }

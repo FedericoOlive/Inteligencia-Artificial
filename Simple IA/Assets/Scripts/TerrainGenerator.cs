@@ -4,17 +4,15 @@ using UnityEngine;
 [ExecuteAlways]
 public class TerrainGenerator : MonoBehaviour
 {
+    [SerializeField] private LevelSettings levelSettings;
     [SerializeField] private List<GameObject> tiles = new List<GameObject>();
     [SerializeField] private GameObject prefabTile;
     [SerializeField] private bool generateTerrain;
-    [SerializeField] private int halfHeight = 7;
-    [SerializeField] private int halfWidth = 7;
     [SerializeField] private Camera cam;
     public static Vector3 minPos;
     public static Vector3 maxPos;
 
     [Header("Spawn Settings: ")]
-    [SerializeField] private int offsetLimit;
     private static List<Transform> spawnPointsUp = new List<Transform>();
     private static List<Transform> spawnPointsRight = new List<Transform>();
     private static List<Transform> spawnPointsDown = new List<Transform>();
@@ -30,20 +28,23 @@ public class TerrainGenerator : MonoBehaviour
 
     public void Init ()
     {
+        maxPos = new Vector3(levelSettings.halfWidth * 2, 0, levelSettings.halfHeight * 2 + 1);
+        minPos = new Vector3(1, 0, 0);
+
         DeInit();
 
         Vector3 pos = transform.position;
 
-        for (int i = 0; i < halfHeight * 2; i++)
+        for (int i = 0; i < levelSettings.halfHeight * 2; i++)
         {
-            for (int j = 0; j < halfWidth * 2; j++)
+            for (int j = 0; j < levelSettings.halfWidth * 2; j++)
             {
                 GameObject tile = Instantiate(prefabTile, pos, Quaternion.identity, transform);
-                string space = pos.x > 9 ? "\t" : "";
                 tile.name = "Tile: " + pos.x + "\t" + pos.z;
-                if (i == halfHeight && j == halfWidth)
+                if (i == levelSettings.halfHeight && j == levelSettings.halfWidth)
                 {
                     tile.GetComponentInChildren<SpriteRenderer>().color = Color.black;
+                    levelSettings.autoRePositionFoodCenter = tile.transform.position;
                 }
 
                 tiles.Add(tile);
@@ -56,39 +57,42 @@ public class TerrainGenerator : MonoBehaviour
             pos.z += 1;
         }
 
-        cam.transform.position = new Vector3(halfHeight + 0.5f, 10, halfWidth + 0.5f);
+        spawnPointsRight.Reverse();
+        spawnPointsDown.Reverse();
+
+        cam.transform.position = new Vector3(levelSettings.halfHeight + 0.5f, 10, levelSettings.halfWidth + 0.5f);
     }
 
     private void SetSpawnPoint (int i, int j, GameObject tile)
     {
-        if (i == offsetLimit)
+        if (i == levelSettings.offsetLimit)
         {
-            if (j > offsetLimit && j < halfWidth * 2 - offsetLimit - 1)
+            if (j > levelSettings.offsetLimit && j < levelSettings.halfWidth * 2 - levelSettings.offsetLimit - 1)
             {
                 tile.GetComponentInChildren<SpriteRenderer>().color = Color.blue;
                 spawnPointsDown.Add(tile.transform);
             }
         }
-        else if (i == halfHeight * 2 - offsetLimit - 1)
+        else if (i == levelSettings.halfHeight * 2 - levelSettings.offsetLimit - 1)
         {
-            if (j > offsetLimit && j < halfWidth * 2 - offsetLimit - 1)
+            if (j > levelSettings.offsetLimit && j < levelSettings.halfWidth * 2 - levelSettings.offsetLimit - 1)
             {
                 tile.GetComponentInChildren<SpriteRenderer>().color = Color.red;
                 spawnPointsUp.Add(tile.transform);
             }
         }
 
-        if (j == offsetLimit)
+        if (j == levelSettings.offsetLimit)
         {
-            if (i > offsetLimit && i < halfWidth * 2 - offsetLimit - 1)
+            if (i > levelSettings.offsetLimit && i < levelSettings.halfWidth * 2 - levelSettings.offsetLimit - 1)
             {
                 tile.GetComponentInChildren<SpriteRenderer>().color = Color.green;
                 spawnPointsLeft.Add(tile.transform);
             }
         }
-        else if (j == halfHeight * 2 - offsetLimit - 1)
+        else if (j == levelSettings.halfHeight * 2 - levelSettings.offsetLimit - 1)
         {
-            if (i > offsetLimit && i < halfWidth * 2 - offsetLimit - 1)
+            if (i > levelSettings.offsetLimit && i < levelSettings.halfWidth * 2 - levelSettings.offsetLimit - 1)
             {
                 tile.GetComponentInChildren<SpriteRenderer>().color = Color.magenta;
                 spawnPointsRight.Add(tile.transform);
@@ -98,6 +102,11 @@ public class TerrainGenerator : MonoBehaviour
 
     public void DeInit ()
     {
+        spawnPointsUp.Clear();
+        spawnPointsRight.Clear();
+        spawnPointsDown.Clear();
+        spawnPointsLeft.Clear();
+
         generateTerrain = false;
 
         if (!Application.isPlaying)
@@ -108,14 +117,11 @@ public class TerrainGenerator : MonoBehaviour
                 Destroy(tiles[i].gameObject);
 
         tiles.Clear();
-
-        maxPos = new Vector3(halfWidth, 0, halfHeight);
-        minPos = maxPos * -1;
     }
 
     public static bool IsPositionInsideBounds (Vector3 pos)
     {
-        if (pos.x > minPos.x && pos.x < maxPos.x) // Ancho
+        //if (pos.x > minPos.x && pos.x < maxPos.x) // Ancho (No se chequea en ancho porque debe spawnear del otro lado)
             if (pos.z > minPos.z && pos.z < maxPos.z) // Alto
                 return true;
 

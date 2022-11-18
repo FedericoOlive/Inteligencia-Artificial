@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PopulationManager : MonoBehaviour
 {
@@ -8,26 +10,23 @@ public class PopulationManager : MonoBehaviour
     public GameObject prefabVillager;
 
     [SerializeField] private DataPopulation dataPopulation;
-    //public int PopulationCount = 10;
-
-    public float generationDuration = 20.0f;
-    public int iterationCount = 1;
-    public int team;
+    [SerializeField] private LevelSettings levelSettings;
+    public Team team;
 
     GeneticAlgorithm genAlg;
     public Village village;
-
-    float accumTime = 0;
-    bool isRunning = false;
+    public float accumTime;
+    public float accumRounds;
+    bool isRunning;
 
     public void Init ()
     {
-
+        StartSimulation();
     }
 
     public void DeInit ()
     {
-
+        DestroyVillagers();
     }
 
     public void StartSimulation ()
@@ -49,10 +48,10 @@ public class PopulationManager : MonoBehaviour
     void GenerateInitialPopulation ()
     {
         // Destroy previous tanks (if there are any)
-        DestroyTanks();
+        DestroyVillagers();
 
         village.generation = 0;
-        village.SetTeam(team);
+        village.SetColorCivTeam(team);
 
         for (int i = 0; i < dataPopulation.populationCount; i++)
         {
@@ -63,11 +62,12 @@ public class PopulationManager : MonoBehaviour
             village.brains.Add(brain);
 
             village.population.Add(genome);
-            village.populationGOs.Add(CreateTank(genome, brain, i));
+            village.populationGOs.Add(CreateVillager(genome, brain, i));
+
         }
 
-        village.SetTanks();
-        accumTime = 0.0f;
+        village.SetVillager();
+        accumTime = 0;
     }
 
     // Creates a new NeuralNetwork
@@ -91,8 +91,18 @@ public class PopulationManager : MonoBehaviour
     }
 
     // Evolve!!!
-    void Epoch ()
+    public void Epoch ()
     {
+        for (int i = 0; i < village.populationGOs.Count; i++)
+        {
+            village.populationGOs[i].generationsAlive--;
+            if (village.populationGOs[i].generationsAlive <= 0)
+                village.populationGOs[i].Kill();
+
+        }
+
+        accumTime = 0;
+        accumRounds = 0;
         OnEpoch?.Invoke();
 
         // Increment generation counter
@@ -115,56 +125,65 @@ public class PopulationManager : MonoBehaviour
             brain.SetWeights(newGenomes[i].genome);
 
             village.populationGOs[i].SetBrain(newGenomes[i], brain);
-            village.populationGOs[i].transform.position = TerrainGenerator.GetSpawnPoints(team)[i].position;
+            village.populationGOs[i].transform.position = TerrainGenerator.GetSpawnPoints((int) team)[i].position;
             village.populationGOs[i].transform.rotation = Quaternion.identity;
         }
     }
 
-    void FixedUpdate ()
+    public void FixedUpdateForGameManager (float deltaTime)
     {
         if (!isRunning)
             return;
 
         village.UpdateFitness();
 
-        float dt = Time.fixedDeltaTime;
-
-        for (int i = 0; i < Mathf.Clamp((float) (iterationCount / 100.0f) * 50, 1, 50); i++)
+        foreach (Villager villager in village.populationGOs)
         {
+            Food food = GetNearestFood(villager.transform.position);
+            villager.SetNearestFood(food);
+            villager.Think(deltaTime);
+        }
 
-            foreach (Villager tank in village.populationGOs)
-            {
-                Food food = GetNearestFood(tank.transform.position);
-                tank.SetNearestFood(food);
-                tank.Think(dt);
-            }
+        accumRounds++;
+        accumTime += deltaTime;
+    }
 
-            // Check the time to evolve
-            accumTime += dt;
-            if (accumTime >= generationDuration)
-            {
-                accumTime -= generationDuration;
-                Epoch();
+    public void CheckForEpoch ()
+    {
+        switch (levelSettings.generationEndType)
+        {
+            case GenerationEndType.Manual:
                 break;
-            }
+            case GenerationEndType.Time:
+                if (accumTime > levelSettings.timeGenerationDuration)
+                    Epoch();
+                break;
+            case GenerationEndType.Rounds:
+                if (accumRounds > levelSettings.roundsGenerationDuration)
+                    Epoch();
+                break;
         }
     }
 
     #region Helpers
 
-    Villager CreateTank (Genome genome, NeuralNetwork brain, int i)
+    Villager CreateVillager (Genome genome, NeuralNetwork brain, int i) // Todo: Acá se crea y setea el villager Inicial
     {
-        Vector3 position = TerrainGenerator.GetSpawnPoints(team)[i].position;
-        GameObject go = Instantiate<GameObject>(prefabVillager, position, Quaternion.identity, transform);
+        Vector3 position = TerrainGenerator.GetSpawnPoints((int) team)[i].position;
+        GameObject go = Instantiate(prefabVillager, position, Quaternion.identity, transform);
         Villager t = go.GetComponent<Villager>();
         t.SetBrain(genome, brain);
         return t;
     }
 
-    void DestroyTanks ()
+    void DestroyVillagers ()
     {
-        foreach (Villager go in village.populationGOs)
-            Destroy(go.gameObject);
+        if (!Application.isPlaying)
+            for (int i = 0; i < village.populationGOs.Count; i++)
+                DestroyImmediate(village.populationGOs[i].gameObject);
+        else
+            for (int i = 0; i < village.populationGOs.Count; i++)
+                Destroy(village.populationGOs[i].gameObject);
 
         village.populationGOs.Clear();
         village.population.Clear();
@@ -202,4 +221,11 @@ public enum Team
     Magenta,
     Blue,
     Green,
+}
+
+public enum GenerationEndType
+{
+    Manual,
+    Time,
+    Rounds
 }

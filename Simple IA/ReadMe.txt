@@ -23,6 +23,7 @@ Condición mínima de aprobación:
 * En caso de que un agente se salga de la grilla HORINTALMENTE, aparecerá en el otro extremo. Esto no funciona verticalmente.
 * En caso de que un agente se salga de la grilla VERTICALMENTE, no se moverá en esa dirección.
 * La generación termina tras una cantidad de turnos variable.
+------------ Acá ------------
 * Los agentes deben comer la comida que esta repartida por el mapa (se considera comer haber terminado el turno en la casilla donde estaba la comida).
 * En caso de que dos agentes de equipos diferentes lleguen a una celda con comida al mismo tiempo, los agentes deberán decidir entre una de las siguientes opciones, sin saber que decisión tomara el otro agente:
 	- A) Quedarse en la celda

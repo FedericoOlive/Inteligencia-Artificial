@@ -13,13 +13,12 @@ MonoBehaviour:
   m_Name: Data Population
   m_EditorClassIdentifier: 
   populationCount: 10
-  iterationCount: 1
   eliteCount: 4
   mutationChance: 0.1
   mutationRate: 0.01
   inputsCount: 4
   hiddenLayers: 1
-  outputsCount: 2
+  outputsCount: 5
   neuronsCountPerHL: 7
   bias: 1
   p: 0.5
