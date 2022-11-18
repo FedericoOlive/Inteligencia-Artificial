@@ -17,6 +17,7 @@ public class LevelSettings : ScriptableObject
 
     [Space(spaceHeaders), Header("Population: ")] 
     public int maxCivilizations = 4;
+    public int maxGeneationsAlive = 3;
     public GenerationEndType generationEndType = GenerationEndType.Manual;
     public float timeGenerationDuration = 20;
     public int roundsGenerationDuration = 20;

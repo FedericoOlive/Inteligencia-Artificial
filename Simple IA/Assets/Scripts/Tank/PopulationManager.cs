@@ -15,8 +15,6 @@ public class PopulationManager : MonoBehaviour
 
     GeneticAlgorithm genAlg;
     public Village village;
-    public float accumTime;
-    public float accumRounds;
     bool isRunning;
 
     public void Init ()
@@ -58,16 +56,18 @@ public class PopulationManager : MonoBehaviour
             NeuralNetwork brain = CreateBrain();
             Genome genome = new Genome(brain.GetTotalWeightsCount());
 
-            brain.SetWeights(genome.genome);
-            village.brains.Add(brain);
-
-            village.population.Add(genome);
-            village.populationGOs.Add(CreateVillager(genome, brain, i));
-
+            SetVillager(brain, genome, i);
         }
 
         village.SetVillager();
-        accumTime = 0;
+    }
+
+    public void SetVillager (NeuralNetwork brain, Genome genome, int i)
+    {
+        brain.SetWeights(genome.genome);
+        village.brains.Add(brain);
+        village.population.Add(genome);
+        village.populationGOs.Add(CreateVillager(genome, brain, i));
     }
 
     // Creates a new NeuralNetwork
@@ -93,16 +93,6 @@ public class PopulationManager : MonoBehaviour
     // Evolve!!!
     public void Epoch ()
     {
-        for (int i = 0; i < village.populationGOs.Count; i++)
-        {
-            village.populationGOs[i].generationsAlive--;
-            if (village.populationGOs[i].generationsAlive <= 0)
-                village.populationGOs[i].Kill();
-
-        }
-
-        accumTime = 0;
-        accumRounds = 0;
         OnEpoch?.Invoke();
 
         // Increment generation counter
@@ -143,31 +133,13 @@ public class PopulationManager : MonoBehaviour
             villager.SetNearestFood(food);
             villager.Think(deltaTime);
         }
-
-        accumRounds++;
-        accumTime += deltaTime;
     }
 
-    public void CheckForEpoch ()
-    {
-        switch (levelSettings.generationEndType)
-        {
-            case GenerationEndType.Manual:
-                break;
-            case GenerationEndType.Time:
-                if (accumTime > levelSettings.timeGenerationDuration)
-                    Epoch();
-                break;
-            case GenerationEndType.Rounds:
-                if (accumRounds > levelSettings.roundsGenerationDuration)
-                    Epoch();
-                break;
-        }
-    }
+    
 
     #region Helpers
 
-    Villager CreateVillager (Genome genome, NeuralNetwork brain, int i) // Todo: Acá se crea y setea el villager Inicial
+    public Villager CreateVillager (Genome genome, NeuralNetwork brain, int i)
     {
         Vector3 position = TerrainGenerator.GetSpawnPoints((int) team)[i].position;
         GameObject go = Instantiate(prefabVillager, position, Quaternion.identity, transform);

@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     [SerializeField] private LevelSettings levelSettings;
 
+    public float accumTime;
+    public float accumRounds;
+
     private void Start ()
     {
         Init();
@@ -34,6 +37,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     private void FixedUpdate ()
     {
         float deltaTime = Time.fixedDeltaTime;
+        accumRounds++;
+        accumTime += deltaTime;
+
         for (int i = 0; i < populationManager.Count; i++)
         {
             populationManager[i].FixedUpdateForGameManager(deltaTime);
@@ -43,13 +49,110 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         CheckVillagerToEatAndFight();
         EatVillagersAlives();
 
+        RemoveAllKilleds();
+
+        CheckForEpoch();
+    }
+    public void CheckForEpoch()
+    {
+        switch (levelSettings.generationEndType)
+        {
+            case GenerationEndType.Manual:
+                break;
+            case GenerationEndType.Time:
+                if (accumTime > levelSettings.timeGenerationDuration)
+                {
+                    accumRounds = 0;
+                    accumTime = 0;
+                    EpochAll();
+                }
+                break;
+            case GenerationEndType.Rounds:
+                if (accumRounds > levelSettings.roundsGenerationDuration)
+                {
+                    accumRounds = 0;
+                    accumTime = 0;
+                    EpochAll();
+                }
+                break;
+        }
+    }
+
+    void EpochAll ()
+    {
+        // Kill survivals 3 generations
+        for (int i = 0; i < populationManager.Count; i++)
+        {
+            for (int j = 0; j < populationManager[i].village.populationGOs.Count; j++)
+            {
+                populationManager[i].village.populationGOs[j].generationsAlive--;
+
+                if (populationManager[i].village.populationGOs[j].generationsAlive < 1)
+                {
+                    populationManager[i].village.populationGOs[j].Kill();
+                }
+            }
+        }
+
+        RemoveAllKilleds();
+
+        // Save those who eat more than 1 Food
+        List<KeepGeneration> keeps = new List<KeepGeneration>();
 
         for (int i = 0; i < populationManager.Count; i++)
         {
-            populationManager[i].CheckForEpoch();
+            for (int j = 0; j < populationManager[i].village.populationGOs.Count; j++)
+            {
+                if (populationManager[i].village.populationGOs[j].foodsEatsInGeneration == 1)
+                {
+                    keeps[i].populationGOs.Add(populationManager[i].village.populationGOs[j]);
+                    keeps[i].population.Add(populationManager[i].village.population[j]);
+                    keeps[i].brains.Add(populationManager[i].village.brains[j]);
+                }
+            }
+        }
+
+        for (int i = 0; i < populationManager.Count; i++)
+        {
+            populationManager[i].Epoch();
+        }
+
+        for (int i = 0; i < keeps.Count; i++)
+        {
+            for (int j = 0; j < keeps[i].populationGOs.Count; j++)
+            {
+                populationManager[i].SetVillager(keeps[i].brains[j], keeps[i].population[j], populationManager[i].village.populationGOs.Count - 1);
+            }
         }
     }
-    
+
+    void RemoveAllKilleds ()
+    {
+        for (int i = 0; i < populationManager.Count; i++)
+        {
+            List<int> villagers = new List<int>();
+
+            for (int j = populationManager[i].village.populationGOs.Count - 1; j >= 0; j--)
+            {
+                Villager villager = populationManager[i].village.populationGOs[j];
+
+                if (!villager.isAlive)
+                {
+                    Destroy(populationManager[i].village.populationGOs[j]);
+                    populationManager[i].village.populationGOs.RemoveAt(j);
+                    populationManager[i].village.population.RemoveAt(j);
+                    populationManager[i].village.brains.RemoveAt(j);
+                }
+            }
+        }
+    }
+
+    Villager FindOrCreateVillager (int villageOwner)
+    {
+
+        return null;
+    }
+
     private void Init ()
     {
         terrainGenerator.Init();
@@ -111,7 +214,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             fightGroups[i].Combat();
         }
 
-        // Mato a los que la vida le llega a 0
+        // Mueren a los que la vida le llega a 0
         for (int i = 0; i < villagers.Count; i++)
         {
             if (villagers[i].life < 1)
@@ -145,7 +248,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             }
         }
 
-        // Pelean todos los que están en la comida
+        // Se decide quien se queda con la comida
         for (int i = 0; i < fightGroups.Count; i++)
         {
             fightGroups[i].KeepFood();
@@ -159,7 +262,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             for (int j = 0; j < populationManager[i].village.populationGOs.Count; j++)
             {
                 Villager villager = populationManager[i].village.populationGOs[j];
-                if (villager.life > 0)
+                if (villager.isAlive)
                 {
                     StateAttack state = villager.stateAttack;
                     if (state == StateAttack.EatOrRun || state == StateAttack.FightAndEat)
@@ -303,4 +406,11 @@ public class EatGroup
 
         return indexEat;
     }
+}
+
+public class KeepGeneration
+{
+    public List<Villager> populationGOs = new List<Villager>();
+    public List<Genome> population = new List<Genome>();
+    public List<NeuralNetwork> brains = new List<NeuralNetwork>();
 }

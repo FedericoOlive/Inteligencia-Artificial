@@ -30,11 +30,11 @@ public class Villager : VillagerBase
 
         float[] output = brain.Synapsis(inputs);
 
-        if (output[0] > 0.8f)
+        if (output[0] > 0.5f) // 0.8f
         {
             TryEatOrRun();
         }
-        else if (output[0] > 0.6f)
+        else if (output[0] < 0.5f) // 0.6f
         {
             TryEatAndFight();
         }

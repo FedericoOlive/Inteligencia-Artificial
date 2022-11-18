@@ -4,7 +4,7 @@ using Random = UnityEngine.Random;
 
 public class VillagerBase : MonoBehaviour
 {
-    public event Action OnKilled;
+    public bool isAlive = true;
     public Vector3 lastPosition = Vector3.one * -100;
     public Team team;
     public int life;
@@ -36,11 +36,6 @@ public class VillagerBase : MonoBehaviour
         targetFood = food;
     }
 
-    protected bool IsCloseToFood (GameObject food)
-    {
-        return (transform.position == food.transform.position);
-    }
-
     protected void SetDirection (Direction dir)
     {
         if (lastPosition != transform.position)
@@ -50,16 +45,16 @@ public class VillagerBase : MonoBehaviour
         switch (dir)
         {
             case Direction.Up:
-                nextPos.x += 1;
+                nextPos.z += 1;
                 break;
             case Direction.Down:
-                nextPos.x -= 1;
-                break;
-            case Direction.Left:
                 nextPos.z -= 1;
                 break;
+            case Direction.Left:
+                nextPos.x -= 1;
+                break;
             case Direction.Right:
-                nextPos.z += 1;
+                nextPos.x += 1;
                 break;
         }
 
@@ -81,7 +76,9 @@ public class VillagerBase : MonoBehaviour
 
     public void Kill ()
     {
-        OnKilled?.Invoke();
+        isAlive = false;
+        life = 0;
+        generationsAlive = 0;
     }
 
     protected virtual void OnThink (float dt) { }
