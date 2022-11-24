@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acd87f5841b2971448fb98c6a761299f, type: 3}
   m_Name: Data Population
   m_EditorClassIdentifier: 
-  populationCount: 10
+  populationCount: 9
   eliteCount: 4
   mutationChance: 0.1
   mutationRate: 0.01

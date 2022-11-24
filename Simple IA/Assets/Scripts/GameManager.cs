@@ -105,18 +105,42 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             {
                 if (populationManager[i].village.populationGOs[j].foodsEatsInGeneration == 1)
                 {
-                    keeps[i].populationGOs.Add(populationManager[i].village.populationGOs[j]);
-                    keeps[i].population.Add(populationManager[i].village.population[j]);
-                    keeps[i].brains.Add(populationManager[i].village.brains[j]);
+                    KeepGeneration keep = new KeepGeneration();
+                    keep.populationGOs.Add(populationManager[i].village.populationGOs[j]);
+                    keep.population.Add(populationManager[i].village.population[j]);
+                    keep.brains.Add(populationManager[i].village.brains[j]);
                 }
             }
         }
 
+        List<int> indexPopDeads = new List<int>();
         for (int i = 0; i < populationManager.Count; i++)
         {
             populationManager[i].Epoch();
+            if (populationManager[i].village.populationGOs.Count < 1)
+                indexPopDeads.Add(i);
         }
 
+        if (indexPopDeads.Count == levelSettings.maxCivilizations)
+        {
+            Debug.Log("Se reinicia la Simulación");
+            // Murieron Todas las civs
+            for (int i = 0; i < populationManager.Count; i++)
+            {
+                populationManager[i].StartSimulation();
+            }
+        }
+        else if (indexPopDeads.Count > 0)
+        {
+            int indexPopAlive = GetIndexPopAlive(indexPopDeads);
+
+            for (int i = 0; i < indexPopDeads.Count; i++)
+            {
+                //populationManager[indexPopDeads[i]].CopyPopulation(populationManager[indexPopAlive]);
+            }
+        }
+
+        //Todo: No funciona el Keep luego de reproducirse
         for (int i = 0; i < keeps.Count; i++)
         {
             for (int j = 0; j < keeps[i].populationGOs.Count; j++)
@@ -124,6 +148,27 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
                 populationManager[i].SetVillager(keeps[i].brains[j], keeps[i].population[j], populationManager[i].village.populationGOs.Count - 1);
             }
         }
+    }
+
+    int GetIndexPopAlive (List<int> indexPopDeads)
+    {
+        for (int i = 0; i < indexPopDeads.Count; i++)
+        {
+            bool isOk = true;
+            for (int j = 0; j < indexPopDeads.Count; j++)
+            {
+                if (indexPopDeads[i] == j)
+                {
+                    isOk = false;
+                    break;
+                }
+            }
+
+            if (isOk)
+                return i;
+        }
+
+        return -1;
     }
 
     void RemoveAllKilleds ()
@@ -138,7 +183,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
                 if (!villager.isAlive)
                 {
-                    Destroy(populationManager[i].village.populationGOs[j]);
+                    Destroy(populationManager[i].village.populationGOs[j].gameObject);
                     populationManager[i].village.populationGOs.RemoveAt(j);
                     populationManager[i].village.population.RemoveAt(j);
                     populationManager[i].village.brains.RemoveAt(j);

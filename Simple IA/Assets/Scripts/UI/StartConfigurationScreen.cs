@@ -134,5 +134,4 @@ public class StartConfigurationScreen : MonoBehaviour
         this.gameObject.SetActive(false);
         simulationScreen.SetActive(true);
     }
-    
 }

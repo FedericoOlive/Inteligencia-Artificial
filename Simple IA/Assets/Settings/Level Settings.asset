@@ -18,7 +18,8 @@ MonoBehaviour:
   autoRePositionFoodCenter: {x: 21, y: 0, z: 21}
   size: 20
   maxFood: 20
-  maxCivilizations: 4
-  generationEndType: 0
-  timeGenerationDuration: 20
+  maxCivilizations: 2
+  maxGeneationsAlive: 3
+  generationEndType: 1
+  timeGenerationDuration: 3
   roundsGenerationDuration: 20

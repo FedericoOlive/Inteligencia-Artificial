@@ -29,6 +29,15 @@ public class Villager : VillagerBase
         //inputs[8] = allyLifeNearTargetFood;
 
         float[] output = brain.Synapsis(inputs);
+        
+        Direction nextDir = Direction.None;
+
+             if (output[1] > 0.8f) nextDir = Direction.Up;
+        else if (output[1] > 0.6f) nextDir = Direction.Right;
+        else if (output[1] > 0.4f) nextDir = Direction.Down;
+        else if (output[1] > 0.2f) nextDir = Direction.Left;
+
+        SetDirection(nextDir);
 
         if (output[0] > 0.5f) // 0.8f
         {
@@ -37,17 +46,6 @@ public class Villager : VillagerBase
         else if (output[0] < 0.5f) // 0.6f
         {
             TryEatAndFight();
-        }
-        //else      // Descomentar en caso de querer que no se mueva cuando intente comer
-        {
-            Direction nextDir = Direction.None;
-
-                 if (output[1] > 0.8f) nextDir = Direction.Up;
-            else if (output[1] > 0.6f) nextDir = Direction.Right;
-            else if (output[1] > 0.4f) nextDir = Direction.Down;
-            else if (output[1] > 0.2f) nextDir = Direction.Left;
-
-            SetDirection(nextDir);
         }
     }
 

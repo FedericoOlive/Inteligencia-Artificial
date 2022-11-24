@@ -61,7 +61,7 @@ public class GeneticAlgorithm
     }
 
 
-	public Genome[] Epoch(Genome[] oldGenomes)
+	public List<Genome> Epoch(Genome[] oldGenomes)
 	{
 		totalFitness = 0;
 
@@ -83,7 +83,7 @@ public class GeneticAlgorithm
 			Crossover();
 		}
 
-		return newPopulation.ToArray();
+		return newPopulation;
 	}
 
 	void SelectElite()
@@ -94,21 +94,34 @@ public class GeneticAlgorithm
 		}
 	}
 
-	void Crossover()
-	{
-		Genome mom = RouletteSelection();
-		Genome dad = RouletteSelection();
+    void Crossover ()
+    {
+        Genome mom = RouletteSelection();
+        Genome dad = RouletteSelection();
 
-		Genome child1;
-		Genome child2;
+       
 
-		Crossover(mom, dad, out child1, out child2);
+        if (mom != null && dad != null)
+        {
+            Genome child1;
+            Genome child2;
 
-		newPopulation.Add(child1);
-		newPopulation.Add(child2);
-	}
+			Crossover(mom, dad, out child1, out child2);
 
-	void Crossover(Genome mom, Genome dad, out Genome child1, out Genome child2)
+            newPopulation.Add(child1);
+            newPopulation.Add(child2);
+        }
+        else if (mom != null)
+        {
+            newPopulation.Add(mom);
+        }
+        else if (dad != null)
+        {
+            newPopulation.Add(dad);
+        }
+    }
+
+    void Crossover(Genome mom, Genome dad, out Genome child1, out Genome child2)
 	{
 		child1 = new Genome();
 		child2 = new Genome();

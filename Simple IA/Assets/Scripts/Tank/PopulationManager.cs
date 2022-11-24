@@ -5,8 +5,6 @@ using Random = UnityEngine.Random;
 
 public class PopulationManager : MonoBehaviour
 {
-    public static event System.Action OnEpoch;
-
     public GameObject prefabVillager;
 
     [SerializeField] private DataPopulation dataPopulation;
@@ -43,7 +41,7 @@ public class PopulationManager : MonoBehaviour
     }
 
     // Generate the random initial population
-    void GenerateInitialPopulation ()
+    public void GenerateInitialPopulation ()
     {
         // Destroy previous tanks (if there are any)
         DestroyVillagers();
@@ -62,6 +60,22 @@ public class PopulationManager : MonoBehaviour
         village.SetVillager();
     }
 
+    // Generate the random initial population
+    public void CopyPopulation (PopulationManager other)
+    {
+        // Destroy previous tanks (if there are any)
+        DestroyVillagers();
+        village.generation = 0;
+
+
+        for (int i = 0; i < other.village.populationGOs.Count; i++)
+        {
+            SetVillager(other.village.brains[i], other.village.population[i], i);
+        }
+        EpochWithOutFitness();
+        village.SetVillager();
+    }
+    
     public void SetVillager (NeuralNetwork brain, Genome genome, int i)
     {
         brain.SetWeights(genome.genome);
@@ -93,31 +107,61 @@ public class PopulationManager : MonoBehaviour
     // Evolve!!!
     public void Epoch ()
     {
-        OnEpoch?.Invoke();
-
         // Increment generation counter
         village.generation++;
 
-        // Evolve each genome and create a new array of genomes
-        Genome[] newGenomes = genAlg.Epoch(village.population.ToArray());
+        // Se reproducen solo los que hayan comido más de 1 comida
+        List<Genome> populationReproduce = new List<Genome>();
+        List<Genome> populationSurvival = new List<Genome>();
+
+        for (int i = village.populationGOs.Count - 1; i >= 0; i--)
+        {
+            if (village.populationGOs[i].foodsEatsInGeneration > 1)
+            {
+                populationReproduce.Add(village.population[i]);
+            }
+            else if (village.populationGOs[i].foodsEatsInGeneration > 0)
+            {
+                populationSurvival.Add(village.population[i]);
+            }
+
+            village.populationGOs[i].foodsEatsInGeneration = 0;
+        }
 
         // Clear current population
         village.population.Clear();
 
+        List<Genome> newGenomes = genAlg.Epoch(populationReproduce.ToArray());
+
         // Add new population
+        newGenomes.AddRange(populationSurvival);
         village.population.AddRange(newGenomes);
 
         // Set the new genomes as each NeuralNetwork weights
-        for (int i = 0; i < dataPopulation.populationCount; i++)
+        int j = 0;
+        for (; j < newGenomes.Count; j++)
         {
-            NeuralNetwork brain = village.brains[i];
-
-            brain.SetWeights(newGenomes[i].genome);
-
-            village.populationGOs[i].SetBrain(newGenomes[i], brain);
-            village.populationGOs[i].transform.position = TerrainGenerator.GetSpawnPoints((int) team)[i].position;
-            village.populationGOs[i].transform.rotation = Quaternion.identity;
+            NeuralNetwork brain = village.brains[j];
+            brain.SetWeights(newGenomes[j].genome);
+            village.populationGOs[j].SetBrain(newGenomes[j], brain);
+            village.populationGOs[j].transform.position = TerrainGenerator.GetSpawnPoints((int) team)[j].position;
+            village.populationGOs[j].transform.rotation = Quaternion.identity;
         }
+
+        for (int k = village.populationGOs.Count - 1; k >= j; k--)
+        {
+            Destroy(village.populationGOs[k].gameObject);
+            village.populationGOs.RemoveAt(k);
+            village.brains.RemoveAt(k);
+        }
+    }
+
+    void EpochWithOutFitness ()
+    {
+        //village.population.Clear();
+        //
+        //List<Genome> newGenomes = genAlg.Epoch(village.population.ToArray());
+
     }
 
     public void FixedUpdateForGameManager (float deltaTime)
