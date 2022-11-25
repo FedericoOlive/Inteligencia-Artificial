@@ -57,8 +57,8 @@ public class TerrainGenerator : MonoBehaviour
             pos.z += 1;
         }
 
-        spawnPointsRight.Reverse();
-        spawnPointsDown.Reverse();
+        spawnPointsLeft.Reverse();
+        spawnPointsUp.Reverse();
 
         cam.transform.position = new Vector3(levelSettings.halfHeight + 0.5f, 10, levelSettings.halfWidth + 0.5f);
     }
