@@ -16,22 +16,22 @@ Condición mínima de aprobación:
 	- Dos grupos de la misma cantidad de integrantes de tamaño variable (siempre menor o igual al ancho de la grilla)
 	- Una cantidad de comida repartida por el mapa igual a la cantidad de agentes en la grilla al inicio de la simulación.
 * La configuración de la red neuronal de cada grupo puede ser diferente.
-- Los agentes de un grupo comienzan la simulación alineados de izquierda a derecha en la fila inferior de la grilla.
-- Los agentes del otro grupo comienzan la simulación alineados de derecha a izquierda en la fila superior de la grilla.
+* Los agentes de un grupo comienzan la simulación alineados de izquierda a derecha en la fila inferior de la grilla.
+* Los agentes del otro grupo comienzan la simulación alineados de derecha a izquierda en la fila superior de la grilla.
 * La simulación se ejecuta por turnos.
 * Cada turno, cada uno de los agentes puede moverse una casilla en las cuatro direcciones cardinales, o quedarse quieto.
 * En caso de que un agente se salga de la grilla HORINTALMENTE, aparecerá en el otro extremo. Esto no funciona verticalmente.
 * En caso de que un agente se salga de la grilla VERTICALMENTE, no se moverá en esa dirección.
 * La generación termina tras una cantidad de turnos variable.
 * Los agentes deben comer la comida que esta repartida por el mapa (se considera comer haber terminado el turno en la casilla donde estaba la comida).
-* En caso de que dos agentes de equipos diferentes lleguen a una celda con comida al mismo tiempo, los agentes deberán decidir entre una de las siguientes opciones, sin saber que decisión tomara el otro agente:
+--En caso de que dos agentes de equipos diferentes lleguen a una celda con comida al mismo tiempo, los agentes deberán decidir entre una de las siguientes opciones, sin saber que decisión tomara el otro agente:
 	- A) Quedarse en la celda
 	- B) Huir a la celda de la que provenían
 * En caso de que ambos se hallan quedado en la celda, aleatoriamente uno morirá, el agente que este en la celda al final del turno habrá comido.
 * En caso de que termine la generación:
 	- Si un agente no comió, MUERE.
-?	- En caso de que halla comido solo una unidad sobrevivirá a la generación siguiente.
-?	- En caso de que halla comido dos o mas se reproducirá.
+*	- En caso de que halla comido solo una unidad sobrevivirá a la generación siguiente.
+*	- En caso de que halla comido dos o mas se reproducirá.
 * Los agentes que hallan comido mas tienen mayor fitness.
 * Un grupo solo se puede reproducir si hay al menos dos agentes que puedan hacerlo.
 * Al momento de reproducirse se generaran tantos agentes igual a la cantidad de agentes que se estén reproduciendo.
@@ -42,7 +42,7 @@ Condición mínima de aprobación:
 
 ---------- Examen completo: ----------
 
-* En caso de que dos agentes de el mismo equipo lleguen a una celda con comida al mismo tiempo, deberán decidir entre ellos quien la comerá, o que ninguno de ellos la coma. El agente que no come se desplaza a una casilla adyacente.
+--En caso de que dos agentes de el mismo equipo lleguen a una celda con comida al mismo tiempo, deberán decidir entre ellos quien la comerá, o que ninguno de ellos la coma. El agente que no come se desplaza a una casilla adyacente.
 - En caso de que uno de los grupos se extinga, el grupo superviviente creara una población nueva cruzando sus agentes aleatoriamente (sin utilizar el fitness) y con un ratio de mutación superior al normal. La nueva generación creada cuenta con la misma cantidad de agentes que la generación superviviente y pasan a ocupar el puesto del grupo extinto.
 - Los distintos comportamientos que puede tomar el agente son manejados por un Behabeour Tree, el output de la red neuronal indica a los nodos a que método transicionar.
 * En caso de que dos agentes de equipos diferentes se encuentren en una celda que no contengan comida, ambos podrán optar por:

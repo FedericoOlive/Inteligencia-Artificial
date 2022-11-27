@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class PopulationManager : MonoBehaviour
 {
@@ -132,16 +130,19 @@ public class PopulationManager : MonoBehaviour
         village.population.Clear();
 
         List<Genome> newGenomes = genAlg.Epoch(populationReproduce.ToArray());
-
+        
         // Add new population
         newGenomes.AddRange(populationSurvival);
         village.population.AddRange(newGenomes);
-
+        
+        for (int i = 0; i < village.population.Count; i++)
+            village.population[i].fitness = 1;
+        
         // Set the new genomes as each NeuralNetwork weights
         int j = 0;
         for (; j < newGenomes.Count; j++)
         {
-            NeuralNetwork brain = village.brains[j];
+            NeuralNetwork brain = village.brains[j]; // Todo: Crash por combate (Eliminacion o agregacion de cerebro)
             brain.SetWeights(newGenomes[j].genome);
             village.populationGOs[j].SetBrain(newGenomes[j], brain);
             village.populationGOs[j].transform.position = TerrainGenerator.GetSpawnPoints((int) team)[j].position;
@@ -153,6 +154,11 @@ public class PopulationManager : MonoBehaviour
             Destroy(village.populationGOs[k].gameObject);
             village.populationGOs.RemoveAt(k);
             village.brains.RemoveAt(k);
+        }
+
+        for (int i = populationReproduce.Count; i < newGenomes.Count; i++)
+        {
+            village.populationGOs[i].generationsAlive = levelSettings.maxGeneationsAlive;
         }
     }
 
@@ -187,9 +193,10 @@ public class PopulationManager : MonoBehaviour
     {
         Vector3 position = TerrainGenerator.GetSpawnPoints((int) team)[i].position;
         GameObject go = Instantiate(prefabVillager, position, Quaternion.identity, transform);
-        Villager t = go.GetComponent<Villager>();
-        t.SetBrain(genome, brain);
-        return t;
+        Villager villager = go.GetComponent<Villager>();
+        villager.SetBrain(genome, brain);
+        villager.team = team;
+        return villager;
     }
 
     void DestroyVillagers ()

@@ -2,6 +2,7 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "Data Population", menuName = "Data/Population")]
 
+[System.Serializable]
 public class DataPopulation : ScriptableObject
 {
     public int populationCount = 10;

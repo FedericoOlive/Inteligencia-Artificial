@@ -60,7 +60,7 @@ public class GeneticAlgorithm
         return genomes;
     }
 
-
+	
 	public List<Genome> Epoch(Genome[] oldGenomes)
 	{
 		totalFitness = 0;
@@ -76,9 +76,9 @@ public class GeneticAlgorithm
 			totalFitness += g.fitness;
 		}
 
-		SelectElite();
-
-		while (newPopulation.Count < population.Count)
+		KeepReproducer();
+        int amountReproduce = population.Count / 2;
+		while (newPopulation.Count < population.Count + amountReproduce)
 		{
 			Crossover();
 		}
@@ -86,9 +86,9 @@ public class GeneticAlgorithm
 		return newPopulation;
 	}
 
-	void SelectElite()
+	void KeepReproducer()
 	{
-		for (int i = 0; i < eliteCount && newPopulation.Count < population.Count; i++)
+		for (int i = 0; newPopulation.Count < population.Count; i++)
 		{
 			newPopulation.Add(population[i]);
 		}
@@ -98,9 +98,7 @@ public class GeneticAlgorithm
     {
         Genome mom = RouletteSelection();
         Genome dad = RouletteSelection();
-
-       
-
+		
         if (mom != null && dad != null)
         {
             Genome child1;

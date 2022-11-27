@@ -1,9 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [ExecuteAlways]
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
+    private bool isrunning;
     [SerializeField] private bool initWorld;
     [SerializeField] private bool clearWorld;
     [SerializeField] private TerrainGenerator terrainGenerator;
@@ -11,17 +17,17 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     [SerializeField] private List<PopulationManager> populationManager = new List<PopulationManager>();
 
     [SerializeField] private LevelSettings levelSettings;
-
+    [SerializeField] private DataPopulation dataPopulation;
+    public DataAI dataAI;
+    public TextAsset dataString;
+    
     public float accumTime;
     public float accumRounds;
-
-    private void Start ()
-    {
-        Init();
-    }
-
+    
     private void Update ()
     {
+        if (!isrunning)
+            return;
         if (initWorld)
         {
             initWorld = false;
@@ -36,6 +42,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     private void FixedUpdate ()
     {
+        if (!isrunning)
+            return;
+
         float deltaTime = Time.fixedDeltaTime;
         accumRounds++;
         accumTime += deltaTime;
@@ -45,14 +54,142 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             populationManager[i].FixedUpdateForGameManager(deltaTime);
         }
 
+
+        CheckVillagerToEatAndFight(); // Tengo que unificar estos 2 comportamientos porque sino queda 1 de cada uno intentando comer una comida (Para el 2do no va a existir)
         CheckVillagerToEatOrRun();
-        CheckVillagerToEatAndFight();
         EatVillagersAlives();
 
         RemoveAllKilleds();
 
         CheckForEpoch();
     }
+    
+    private void CheckVillagerToEatAndFight()
+    {
+        List<Villager> villagers = GetVillagersByState(StateAttack.FightAndEat);
+        List<EatGroup> fightGroups = new List<EatGroup>();
+
+        // Agarro los Grupos que están en la misma posicion y sobre la comida y que hayan decidido pelear por ella
+        for (int i = 0; i < villagers.Count; i++)
+        {
+            List<Villager> villagersEqualPositions = new List<Villager>();
+            for (int j = i + 1; j < villagers.Count; j++)
+            {
+                if (villagers[i].transform.position == villagers[j].transform.position)
+                {
+                    villagersEqualPositions.Add(villagers[i]);
+                    villagersEqualPositions.Add(villagers[j]);
+                }
+            }
+
+            if (villagersEqualPositions.Count > 1)
+            {
+                EatGroup eatGroup = new EatGroup();
+                eatGroup.villagers = villagersEqualPositions;
+                fightGroups.Add(eatGroup);
+            }
+        }
+
+        // Pelean todos los que están en la comida
+        for (int i = 0; i < fightGroups.Count; i++)
+        {
+            fightGroups[i].Combat();
+        }
+
+        // Mueren a los que la vida le llega a 0
+        for (int i = 0; i < villagers.Count; i++)
+        {
+            if (villagers[i].life < 1)
+                villagers[i].Kill();
+        }
+    }
+
+    private void CheckVillagerToEatOrRun()
+    {
+        List<Villager> villagers = GetVillagersByState(StateAttack.EatOrRun);
+        List<EatGroup> fightGroups = new List<EatGroup>();
+
+        // Agarro los Grupos que están en la misma posicion y sobre la comida y que hayan decidido pelear por ella
+        for (int i = 0; i < villagers.Count; i++)
+        {
+            List<Villager> villagersEqualPositions = new List<Villager>();
+            for (int j = i + 1; j < villagers.Count; j++)
+            {
+                if (villagers[i].transform.position == villagers[j].transform.position)
+                {
+                    villagersEqualPositions.Add(villagers[i]);
+                    villagersEqualPositions.Add(villagers[j]);
+                }
+            }
+
+            if (villagersEqualPositions.Count > 1)
+            {
+                EatGroup eatGroup = new EatGroup();
+                eatGroup.villagers = villagersEqualPositions;
+                fightGroups.Add(eatGroup);
+            }
+        }
+
+        // Se decide quien se queda con la comida
+        for (int i = 0; i < fightGroups.Count; i++)
+        {
+            fightGroups[i].KeepFood();
+        }
+    }
+
+    private void EatVillagersAlives()
+    {
+        for (int i = 0; i < populationManager.Count; i++)
+        {
+            for (int j = 0; j < populationManager[i].village.populationGOs.Count; j++)
+            {
+                Villager villager = populationManager[i].village.populationGOs[j];
+                if (villager.isAlive)
+                {
+                    StateAttack state = villager.stateAttack;
+                    if (state == StateAttack.FightAndEat)
+                    {
+                        Food food = foodManager.GetFoodInPosition(villager.transform.position);
+                        if (food)
+                        {
+                            villager.TakeFood(food);
+                        }
+                        else
+                        {
+                            Debug.LogError("No existe esta Food en esta posicion: " + villager.transform.position);
+                            Debug.LogError("Para este Villager: ", villager);
+                            Debug.Break();
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < populationManager.Count; i++)
+        {
+            for (int j = 0; j < populationManager[i].village.populationGOs.Count; j++)
+            {
+                Villager villager = populationManager[i].village.populationGOs[j];
+                if (villager.isAlive)
+                {
+                    StateAttack state = villager.stateAttack;
+                    if (state == StateAttack.EatOrRun)
+                    {
+                        Food food = foodManager.GetFoodInPosition(villager.transform.position);
+                        if (food)
+                        {
+                            villager.TakeFood(food);
+                        }
+                        else
+                        {
+                            villager.GoBackPosition();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void CheckForEpoch()
     {
         switch (levelSettings.generationEndType)
@@ -139,15 +276,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
                 //populationManager[indexPopDeads[i]].CopyPopulation(populationManager[indexPopAlive]);
             }
         }
-
-        //Todo: No funciona el Keep luego de reproducirse
-        for (int i = 0; i < keeps.Count; i++)
-        {
-            for (int j = 0; j < keeps[i].populationGOs.Count; j++)
-            {
-                populationManager[i].SetVillager(keeps[i].brains[j], keeps[i].population[j], populationManager[i].village.populationGOs.Count - 1);
-            }
-        }
     }
 
     int GetIndexPopAlive (List<int> indexPopDeads)
@@ -191,15 +319,12 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             }
         }
     }
+    
 
-    Villager FindOrCreateVillager (int villageOwner)
+    public void Init ()
     {
-
-        return null;
-    }
-
-    private void Init ()
-    {
+        if (Application.isPlaying)
+            isrunning = true;
         terrainGenerator.Init();
         foodManager.Init();
 
@@ -227,108 +352,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     }
 
-    private void CheckVillagerToEatAndFight ()
-    {
-        List<Villager> villagers = GetVillagersByState(StateAttack.FightAndEat);
-        List<EatGroup> fightGroups = new List<EatGroup>();
-
-        // Agarro los Grupos que están en la misma posicion y sobre la comida y que hayan decidido pelear por ella
-        for (int i = 0; i < villagers.Count; i++)
-        {
-            List<Villager> villagersEqualPositions = new List<Villager>();
-            for (int j = i + 1; j < villagers.Count; j++)
-            {
-                if (villagers[i].transform.position == villagers[j].transform.position)
-                {
-                    villagersEqualPositions.Add(villagers[i]);
-                    villagersEqualPositions.Add(villagers[j]);
-                }
-            }
-
-            if (villagersEqualPositions.Count > 1)
-            {
-                EatGroup eatGroup = new EatGroup();
-                eatGroup.villagers = villagersEqualPositions;
-                fightGroups.Add(eatGroup);
-            }
-        }
-
-        // Pelean todos los que están en la comida
-        for (int i = 0; i < fightGroups.Count; i++)
-        {
-            fightGroups[i].Combat();
-        }
-
-        // Mueren a los que la vida le llega a 0
-        for (int i = 0; i < villagers.Count; i++)
-        {
-            if (villagers[i].life < 1)
-                villagers[i].Kill();
-        }
-    }
-
-    private void CheckVillagerToEatOrRun ()
-    {
-        List<Villager> villagers = GetVillagersByState(StateAttack.EatOrRun);
-        List<EatGroup> fightGroups = new List<EatGroup>();
-
-        // Agarro los Grupos que están en la misma posicion y sobre la comida y que hayan decidido pelear por ella
-        for (int i = 0; i < villagers.Count; i++)
-        {
-            List<Villager> villagersEqualPositions = new List<Villager>();
-            for (int j = i + 1; j < villagers.Count; j++)
-            {
-                if (villagers[i].transform.position == villagers[j].transform.position)
-                {
-                    villagersEqualPositions.Add(villagers[i]);
-                    villagersEqualPositions.Add(villagers[j]);
-                }
-            }
-
-            if (villagersEqualPositions.Count > 1)
-            {
-                EatGroup eatGroup = new EatGroup();
-                eatGroup.villagers = villagersEqualPositions;
-                fightGroups.Add(eatGroup);
-            }
-        }
-
-        // Se decide quien se queda con la comida
-        for (int i = 0; i < fightGroups.Count; i++)
-        {
-            fightGroups[i].KeepFood();
-        }
-    }
-
-    private void EatVillagersAlives ()
-    {
-        for (int i = 0; i < populationManager.Count; i++)
-        {
-            for (int j = 0; j < populationManager[i].village.populationGOs.Count; j++)
-            {
-                Villager villager = populationManager[i].village.populationGOs[j];
-                if (villager.isAlive)
-                {
-                    StateAttack state = villager.stateAttack;
-                    if (state == StateAttack.EatOrRun || state == StateAttack.FightAndEat)
-                    {
-                        Food food = foodManager.GetFoodInPosition(villager.transform.position);
-                        if (food)
-                        {
-                            villager.TakeFood(food);
-                        }
-                        else
-                        {
-                            Debug.LogError("No existe esta Food en esta posicion: " + villager.transform.position);
-                            Debug.LogError("Para este Villager: ", villager);
-                            Debug.Break();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private List<Villager> GetVillagersByState (StateAttack state)
     {
         List<Villager> villagers = new List<Villager>();
@@ -347,6 +370,80 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         return villagers;
     }
 
+
+    public void LoadData()
+    {
+        string path;
+
+#if UNITY_EDITOR
+        path = EditorUtility.OpenFilePanel("Select Brain Data", "", "json");
+#endif
+        DataAI dataAi = null;
+        string data;
+
+        if (string.IsNullOrEmpty(path))
+        {
+            if (dataString == null)
+                data = string.Empty;
+            else
+                data = dataString.text;
+        }
+        else
+        {
+            data = File.ReadAllText(path);
+        }
+        dataAi = JsonUtility.FromJson<DataAI>(data);
+
+        if (dataAi == null) return;
+
+        dataPopulation.eliteCount = dataAi.eliteCount;
+        dataPopulation.mutationChance = dataAi.mutationChance;
+        dataPopulation.mutationRate = dataAi.mutationRate;
+
+        dataPopulation.inputsCount = dataAi.inputsCount;
+        dataPopulation.hiddenLayers = dataAi.hiddenLayers;
+        dataPopulation.outputsCount = dataAi.outputsCount;
+        dataPopulation.neuronsCountPerHL = dataAi.neuronsCountPerHL;
+        dataPopulation.bias = dataAi.bias;
+        dataPopulation.p = dataAi.p;
+
+        Init();
+    }
+
+    public void SaveData (int indexPopulation)
+    {
+        string path = null;
+
+#if UNITY_EDITOR
+        path = EditorUtility.SaveFilePanel("Save Brain Data", "", "brain_data.json", "json");
+#endif
+
+        if (string.IsNullOrEmpty(path)) return;
+
+        DataAI data = new DataAI();
+        List<float[]> genomes = new List<float[]>();
+        for (int i = 0; i < populationManager[indexPopulation].village.population.Count; i++)
+        {
+            genomes.Add(populationManager[indexPopulation].village.population[i].genome);
+        }
+
+        data.genomes = genomes;
+
+        data.eliteCount = dataPopulation.eliteCount;
+        data.mutationChance = dataPopulation.mutationChance;
+        data.mutationRate = dataPopulation.mutationRate;
+
+        data.inputsCount = dataPopulation.inputsCount;
+        data.hiddenLayers = dataPopulation.hiddenLayers;
+        data.outputsCount = dataPopulation.outputsCount;
+        data.neuronsCountPerHL = dataPopulation.neuronsCountPerHL;
+        data.bias = dataPopulation.bias;
+        data.p = dataPopulation.p;
+
+        string dataJson = JsonUtility.ToJson(data, true);
+        File.WriteAllText(path, dataJson);
+    }
+
     public List<PopulationManager> GetPopulations () => populationManager;
 }
 
@@ -361,7 +458,10 @@ public class EatGroup
         for (int i = 0; i < villagers.Count; i++)
         {
             if (team != villagers[i].team)
-                pacify = false;
+            {
+                pacify = false; // Agregar Break
+                break;
+            }
         }
 
         if (pacify)
@@ -411,12 +511,12 @@ public class EatGroup
             {
                 if (i == indexWinner)
                 {
-                    villagers[indexWinner].life -= villagers[indexLoser].life;
+                    villagers[indexWinner].life -= maxLifeB;
                 }
                 else
                 {
                     villagers[i].stateAttack = StateAttack.None;
-                    villagers[i].life = 0;
+                    villagers[i].Kill();
                 }
             }
         }

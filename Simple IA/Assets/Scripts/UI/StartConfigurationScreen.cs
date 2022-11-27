@@ -5,6 +5,7 @@ public class StartConfigurationScreen : MonoBehaviour
 {
     [SerializeField] private PopulationManager populationManager;
     [SerializeField] private DataPopulation dataPopulation;
+    [SerializeField] private LevelSettings levelSettings;
     [Space(15)]
     public Text populationCountTxt;
     public Slider populationCountSlider;
@@ -27,6 +28,7 @@ public class StartConfigurationScreen : MonoBehaviour
     public Text sigmoidSlopeTxt;
     public Slider sigmoidSlopeSlider;
     public Button startButton;
+    public Button loadButton;
     public GameObject simulationScreen;
     
     string populationText;
@@ -68,70 +70,66 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeSlider.value = dataPopulation.p;
 
         startButton.onClick.AddListener(OnStartButtonClick);        
+        loadButton.onClick.AddListener(OnLoad);        
     }
 
     void OnPopulationCountChange(float value)
     {
         dataPopulation.populationCount = (int)value;
-        
         populationCountTxt.text = string.Format(populationText, dataPopulation.populationCount);
     }
 
     void OnEliteCountChange(float value)
     {
         dataPopulation.eliteCount = (int)value;
-
         eliteCountTxt.text = string.Format(elitesText, dataPopulation.eliteCount);
     }
 
     void OnMutationChanceChange(float value)
     {
         dataPopulation.mutationChance = value / 100.0f;
-
         mutationChanceTxt.text = string.Format(mutationChanceText, (int)(dataPopulation.mutationChance * 100));
     }
 
     void OnMutationRateChange(float value)
     {
         dataPopulation.mutationRate = value / 100.0f;
-
         mutationRateTxt.text = string.Format(mutationRateText, (int)(dataPopulation.mutationRate * 100));
     }
 
     void OnHiddenLayersCountChange(float value)
     {
         dataPopulation.hiddenLayers = (int)value;
-        
-
         hiddenLayersCountTxt.text = string.Format(hiddenLayersCountText, dataPopulation.hiddenLayers);
     }
 
     void OnNeuronsPerHLChange(float value)
     {
         dataPopulation.neuronsCountPerHL = (int)value;
-
         neuronsPerHLCountTxt.text = string.Format(neuronsPerHLCountText, dataPopulation.neuronsCountPerHL);
     }
 
     void OnBiasChange(float value)
     {
         dataPopulation.bias = -value;
-
         biasTxt.text = string.Format(biasText, dataPopulation.bias.ToString("0.00"));
     }
 
     void OnSigmoidSlopeChange(float value)
     {
         dataPopulation.p = value;
-
         sigmoidSlopeTxt.text = string.Format(sigmoidSlopeText, dataPopulation.p.ToString("0.00"));
     }
 
-
     void OnStartButtonClick()
     {
-        populationManager.StartSimulation();
+        GameManager.Get().Init();
         this.gameObject.SetActive(false);
         simulationScreen.SetActive(true);
+    }
+
+    void OnLoad()
+    {
+        GameManager.Get().LoadData();
     }
 }
