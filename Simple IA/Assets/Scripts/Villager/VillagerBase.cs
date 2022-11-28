@@ -2,29 +2,27 @@
 
 public class VillagerBase : MonoBehaviour
 {
+    public VillagerData villagerData = new VillagerData();
+
+    public Team team;
     public bool isAlive = true;
     public Vector3 lastPosition = Vector3.one * -100;
-    public Team team;
-    public int life;
-    protected Genome genome;
-    protected NeuralNetwork brain;
     public Food targetFood;
     protected float[] inputs;
     public MeshRenderer[] meshRenderer;
     public bool fightForFood;
     public StateAttack stateAttack;
-    public int generationsAlive = 3;
     public int foodsEatsInGeneration;
 
     private void Awake ()
     {
-        life = Random.Range(50, 150);
+        villagerData.life = Random.Range(50, 150);
     }
 
     public void SetBrain (Genome genome, NeuralNetwork brain)
     {
-        this.genome = genome;
-        this.brain = brain;
+        villagerData.genome = genome;
+        villagerData.brain = brain;
         inputs = new float[brain.InputsCount];
         OnReset();
     }
@@ -75,8 +73,8 @@ public class VillagerBase : MonoBehaviour
     public void Kill ()
     {
         isAlive = false;
-        life = 0;
-        generationsAlive = 0;
+        villagerData.life = 0;
+        villagerData.generationsAlive = 0;
     }
 
     protected virtual void OnThink (float dt) { }

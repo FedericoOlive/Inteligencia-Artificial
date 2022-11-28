@@ -86,6 +86,14 @@ public class Village
         }
     }
 
+    public void SetColorVillager (Villager villager)
+    {
+        for (int j = 0; j < villager.meshRenderer.Length; j++)
+        {
+            villager.meshRenderer[j].material.color = colorCiv;
+        }
+    }
+
     public void OnDrawGizmos ()
     {
         Gizmos.color = colorCiv;

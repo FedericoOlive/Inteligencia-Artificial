@@ -26,8 +26,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     
     private void Update ()
     {
-        if (!isrunning)
-            return;
+        if(Application.isPlaying)
+            if (!isrunning)
+                return;
         if (initWorld)
         {
             initWorld = false;
@@ -99,7 +100,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         // Mueren a los que la vida le llega a 0
         for (int i = 0; i < villagers.Count; i++)
         {
-            if (villagers[i].life < 1)
+            if (villagers[i].villagerData.life < 1)
                 villagers[i].Kill();
         }
     }
@@ -217,35 +218,19 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     void EpochAll ()
     {
-        // Kill survivals 3 generations
-        for (int i = 0; i < populationManager.Count; i++)
-        {
-            for (int j = 0; j < populationManager[i].village.populationGOs.Count; j++)
-            {
-                populationManager[i].village.populationGOs[j].generationsAlive--;
-
-                if (populationManager[i].village.populationGOs[j].generationsAlive < 1)
-                {
-                    populationManager[i].village.populationGOs[j].Kill();
-                }
-            }
-        }
-
-        RemoveAllKilleds();
-        
         List<int> indexPopDeads = new List<int>();
-        for (int i = 0; i < populationManager.Count; i++)
+        for (int i = 0; i < levelSettings.maxCivilizations; i++)
         {
             populationManager[i].Epoch();
             if (populationManager[i].village.populationGOs.Count < 1)
                 indexPopDeads.Add(i);
         }
 
-        if (indexPopDeads.Count == levelSettings.maxCivilizations)
+        if (indexPopDeads.Count >= levelSettings.maxCivilizations)
         {
             Debug.Log("Se reinicia la Simulación");
             // Murieron Todas las civs
-            for (int i = 0; i < populationManager.Count; i++)
+            for (int i = 0; i < levelSettings.maxCivilizations; i++)
             {
                 populationManager[i].StartSimulation();
             }
@@ -392,7 +377,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
         Init();
 
-        for (int i = 0; i < populationManager.Count; i++)
+        for (int i = 0; i < levelSettings.maxCivilizations; i++)
         {
             populationManager[i].GenerateInitialPopulation(dataAi.genomes);
         }
@@ -468,9 +453,9 @@ public class EatGroup
 
             for (int i = 0; i < villagers.Count; i++)
             {
-                if (villagers[i].life > maxLifeA)
+                if (villagers[i].villagerData.life > maxLifeA)
                 {
-                    maxLifeA = villagers[i].life;
+                    maxLifeA = villagers[i].villagerData.life;
                     indexMaxLifeA = i;
                 }
             }
@@ -480,9 +465,9 @@ public class EatGroup
                 if (i == indexMaxLifeA)
                     continue;
 
-                if (villagers[i].life > maxLifeB)
+                if (villagers[i].villagerData.life > maxLifeB)
                 {
-                    maxLifeB = villagers[i].life;
+                    maxLifeB = villagers[i].villagerData.life;
                     indexMaxLifeB = i;
                 }
             }
@@ -494,7 +479,7 @@ public class EatGroup
             {
                 if (i == indexWinner)
                 {
-                    villagers[indexWinner].life -= maxLifeB;
+                    villagers[indexWinner].villagerData.life -= maxLifeB;
                 }
                 else
                 {
@@ -525,10 +510,10 @@ public class EatGroup
 
         for (int i = 0; i < villagers.Count; i++)
         {
-            if (villagers[i].life > life)
+            if (villagers[i].villagerData.life > life)
             {
                 indexEat = 0;
-                life = villagers[i].life;
+                life = villagers[i].villagerData.life;
             }
         }
 

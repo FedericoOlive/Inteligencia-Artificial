@@ -28,7 +28,7 @@ public class Villager : VillagerBase
         //inputs[7] = allyDistanceToFood.z;
         //inputs[8] = allyLifeNearTargetFood;
 
-        float[] output = brain.Synapsis(inputs);
+        float[] output = villagerData.brain.Synapsis(inputs);
         
         Direction nextDir = Direction.None;
 
@@ -89,13 +89,13 @@ public class Villager : VillagerBase
             food.EatFood();
             foodsEatsInGeneration++;
             fitness += 1000;
-            genome.fitness = fitness;
-            life += 50;
+            villagerData.genome.fitness = fitness;
+            villagerData.life += 50;
         }
         else // Eating Grass
         {
             fitness -= 10;
-            genome.fitness = fitness;
+            villagerData.genome.fitness = fitness;
         }
     }
 

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PopulationManager : MonoBehaviour
 {
@@ -76,13 +78,11 @@ public class PopulationManager : MonoBehaviour
 
         village.SetVillager();
     }
-    
+
     public void SetVillager (NeuralNetwork brain, Genome genome, int i)
     {
         brain.SetWeights(genome.genome);
-        village.brains.Add(brain);
-        village.population.Add(genome);
-        village.populationGOs.Add(CreateVillager(genome, brain, i));
+        CreateVillager(genome, brain, i);
     }
 
     // Creates a new NeuralNetwork
@@ -108,72 +108,46 @@ public class PopulationManager : MonoBehaviour
     // Evolve!!!
     public void Epoch ()
     {
-        // Increment generation counter
         village.generation++;
+        List<VillagerData> villagerSurvival = new List<VillagerData>();
 
         // Se reproducen solo los que hayan comido más de 1 comida
         List<Genome> populationReproduce = new List<Genome>();
-        List<Genome> populationSurvival = new List<Genome>();
 
         for (int i = village.populationGOs.Count - 1; i >= 0; i--)
         {
-            if (village.populationGOs[i].generationsAlive > 0)
+            if (village.populationGOs[i].villagerData.generationsAlive > 0)
             {
                 if (village.populationGOs[i].foodsEatsInGeneration > 1)
                 {
                     populationReproduce.Add(village.population[i]);
                 }
-                else if (village.populationGOs[i].foodsEatsInGeneration > 0)
+
+                if (village.populationGOs[i].foodsEatsInGeneration > 0)
                 {
-                    populationSurvival.Add(village.population[i]);
+                    villagerSurvival.Add(village.populationGOs[i].villagerData);
                 }
+
             }
 
             village.populationGOs[i].foodsEatsInGeneration = 0;
         }
 
-        // Clear current population
-        village.population.Clear();
-
+        DestroyVillagers();
         List<Genome> newGenomes = genAlg.Epoch(populationReproduce.ToArray());
-        
-        // Add new population
-        newGenomes.AddRange(populationSurvival);
-        village.population.AddRange(newGenomes);
-        
-        for (int i = 0; i < village.population.Count; i++)
-            village.population[i].fitness = 1;
-        
-        // Set the new genomes as each NeuralNetwork weights
-        int j = 0;
-        for (; j < newGenomes.Count; j++)
+
+        for (int i = 0; i < villagerSurvival.Count; i++)
         {
-            NeuralNetwork brain = village.brains[j]; // Todo: Crash por combate (Eliminacion o agregacion de cerebro)
-            brain.SetWeights(newGenomes[j].genome);
-            village.populationGOs[j].SetBrain(newGenomes[j], brain);
-            village.populationGOs[j].transform.position = TerrainGenerator.GetSpawnPoints((int) team)[j].position;
-            village.populationGOs[j].transform.rotation = Quaternion.identity;
+            Villager vill = CreateVillager(villagerSurvival[i].genome, villagerSurvival[i].brain, i);
+            vill.villagerData = villagerSurvival[i];
         }
 
-        for (int k = village.populationGOs.Count - 1; k >= j; k--)
+        for (int i = 0; i < newGenomes.Count; i++)
         {
-            Destroy(village.populationGOs[k].gameObject);
-            village.populationGOs.RemoveAt(k);
-            village.brains.RemoveAt(k);
+            CreateVillager(newGenomes[i], null, villagerSurvival.Count + i);
         }
 
-        for (int i = populationReproduce.Count; i < newGenomes.Count; i++)
-        {
-            village.populationGOs[i].generationsAlive = levelSettings.maxGeneationsAlive;
-        }
-    }
-
-    void EpochWithOutFitness ()
-    {
-        //village.population.Clear();
-        //
-        //List<Genome> newGenomes = genAlg.Epoch(village.population.ToArray());
-
+        village.SetVillager();
     }
 
     public void FixedUpdateForGameManager (float deltaTime)
@@ -197,11 +171,26 @@ public class PopulationManager : MonoBehaviour
 
     public Villager CreateVillager (Genome genome, NeuralNetwork brain, int i)
     {
+        if (brain == null)
+        {
+            brain = CreateBrain();
+        }
+
+        if (i > TerrainGenerator.GetSpawnPoints((int) team).Count - 1)
+            i = 0;
+
+        if (i < 0) i = 0;
         Vector3 position = TerrainGenerator.GetSpawnPoints((int) team)[i].position;
         GameObject go = Instantiate(prefabVillager, position, Quaternion.identity, transform);
         Villager villager = go.GetComponent<Villager>();
         villager.SetBrain(genome, brain);
         villager.team = team;
+        
+        village.brains.Add(brain);
+        village.population.Add(genome);
+        village.populationGOs.Add(villager);
+        village.SetColorVillager(villager);
+
         return villager;
     }
 
@@ -257,4 +246,12 @@ public enum GenerationEndType
     Manual,
     Time,
     Rounds
+}
+
+public class VillagerData
+{
+    public Genome genome;
+    public NeuralNetwork brain;
+    public int life;
+    public int generationsAlive = 3;
 }
