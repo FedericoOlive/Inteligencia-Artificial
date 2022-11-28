@@ -341,7 +341,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     public void LoadData()
     {
-        string path;
+        string path = "";
 
 #if UNITY_EDITOR
         path = EditorUtility.OpenFilePanel("Select Brain Data", "", "json");

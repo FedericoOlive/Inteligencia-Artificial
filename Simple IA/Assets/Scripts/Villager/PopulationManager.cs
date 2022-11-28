@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class PopulationManager : MonoBehaviour
 {
     public GameObject prefabVillager;
-
+    public bool drawGizmo;
     [SerializeField] private DataPopulation dataPopulation;
     [SerializeField] private LevelSettings levelSettings;
     public Team team;
@@ -232,12 +230,14 @@ public class PopulationManager : MonoBehaviour
 
     Food GetNearestFood (Vector3 pos) => GameManager.Get().GetNearFood(pos);
 
+#if UNITY_EDITOR
     private void OnDrawGizmos ()
     {
-        village.OnDrawGizmos();
+        if (drawGizmo)
+            village.OnDrawGizmos();
     }
-
-    #endregion
+#endif
+#endregion
 
 }
 

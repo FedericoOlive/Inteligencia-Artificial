@@ -94,6 +94,7 @@ public class Village
         }
     }
 
+#if UNITY_EDITOR
     public void OnDrawGizmos ()
     {
         Gizmos.color = colorCiv;
@@ -105,4 +106,5 @@ public class Village
 
         Gizmos.color = Color.white;
     }
+#endif
 }
