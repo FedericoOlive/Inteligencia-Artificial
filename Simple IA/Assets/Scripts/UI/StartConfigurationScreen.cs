@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class StartConfigurationScreen : MonoBehaviour
@@ -29,6 +30,7 @@ public class StartConfigurationScreen : MonoBehaviour
     public Slider sigmoidSlopeSlider;
     public Button startButton;
     public Button loadButton;
+    public List<Button> saveButton;
     public GameObject simulationScreen;
     
     string populationText;
@@ -70,7 +72,12 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeSlider.value = dataPopulation.p;
 
         startButton.onClick.AddListener(OnStartButtonClick);        
-        loadButton.onClick.AddListener(OnLoad);        
+        loadButton.onClick.AddListener(OnLoad);
+        for (int i = 0; i < saveButton.Count; i++)
+        {
+            int index = i;
+            saveButton[i].onClick.AddListener(() => OnSave(index));
+        }
     }
 
     void OnPopulationCountChange(float value)
@@ -130,6 +137,15 @@ public class StartConfigurationScreen : MonoBehaviour
 
     void OnLoad()
     {
+        GameManager.Get().Init();
+        this.gameObject.SetActive(false);
+        simulationScreen.SetActive(true);
+
         GameManager.Get().LoadData();
+    }
+
+    void OnSave(int i)
+    {
+        GameManager.Get().SaveData(i);
     }
 }

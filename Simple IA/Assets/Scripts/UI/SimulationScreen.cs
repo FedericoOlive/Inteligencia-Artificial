@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,7 @@ public class SimulationScreen : MonoBehaviour
 
     public Text timerTxt;
     public Slider timerSlider;
+    public Text timeElapsed;
     public Button pauseBtn;
     public Button stopBtn;
     public GameObject startConfigurationScreen;
@@ -23,6 +25,18 @@ public class SimulationScreen : MonoBehaviour
 
         pauseBtn.onClick.AddListener(OnPauseButtonClick);
         stopBtn.onClick.AddListener(OnStopButtonClick);
+        timerSlider.onValueChanged.AddListener(UpdateDeltaTime);
+    }
+
+    private void Update ()
+    {
+        timeElapsed.text = string.Format(timerText, GameManager.Get().accumTime.ToString("F2"));
+    }
+
+    void UpdateDeltaTime (float value)
+    {
+        Time.timeScale = value;
+        timerTxt.text = string.Format(timerText, value.ToString("F2"));
     }
 
     void OnPauseButtonClick()

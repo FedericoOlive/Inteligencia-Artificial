@@ -3,7 +3,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class DataAI
 {
-    public List<float[]> genomes;
+    public List<Genome> genomes;
 
     public int eliteCount = 4;
     public float mutationChance = 0.10f;

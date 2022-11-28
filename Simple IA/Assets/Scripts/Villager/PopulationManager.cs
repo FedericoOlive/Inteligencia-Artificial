@@ -58,19 +58,22 @@ public class PopulationManager : MonoBehaviour
         village.SetVillager();
     }
 
-    // Generate the random initial population
-    public void CopyPopulation (PopulationManager other)
+    public void GenerateInitialPopulation (List<Genome> genomes)
     {
         // Destroy previous tanks (if there are any)
         DestroyVillagers();
+
         village.generation = 0;
+        village.SetColorCivTeam(team);
 
-
-        for (int i = 0; i < other.village.populationGOs.Count; i++)
+        for (int i = 0; i < dataPopulation.populationCount; i++)
         {
-            SetVillager(other.village.brains[i], other.village.population[i], i);
+            NeuralNetwork brain = CreateBrain();
+            Genome genome = genomes[i];
+
+            SetVillager(brain, genome, i);
         }
-        EpochWithOutFitness();
+
         village.SetVillager();
     }
     
@@ -114,13 +117,16 @@ public class PopulationManager : MonoBehaviour
 
         for (int i = village.populationGOs.Count - 1; i >= 0; i--)
         {
-            if (village.populationGOs[i].foodsEatsInGeneration > 1)
+            if (village.populationGOs[i].generationsAlive > 0)
             {
-                populationReproduce.Add(village.population[i]);
-            }
-            else if (village.populationGOs[i].foodsEatsInGeneration > 0)
-            {
-                populationSurvival.Add(village.population[i]);
+                if (village.populationGOs[i].foodsEatsInGeneration > 1)
+                {
+                    populationReproduce.Add(village.population[i]);
+                }
+                else if (village.populationGOs[i].foodsEatsInGeneration > 0)
+                {
+                    populationSurvival.Add(village.population[i]);
+                }
             }
 
             village.populationGOs[i].foodsEatsInGeneration = 0;

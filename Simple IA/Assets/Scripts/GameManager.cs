@@ -232,24 +232,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
 
         RemoveAllKilleds();
-
-        // Save those who eat more than 1 Food
-        List<KeepGeneration> keeps = new List<KeepGeneration>();
-
-        for (int i = 0; i < populationManager.Count; i++)
-        {
-            for (int j = 0; j < populationManager[i].village.populationGOs.Count; j++)
-            {
-                if (populationManager[i].village.populationGOs[j].foodsEatsInGeneration == 1)
-                {
-                    KeepGeneration keep = new KeepGeneration();
-                    keep.populationGOs.Add(populationManager[i].village.populationGOs[j]);
-                    keep.population.Add(populationManager[i].village.population[j]);
-                    keep.brains.Add(populationManager[i].village.brains[j]);
-                }
-            }
-        }
-
+        
         List<int> indexPopDeads = new List<int>();
         for (int i = 0; i < populationManager.Count; i++)
         {
@@ -408,6 +391,11 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         dataPopulation.p = dataAi.p;
 
         Init();
+
+        for (int i = 0; i < populationManager.Count; i++)
+        {
+            populationManager[i].GenerateInitialPopulation(dataAi.genomes);
+        }
     }
 
     public void SaveData (int indexPopulation)
@@ -421,13 +409,8 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         if (string.IsNullOrEmpty(path)) return;
 
         DataAI data = new DataAI();
-        List<float[]> genomes = new List<float[]>();
-        for (int i = 0; i < populationManager[indexPopulation].village.population.Count; i++)
-        {
-            genomes.Add(populationManager[indexPopulation].village.population[i].genome);
-        }
 
-        data.genomes = genomes;
+        data.genomes = populationManager[indexPopulation].village.population;
 
         data.eliteCount = dataPopulation.eliteCount;
         data.mutationChance = dataPopulation.mutationChance;
