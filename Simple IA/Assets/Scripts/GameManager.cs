@@ -241,14 +241,14 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
             for (int i = 0; i < indexPopDeads.Count; i++)
             {
-                //populationManager[indexPopDeads[i]].CopyPopulation(populationManager[indexPopAlive]);
+                populationManager[indexPopDeads[i]].GenerateInitialPopulation(populationManager[indexPopAlive].village.population);
             }
         }
     }
 
     int GetIndexPopAlive (List<int> indexPopDeads)
     {
-        for (int i = 0; i < indexPopDeads.Count; i++)
+        for (int i = 0; i < levelSettings.maxCivilizations; i++)
         {
             bool isOk = true;
             for (int j = 0; j < indexPopDeads.Count; j++)

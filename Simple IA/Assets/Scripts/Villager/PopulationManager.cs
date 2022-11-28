@@ -71,7 +71,15 @@ public class PopulationManager : MonoBehaviour
         for (int i = 0; i < dataPopulation.populationCount; i++)
         {
             NeuralNetwork brain = CreateBrain();
-            Genome genome = genomes[i];
+            Genome genome;
+            if (i >= genomes.Count)
+            {
+                genome = new Genome(brain.GetTotalWeightsCount());
+            }
+            else
+            {
+                genome = genomes[i];
+            }
 
             SetVillager(brain, genome, i);
         }
