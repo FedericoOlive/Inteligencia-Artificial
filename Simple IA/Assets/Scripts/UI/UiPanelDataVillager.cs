@@ -15,7 +15,7 @@ public class UiPanelDataVillager : MonoBehaviour
     private string bestFitnessText;
     private string avgFitnessText;
     private string worstFitnessText;
-    [SerializeField] private PopulationManager populationManager;
+    public PopulationManager populationManager;
 
     private void Start ()
     {

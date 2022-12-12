@@ -13,6 +13,8 @@ public class PopulationManager : MonoBehaviour
     public Village village;
     bool isRunning;
 
+    [HideInInspector] public List<Genome> loadedGenomes;
+
     public void Init ()
     {
         StartSimulation();
@@ -28,14 +30,17 @@ public class PopulationManager : MonoBehaviour
         // Create and confiugre the Genetic Algorithm
         genAlg = new GeneticAlgorithm(dataPopulation.eliteCount, dataPopulation.mutationChance, dataPopulation.mutationRate);
 
-        GenerateInitialPopulation();
+        if (loadedGenomes == null)
+            GenerateInitialPopulation();
+        else
+            GenerateInitialPopulation(loadedGenomes);
 
         isRunning = true;
     }
-
-    public void PauseSimulation ()
+    
+    public void PauseSimulation (bool isRunning)
     {
-        isRunning = !isRunning;
+        this.isRunning = isRunning;
     }
 
     // Generate the random initial population
@@ -83,6 +88,7 @@ public class PopulationManager : MonoBehaviour
         }
 
         village.SetVillager();
+        loadedGenomes.Clear();
     }
 
     public void SetVillager (NeuralNetwork brain, Genome genome, int i)

@@ -15,7 +15,7 @@ Condición mínima de aprobación:
 	- Una grilla de tamaño variable, 
 	- Dos grupos de la misma cantidad de integrantes de tamaño variable (siempre menor o igual al ancho de la grilla)
 	- Una cantidad de comida repartida por el mapa igual a la cantidad de agentes en la grilla al inicio de la simulación.
-* La configuración de la red neuronal de cada grupo puede ser diferente.
+- La configuración de la red neuronal de cada grupo puede ser diferente.
 * Los agentes de un grupo comienzan la simulación alineados de izquierda a derecha en la fila inferior de la grilla.
 * Los agentes del otro grupo comienzan la simulación alineados de derecha a izquierda en la fila superior de la grilla.
 * La simulación se ejecuta por turnos.
@@ -45,12 +45,13 @@ Condición mínima de aprobación:
 * En caso de que dos agentes de el mismo equipo lleguen a una celda con comida al mismo tiempo, deberán decidir entre ellos quien la comerá, o que ninguno de ellos la coma. El agente que no come se desplaza a una casilla adyacente.
 * En caso de que uno de los grupos se extinga, el grupo superviviente creara una población nueva cruzando sus agentes aleatoriamente (sin utilizar el fitness) y con un ratio de mutación superior al normal. La nueva generación creada cuenta con la misma cantidad de agentes que la generación superviviente y pasan a ocupar el puesto del grupo extinto.
 - Los distintos comportamientos que puede tomar el agente son manejados por un Behabeour Tree, el output de la red neuronal indica a los nodos a que método transicionar.
-* En caso de que dos agentes de equipos diferentes se encuentren en una celda que no contengan comida, ambos podrán optar por:
+
+- En caso de que dos agentes de equipos diferentes se encuentren en una celda que no contengan comida, ambos podrán optar por:
 	-A) Quedarse en la celda
 	-B) Huir a la celda de la que provenían
-* En caso de que ambos se queden, uno de ellos morirá con una probabilidad del 50/50.
-* En caso de que uno huya y el otro no, el agente que huye tiene un 75% de probabilidades de morir.
-* En caso de que ambos huyan, no pasara nada.
+- En caso de que ambos se queden, uno de ellos morirá con una probabilidad del 50/50.
+- En caso de que uno huya y el otro no, el agente que huye tiene un 75% de probabilidades de morir.
+- En caso de que ambos huyan, no pasara nada.
 
 
 ---------- Forma de entrega: ----------

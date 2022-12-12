@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
@@ -9,6 +10,7 @@ using UnityEditor;
 [ExecuteAlways]
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
+    public static Action<bool> StartSimulation;
     private bool isrunning;
     [SerializeField] private bool initWorld;
     [SerializeField] private bool clearWorld;
@@ -248,21 +250,23 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     int GetIndexPopAlive (List<int> indexPopDeads)
     {
-        for (int i = 0; i < levelSettings.maxCivilizations; i++)
-        {
-            bool isOk = true;
-            for (int j = 0; j < indexPopDeads.Count; j++)
+        if(indexPopDeads!=null)
+            for (int i = 0; i < levelSettings.maxCivilizations; i++)
             {
-                if (indexPopDeads[i] == j)
+                bool isOk = true;
+                for (int j = 0; j < indexPopDeads.Count; j++)
                 {
-                    isOk = false;
-                    break;
+                    if(indexPopDeads.Count<i)
+                        if (indexPopDeads[i] == j)
+                        {
+                            isOk = false;
+                            break;
+                        }
                 }
-            }
 
-            if (isOk)
-                return i;
-        }
+                if (isOk)
+                    return i;
+            }
 
         return -1;
     }
@@ -287,18 +291,21 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             }
         }
     }
-    
+
 
     public void Init ()
     {
         if (Application.isPlaying)
             isrunning = true;
+
         terrainGenerator.Init();
         foodManager.Init();
 
         int maxCivAmount = Mathf.Min(levelSettings.maxCivilizations, populationManager.Count);
         for (int i = 0; i < maxCivAmount; i++)
             populationManager[i].Init();
+
+        StartSimulation?.Invoke(isrunning);
     }
 
     private void DeInit ()
@@ -339,7 +346,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     }
 
 
-    public void LoadData()
+    public void LoadData(int index, DataPopulation dataPopulation)
     {
         string path = "";
 
@@ -374,16 +381,11 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         dataPopulation.neuronsCountPerHL = dataAi.neuronsCountPerHL;
         dataPopulation.bias = dataAi.bias;
         dataPopulation.p = dataAi.p;
-
-        Init();
-
-        for (int i = 0; i < levelSettings.maxCivilizations; i++)
-        {
-            populationManager[i].GenerateInitialPopulation(dataAi.genomes);
-        }
+        
+        populationManager[index].loadedGenomes = dataAi.genomes;
     }
 
-    public void SaveData (int indexPopulation)
+    public void SaveData (int indexPopulation, DataPopulation dataPopulation)
     {
         string path = null;
 

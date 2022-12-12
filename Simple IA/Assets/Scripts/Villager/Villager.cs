@@ -20,7 +20,7 @@ public class Villager : VillagerBase
 
         inputs[0] = distanceToFood.x;
         inputs[1] = distanceToFood.z;
-        //inputs[2] = life;
+        //inputs[2] = villagerData.life;
         //inputs[3] = enemyDistanceToFood.x;
         //inputs[4] = enemyDistanceToFood.z;
         //inputs[5] = enemyLifeNearTargetFood;

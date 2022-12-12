@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79b9c6b6f2d873140ae67fb96e240afd, type: 3}
   m_Name: Data Level Settings
   m_EditorClassIdentifier: 
-  halfHeight: 50
-  halfWidth: 50
+  halfHeight: 20
+  halfWidth: 20
   offsetLimit: 1
-  autoRePositionFoodCenter: {x: 51, y: 0, z: 51}
-  size: 50
-  maxFood: 500
+  autoRePositionFoodCenter: {x: 21, y: 0, z: 21}
+  size: 10
+  maxFood: 5
   maxCivilizations: 2
   maxGeneationsAlive: 3
   generationEndType: 1
