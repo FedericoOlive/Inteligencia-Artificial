@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-
+using Random = UnityEngine.Random;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -57,20 +57,62 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             populationManager[i].FixedUpdateForGameManager(deltaTime);
         }
 
+        CheckVillagersSameCell();
 
         CheckVillagerToEatAndFight(); // Tengo que unificar estos 2 comportamientos porque sino queda 1 de cada uno intentando comer una comida (Para el 2do no va a existir)
         CheckVillagerToEatOrRun();
         EatVillagersAlives();
 
+
         RemoveAllKilleds();
 
         CheckForEpoch();
     }
-    
+
+    void CheckVillagersSameCell()
+    {
+        List<Villager> villagers = GetVillagersByState(StateAttack.None);
+        List<VillagersGroups> fightGroups = new List<VillagersGroups>();
+
+        // Agarro los Grupos que están en la misma posicion
+        for (int i = 0; i < villagers.Count; i++)
+        {
+            List<Villager> villagersEqualPositions = new List<Villager>();
+            for (int j = i + 1; j < villagers.Count; j++)
+            {
+                if (villagers[i].transform.position == villagers[j].transform.position)
+                {
+                    villagersEqualPositions.Add(villagers[i]);
+                    villagersEqualPositions.Add(villagers[j]);
+                }
+            }
+
+            if (villagersEqualPositions.Count > 1)
+            {
+                VillagersGroups villagersGroups = new VillagersGroups();
+                villagersGroups.villagers = villagersEqualPositions;
+                fightGroups.Add(villagersGroups);
+            }
+        }
+
+        // Pelean todos los que están en la comida
+        for (int i = 0; i < fightGroups.Count; i++)
+        {
+            fightGroups[i].Site();
+        }
+
+        // Mueren a los que la vida le llega a 0
+        for (int i = 0; i < villagers.Count; i++)
+        {
+            if (villagers[i].villagerData.life < 1)
+                villagers[i].Kill();
+        }
+    }
+
     private void CheckVillagerToEatAndFight()
     {
         List<Villager> villagers = GetVillagersByState(StateAttack.FightAndEat);
-        List<EatGroup> fightGroups = new List<EatGroup>();
+        List<VillagersGroups> fightGroups = new List<VillagersGroups>();
 
         // Agarro los Grupos que están en la misma posicion y sobre la comida y que hayan decidido pelear por ella
         for (int i = 0; i < villagers.Count; i++)
@@ -87,9 +129,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
             if (villagersEqualPositions.Count > 1)
             {
-                EatGroup eatGroup = new EatGroup();
-                eatGroup.villagers = villagersEqualPositions;
-                fightGroups.Add(eatGroup);
+                VillagersGroups villagersGroups = new VillagersGroups();
+                villagersGroups.villagers = villagersEqualPositions;
+                fightGroups.Add(villagersGroups);
             }
         }
 
@@ -110,7 +152,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     private void CheckVillagerToEatOrRun()
     {
         List<Villager> villagers = GetVillagersByState(StateAttack.EatOrRun);
-        List<EatGroup> fightGroups = new List<EatGroup>();
+        List<VillagersGroups> fightGroups = new List<VillagersGroups>();
 
         // Agarro los Grupos que están en la misma posicion y sobre la comida y que hayan decidido pelear por ella
         for (int i = 0; i < villagers.Count; i++)
@@ -127,9 +169,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
             if (villagersEqualPositions.Count > 1)
             {
-                EatGroup eatGroup = new EatGroup();
-                eatGroup.villagers = villagersEqualPositions;
-                fightGroups.Add(eatGroup);
+                VillagersGroups villagersGroups = new VillagersGroups();
+                villagersGroups.villagers = villagersEqualPositions;
+                fightGroups.Add(villagersGroups);
             }
         }
 
@@ -193,6 +235,8 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
     }
 
+    
+
     public void CheckForEpoch()
     {
         switch (levelSettings.generationEndType)
@@ -236,6 +280,8 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             {
                 populationManager[i].StartSimulation();
             }
+
+            foodManager.RelocateFoods();
         }
         else if (indexPopDeads.Count > 0)
         {
@@ -417,7 +463,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     public List<PopulationManager> GetPopulations () => populationManager;
 }
 
-public class EatGroup
+public class VillagersGroups
 {
     public List<Villager> villagers = new List<Villager>();
 
@@ -505,6 +551,64 @@ public class EatGroup
         }
     }
 
+    public void Site ()
+    {
+        bool pacify = true;
+        Team team = villagers[0].team;
+        for (int i = 0; i < villagers.Count; i++)
+        {
+            if (team != villagers[i].team)
+            {
+                pacify = false;
+                break;
+            }
+        }
+
+        if (pacify) return; // Son todos del mismo equipo no hay pelea
+
+        int amountFight = 0;
+        for (int i = 0; i < villagers.Count; i++)
+        {
+            if (villagers[i].stateOfSite == StateOfSite.Fight)
+            {
+                amountFight++;
+            }
+        }
+
+        if (amountFight < 1)
+        {
+            for (int i = 0; i < villagers.Count; i++)
+                villagers[i].GoBackPosition();
+
+            return; // Todos deciden huir
+        }
+
+        int random = 0;
+        for (int i = 0; i < villagers.Count; i++)
+        {
+            switch (villagers[i].stateOfSite)
+            {
+                case StateOfSite.Run:
+                    random = Random.Range(0, 100) + 1;
+                    if (random > 75)
+                        villagers[i].Kill();
+                    else
+                        villagers[i].GoBackPosition();
+
+                    break;
+                case StateOfSite.Fight:
+                    if (amountFight > 1)
+                    {
+                        random = Random.Range(0, 100) + 1;
+                        if (random > 50)
+                            villagers[i].Kill();
+                    }
+
+                    break;
+            }
+        }
+    }
+
     private int GetIndexMaxLife ()
     {
         int indexEat = 0;
@@ -528,4 +632,10 @@ public class KeepGeneration
     public List<Villager> populationGOs = new List<Villager>();
     public List<Genome> population = new List<Genome>();
     public List<NeuralNetwork> brains = new List<NeuralNetwork>();
+}
+
+public enum StateOfSite
+{
+    Run,
+    Fight
 }

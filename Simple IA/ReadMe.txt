@@ -29,7 +29,7 @@ Condición mínima de aprobación:
 	- B) Huir a la celda de la que provenían
 * En caso de que ambos se hallan quedado en la celda, aleatoriamente uno morirá, el agente que este en la celda al final del turno habrá comido.
 * En caso de que termine la generación:
-	- Si un agente no comió, MUERE.
+*	- Si un agente no comió, MUERE.
 *	- En caso de que halla comido solo una unidad sobrevivirá a la generación siguiente.
 *	- En caso de que halla comido dos o mas se reproducirá.
 * Los agentes que hallan comido mas tienen mayor fitness.
@@ -46,12 +46,12 @@ Condición mínima de aprobación:
 * En caso de que uno de los grupos se extinga, el grupo superviviente creara una población nueva cruzando sus agentes aleatoriamente (sin utilizar el fitness) y con un ratio de mutación superior al normal. La nueva generación creada cuenta con la misma cantidad de agentes que la generación superviviente y pasan a ocupar el puesto del grupo extinto.
 - Los distintos comportamientos que puede tomar el agente son manejados por un Behabeour Tree, el output de la red neuronal indica a los nodos a que método transicionar.
 
-- En caso de que dos agentes de equipos diferentes se encuentren en una celda que no contengan comida, ambos podrán optar por:
+* En caso de que dos agentes de equipos diferentes se encuentren en una celda que no contengan comida, ambos podrán optar por:
 	-A) Quedarse en la celda
 	-B) Huir a la celda de la que provenían
-- En caso de que ambos se queden, uno de ellos morirá con una probabilidad del 50/50.
-- En caso de que uno huya y el otro no, el agente que huye tiene un 75% de probabilidades de morir.
-- En caso de que ambos huyan, no pasara nada.
+* En caso de que ambos se queden, uno de ellos morirá con una probabilidad del 50/50.
+* En caso de que uno huya y el otro no, el agente que huye tiene un 75% de probabilidades de morir.
+* En caso de que ambos huyan, no pasara nada.
 
 
 ---------- Forma de entrega: ----------

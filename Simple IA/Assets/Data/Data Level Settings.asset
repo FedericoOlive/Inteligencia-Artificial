@@ -16,9 +16,9 @@ MonoBehaviour:
   halfWidth: 20
   offsetLimit: 1
   autoRePositionFoodCenter: {x: 21, y: 0, z: 21}
-  size: 10
-  maxFood: 5
-  maxCivilizations: 2
+  size: 20
+  maxFood: 50
+  maxCivilizations: 4
   maxGeneationsAlive: 3
   generationEndType: 1
   timeGenerationDuration: 5

@@ -15,18 +15,10 @@ public class Villager : VillagerBase
         Vector3 pos = transform.position;
 
         Vector3 distanceToFood = pos - posFood;
-        Vector3 enemyDistanceToFood = pos - posFood;
-        float enemyLifeNearTargetFood = 0;
 
         inputs[0] = distanceToFood.x;
         inputs[1] = distanceToFood.z;
         //inputs[2] = villagerData.life;
-        //inputs[3] = enemyDistanceToFood.x;
-        //inputs[4] = enemyDistanceToFood.z;
-        //inputs[5] = enemyLifeNearTargetFood;
-        //inputs[6] = allyDistanceToFood.x;
-        //inputs[7] = allyDistanceToFood.z;
-        //inputs[8] = allyLifeNearTargetFood;
 
         float[] output = villagerData.brain.Synapsis(inputs);
         
@@ -46,6 +38,15 @@ public class Villager : VillagerBase
         else if (output[0] < 0.5f) // 0.6f
         {
             TryEatAndFight();
+        }
+
+        if (output[2] > 0.5f)
+        {
+            stateOfSite = StateOfSite.Fight;
+        }
+        else
+        {
+            stateOfSite = StateOfSite.Run;
         }
     }
 

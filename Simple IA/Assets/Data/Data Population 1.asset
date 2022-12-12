@@ -16,9 +16,9 @@ MonoBehaviour:
   eliteCount: 4
   mutationChance: 0.1
   mutationRate: 0.01
-  inputsCount: 4
-  hiddenLayers: 1
-  outputsCount: 5
-  neuronsCountPerHL: 7
+  inputsCount: 20
+  hiddenLayers: 3
+  outputsCount: 4
+  neuronsCountPerHL: 3
   bias: 1
   p: 0.5

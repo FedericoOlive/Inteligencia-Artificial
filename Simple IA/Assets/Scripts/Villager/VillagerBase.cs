@@ -13,6 +13,7 @@ public class VillagerBase : MonoBehaviour
     public bool fightForFood;
     public StateAttack stateAttack;
     public int foodsEatsInGeneration;
+    public StateOfSite stateOfSite;
 
     private void Awake ()
     {
